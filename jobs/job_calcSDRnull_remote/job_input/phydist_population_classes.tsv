@@ -1,0 +1,32 @@
+ClassificationType	ClassificationName	ClassificationDescription
+SUB	FIN	Finnish in Finland
+SUB	GBR	British in England and Scotland
+SUB	IBS	Iberian Population in Spain
+SUB	CEU	Utah Residents (CEPH) with Northern and Western European Ancestry
+SUB	TSI	Toscani in Italia
+SUB	CHS	Southern Han Chinese
+SUB	CDX	Chinese Dai in Xishuangbanna, China
+SUB	KHV	Kinh in Ho Chi Minh City, Vietnam
+SUB	CHB	Han Chinese in Beijing, China
+SUB	JPT	Japanese in Tokyo, Japan
+SUB	PUR	Puerto Ricans from Puerto Rico
+SUB	CLM	Colombians from Medellin, Colombia
+SUB	PEL	Peruvians from Lima, Peru
+SUB	MXL	Mexican Ancestry from Los Angeles USA
+SUB	PJL	Punjabi from Lahore, Pakistan
+SUB	BEB	Bengali from Bangladesh
+SUB	STU	Sri Lankan Tamil from the UK
+SUB	ITU	Indian Telugu from the UK
+SUB	GIH	Gujarati Indian from Houston, Texas
+SUB	ACB	African Caribbeans in Barbados
+SUB	GWD	Gambian in Western Divisions in the Gambia
+SUB	MSL	Mende in Sierra Leone
+SUB	ESN	Esan in Nigeria
+SUB	YRI	Yoruba in Ibadan, Nigeria
+SUB	LWK	Luhya in Webuye, Kenya
+SUB	ASW	Americans of African Ancestry in SW USA
+SUPER	EUR	European
+SUPER	EAS	East Asians
+SUPER	AMR	Ad Mixed Americans
+SUPER	SAS	South Asian
+SUPER	AFR	African

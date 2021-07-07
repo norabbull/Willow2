@@ -1,0 +1,13 @@
+---
+ func: 'calcNullSDR'
+ num_rand_trees: 100
+ input_files: 'E:/Master/cophenetic_dists_30samples'
+ input_pop_info: 'E:/Master/otherTreeData/phydist_population_classes.tsv'
+ input_config_folder: 'E:/Master/jobs/job_calcSDRnull/configs'
+ log_config: 'logging.ini'
+ output_folder: 'E:/Master/jobs/job_calcSDRnull/job_output/'
+ output_log: 'log_SDRnullDist_datetime.log'
+ output_SDRsuper: 'nullDistSDRsuper_30samples_datetime.csv'
+ output_SDRsub: 'nullDistSDRsub_30samples_datetime.csv'
+ output_unprocessed: 'unprocessed_files_nullDistSDRcalc_30samples_datetime.csv'
+ LOGGER_SECTION: 'Logger'
