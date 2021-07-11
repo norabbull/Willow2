@@ -13,84 +13,77 @@ from plotnine import ggplot, aes, geom_point, geom_line, labs
 from plotnine import *
 import numpy as np
 import matplotlib.pyplot as plt
+from functools import reduce 
 
-
+# =============================================================================
+# Load stuff 
+# =============================================================================
 uniqseqs = load_uniq_seqs()
 totdist = load_tot_dist()
-SDRs = load_SDRs(level = "psuedo")
-SSDR_NFYA = load_singleSDR("ENSG00000001167___NFYA")
+SDRs = load_SDRs()
+SDVs = load_SDVs()
+SDRnull = load_SDRnull()
+
+
+# Single SDRs	gene
+SSDR_NFYA = load_singleSDR("ENSG00000110700___RS13")
 SSDR_FGR =load_singleSDR("ENSG00000000938___FGR")
 random_trees_50 = load_allSingleSDRs()
+
+# Null dist data
 nullDistSuper = load_nullDist(level = "super")
 nullDistSub = load_nullDist(level = "sub")
+
+# =============================================================================
 # Merge into common df
-us_td = totdist.merge(uniqseqs, left_index = True, right_index = True)
-us_td_sdr = us_td.merge(SDRs, left_index = True, right_on  = "gene", how = 'outer')
-us_td_sdr_null = us_td_sdr.merge(nullDistSuper, left_on = 'gene', right_on = 'gene')
+# =============================================================================
+
+# Merge
+data1 = totdist.merge(uniqseqs, on = 'gene')
+data2 = data1.merge(SDRs, on  = 'gene', how = 'outer')
+data_all = data2.merge(SDVs, on = ['gene', 'level'], how = 'outer')
+
+# Wrangle
+data_all.drop_duplicates(inplace=True)
+data_all.dropna(inplace=True)
+
 # Sort 
-allData = us_td_sdr_null.sort_values(by=['SDR'])
+data_all = data_all.sort_values(by=['SDR'])
 
-# Remove na
-allData = allData.dropna()
-
-# =============================================================================
-# Manual loading of data
-# =============================================================================
-
-nullSDRsub_all = pd.read_csv('E:/Master/Data/SDRnull/all/nullDistSDRsub_all_07.07.21.csv')
-nullSDRsuper_all = pd.read_csv('E:/Master/Data/SDRnull/all/nullDistSDRsuper_all_07.07.21.csv')
-nullSDRsub_all.columns = ['gene', 'SDR']
-nullSDRsuper_all.columns = ['gene', 'SDR']
-
-nullSDRsuper_all.sort_values(by = 'SDR', inplace = True, ignore_index = True)
-nullSDRsub_all.sort_values(by = 'SDR', inplace = True, ignore_index = True)
-
-# =============================================================================
-# Get 20 values from each distribution, interspaced through whole range
-# =============================================================================
-
-idx = np.linspace(0, len(nullSDRsuper_all)-1, 20)
-superGenes20 = nullSDRsuper_all.iloc[idx]
-subGenes20 = nullSDRsub_all.iloc[idx]
-
-# =============================================================================
-# Get 20 values from each distribution, with SDR < 0.9
-# =============================================================================
-
-# Make 0.9 cutoff
-nullSDRsuper09 = nullSDRsuper_all[nullSDRsuper_all['SDR'] <= 0.8]
-nullSDRsub09 = nullSDRsub_all[nullSDRsub_all['SDR'] <= 0.8]
-
-# Select 10 from each
-idx = np.linspace(1, len(nullSDRsuper09)-1, 5)
-superGenes5 = nullSDRsuper_all.iloc[idx]
-subGenes5 = nullSDRsub_all.iloc[idx]
-
-allSuperGenes = superGenes20.append(superGenes5)
-allSubGenes = subGenes20.append(subGenes5)
-
-# Extract gene list: 
-
-allSuperGenes = allSuperGenes['gene']    
-allSubGenes = allSubGenes['gene']    
-
-allGenes = allSuperGenes.append(allSubGenes)
-
-allGenes.drop_duplicates(inplace = True)
-
-# Make folder containing cophenetic dists files with those genes:
-    
-all_files = make_filelist('E:\\Master\\cophenetic_dists')
-
-allGenes_fullpath = pd.DataFrame([f for f in all_files for g in allGenes if g in f])
-
-# save list of genes: 
-
-allGenes_fullpath.to_csv('E:\\Master\\Data\\SDRnull\\other\\nullSDR_47genes.csv', index = False, header = False)
 
 # =============================================================================
 # Plotting
 # =============================================================================
+
+# =============================================================================
+# X vs Y, dotplot, lineplot
+# =============================================================================
+
+
+(ggplot(data_all, aes('SDR', 'uniqseq', fill = 'level'))
+ + geom_point()
+ + theme_classic()
+ + labs(title='SDR vs uniqseq')
+)
+
+(ggplot(data_all, aes('SDR', 'totdist', fill = 'level'))
+ + geom_point()
+ + theme_classic()
+ + labs(title='SDR vs uniqseq')
+)
+
+(ggplot(data_all, aes('uniqseq', 'totdist', fill = 'level'))
+ + geom_point()
+ + theme_classic()
+ + labs(title='SDR vs uniqseq')
+)
+
+(ggplot(data_all, aes('SDR', 'SDV', fill = 'level'))
+ + geom_point()
+ + theme_classic()
+ + labs(title='SDR vs uniqseq')
+)
+
 # =============================================================================
 # Good inspiration: 
 #    https://dputhier.github.io/jgb53d-bd-prog_github/practicals/intro_ggplot/intro_ggplot.html
@@ -101,7 +94,18 @@ allGenes_fullpath.to_csv('E:\\Master\\Data\\SDRnull\\other\\nullSDR_47genes.csv'
 # Violin + points + boxplot
 # =============================================================================
 
-(ggplot(SDRall, aes('level', 'value', fill = 'level'))
+
+shift = 0.1
+
+def alt_sign(x):
+    "Alternate +1/-1 if x is even/odd"
+    return (-1) ** x
+
+m1 = aes(x=stage('level', after_scale='x+shift*alt_sign(x)'))              # shift outward
+m2 = aes(x=stage('level', after_scale='x-shift*alt_sign(x)'), group='gene')  # shift inward
+
+
+(ggplot(data_all, aes('level', 'SDR', fill = 'level'))
  + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.65, show_legend = False)
  + geom_boxplot(width = shift, alpha=0.7, size = 0.65, show_legend = False)
  + scale_fill_manual(values=['dodgerblue', 'darkorange'])
@@ -120,6 +124,12 @@ allGenes_fullpath.to_csv('E:\\Master\\Data\\SDRnull\\other\\nullSDR_47genes.csv'
   #+ scale_x_continuous(breaks=us_td_sdr[''])
 )
 
+(ggplot(data_all,aes('SDR','totdist')) 
+  + geom_line()
+  #+ scale_x_continuous(breaks=us_td_sdr[''])
+)
+
+
 (ggplot(allData,aes('SDR','uniqseq',color='level'))
   + geom_line(alpha = 0.8)
   + labs(title='SDRs vs uniqseq (all)')
@@ -137,7 +147,7 @@ allGenes_fullpath.to_csv('E:\\Master\\Data\\SDRnull\\other\\nullSDR_47genes.csv'
 #  Overlapping distribution plot
 # =============================================================================
 
-density = ggplot(data=allData, 
+density = ggplot(data=data_all, 
        mapping=aes(x='SDR', fill='level')) + geom_density(adjust = 1/4, alpha=0.5)
 
 ggplot_build()
@@ -146,7 +156,8 @@ ggplot_build()
 # Overlapping histogram plot
 # =============================================================================
  
-ggplot(allData) + aes(x="SDR", fill = "level") + stat_bin(bins=100) + geom_bar()
+ggplot(allData) + 
+aes(x="SDR", fill = "level") + stat_bin(bins=100) + geom_bar()
 
 
 # =============================================================================
