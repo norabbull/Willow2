@@ -12,6 +12,31 @@ from os.path import isfile, join
 import re
 
 
+
+#%% Helpers
+
+def make_filelist(input_files):
+
+    if isinstance(input_files, str):     
+        files = [join(input_files, f) for f in os.listdir(input_files) 
+                     if isfile(join(input_files, f))]
+    return files
+
+def geneName(dist_mat_file):
+    """
+    Input: 
+        file: string filepath to distance matrix-file. 
+    Function: 
+        Filters out name of gene the tree represents and assign to
+        class variable "gene_name".
+        Both Ensembl and gene name identifiers included on the form: 
+            'ENSG00000000938___FGR'
+    """
+    subName = re.sub('^.*ENS', 'ENS', dist_mat_file)
+    gene_name = re.sub('___CopD.csv$','', subName)
+    
+    return gene_name
+
 #%% 
 test_genes = ['E:/Master/cophenetic_dists/ENSG00000000938___FGR___CopD.csv',
              'E:/Master/cophenetic_dists/ENSG00000134183___GNAT2___CopD.csv',
@@ -22,7 +47,7 @@ test_genes = ['E:/Master/cophenetic_dists/ENSG00000000938___FGR___CopD.csv',
 pop_info = 'C:/Users/norab/Master/Data/real_tree_data/phydist_population_classes.tsv'
     
 
-#%% 
+#%% Dataframes
 
 # =============================================================================
 #  Make dataframe subset, 10 < 19 dist mat
@@ -67,6 +92,8 @@ submat4 = pd.read_csv('C:/Users/norab/Master/Data/real_tree_data/dist_mat_test/M
 (submat3 == submat4).eq(True).all().all()
 
 
+
+#%% Prosess and extract genelists 
 
 # =============================================================================
 #  Make list of unprocces files from SDR file
@@ -231,6 +258,9 @@ liste.to_csv(file_list, index = False,
 
 
 
+#%% Process datafiles to prepare for inspections
+
+
 # =============================================================================
 # Merge SDR calculation files to one
 # =============================================================================
@@ -315,47 +345,94 @@ SDRsub_05.to_csv('C:\\Users\\norab\\Master\\Data\\SDR\\SDRsub_05.csv',
 
 #%%  Make data files ready for inspecton 
 
+"""
+From .csv file on the form: 
+    
+    ENSG00000288516___KAPCA,0.0934
+    ENSG00000288513___OR4F4,0.0
+    ENSG00000288508___ISLR,0.1869
+    ENSG00000288499___FA20C,0.0053
+    ENSG00000288490___GALT9,0.3585
+    ...
 
+To .csv file on the form: 
+    
+    level,gene,val
+    sub,ENSG00000288516___KAPCA,0.0934
+    sub,ENSG00000288513___OR4F4,0.0
+    sub,ENSG00000288508___ISLR,0.1869
+    sub,ENSG00000288499___FA20C,0.0053
+    sub,ENSG00000288490___GALT9,0.3585
+    ...
+    super,ENSG00000101199___ARFG1,0.0751
+    super,ENSG00000101191___DIDO1,0.001
+    super,ENSG00000101189___MRGBP,0.0462
+    ...
+    
+"""
+
+# =============================================================================
 # SDR
-SDRsuper = pd.read_csv('C:/Users/norab/Master/Data/SDR/SDRsuper_all.csv', header = None, names = ['gene', 'value'])
-SDRsub = pd.read_csv('C:/Users/norab/Master/Data/SDR/SDRsub_all.csv', header = None, names = ['gene', 'value'])
-SDRpsuedo = pd.read_csv('C:/Users/norab/Master/Data/SDRnullDist/nullDistSDRsub_23.06.2021_09.14.csv', header = None, names = ['gene', 'value'])
+# =============================================================================
+
+all_files = make_filelist('C:/Users/norab/Master/Data/SDR')
+SDVsuper_files = [f for f in all_files if 'SDRsuper' in f]
+SDVsub_files = [f for f in all_files if 'SDRsub' in f]
+
+# Load
+SDRsuper = pd.DataFrame(columns = ['gene', 'val'])
+SDRsub = pd.DataFrame(columns = ['gene', 'val'])
+for f in SDRsuper_files: 
+    SDRsuper = SDRsuper.append(pd.read_csv(f, names = ['gene', 'val']))
+for f in SDRsub_files: 
+    SDRsub = SDRsub.append(pd.read_csv(f, names = ['gene', 'val']))
+
 SDRsuper.dropna(inplace=True)
 SDRsub.dropna(inplace=True)
-SDRpsuedo.dropna(inplace=True)
 
 # Add level column
 SDRsuper.insert(0, 'level', 'super')
 SDRsub.insert(0, 'level', 'sub')
-SDRpsuedo.insert(0, 'level', 'psuedo')
+#SDRpsuedo.insert(0, 'level', 'psuedo')
 
-SDRall = pd.concat([SDRsub, SDRsuper, SDRpsuedo])
+SDRall = pd.concat([SDRsub, SDRsuper])
 
-SDRall.to_csv('C:/Users/norab/Master/Data/SDR/SDR_all_shortPsuedo.csv')
+# Save
+SDRsuper.to_csv('C:/Users/norab/Master/Data/SDR/SDRsuper.csv', index = False, header = True)
+SDRsub.to_csv('C:/Users/norab/Master/Data/SDR/SDRsub.csv', index = False, header = True)
+SDRall.to_csv('C:/Users/norab/Master/Data/SDR/SDR_all.csv', index = False, header = True)
 
 
 
+# =============================================================================
+# SDV
+# =============================================================================
+
+all_files = make_filelist('C:/Users/norab/Master/Data/SDV')
+SDVsuper_files = [f for f in all_files if 'SDVsuper' in f]
+SDVsub_files = [f for f in all_files if 'SDVsub' in f]
+
+# Load
+SDVsuper = pd.DataFrame(columns = ['gene', 'val'])
+SDVsub = pd.DataFrame(columns = ['gene', 'val'])
+for f in SDVsuper_files: 
+    SDVsuper = SDVsuper.append(pd.read_csv(f, names = ['gene', 'val']))
+for f in SDVsub_files: 
+    SDVsub = SDVsub.append(pd.read_csv(f, names = ['gene', 'val']))
+
+SDVsuper.dropna(inplace=True)
+SDVsub.dropna(inplace=True)
+
+# Add level column
+SDVsuper.insert(0, 'level', 'super')
+SDVsub.insert(0, 'level', 'sub')
+#SDVpsuedo.insert(0, 'level', 'psuedo')
+
+SDVall = pd.concat([SDVsub, SDVsuper])
+
+# Save
+SDVsuper.to_csv('C:/Users/norab/Master/Data/SDV/SDVsuper.csv', index = False, header = True)
+SDVsub.to_csv('C:/Users/norab/Master/Data/SDV/SDVsub.csv', index = False, header = True)
+SDVall.to_csv('C:/Users/norab/Master/Data/SDV/SDV_all.csv', index = False, header = True)
 
 
-#%% Helpers
-def make_filelist(input_files):
-
-    if isinstance(input_files, str):     
-        files = [join(input_files, f) for f in os.listdir(input_files) 
-                     if isfile(join(input_files, f))]
-    return files
-
-def geneName(dist_mat_file):
-    """
-    Input: 
-        file: string filepath to distance matrix-file. 
-    Function: 
-        Filters out name of gene the tree represents and assign to
-        class variable "gene_name".
-        Both Ensembl and gene name identifiers included on the form: 
-            'ENSG00000000938___FGR'
-    """
-    subName = re.sub('^.*ENS', 'ENS', dist_mat_file)
-    gene_name = re.sub('___CopD.csv$','', subName)
-    
-    return gene_name
