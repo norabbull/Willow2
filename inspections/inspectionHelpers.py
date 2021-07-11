@@ -21,58 +21,45 @@ def make_filelist(input_files):
                      if isfile(join(input_files, f))]
     return files
 
-def load_uniq_seqs():
+def load_uniq_seqs(uniq_seq_dir = "C:/Users/norab/Master/Data/meta_data/9381_uniqseqs.txt"):
     """
     Input: None
     Funtion: Load data. Path is specified in function for functoinality.
     Retun: Pd dataframe with values and gene names as indices.
     """
     
-    uniq_seq_dir = "C:/Users/norab/Master/Data/meta_data/9381_uniqseqs.txt"
     uniqseq = pd.read_csv(uniq_seq_dir, "r", delimiter = ":", header = 0) 
     uniqseq.rename(index=lambda s: re.sub('_HUMAN__uniq.*', '', s), 
                    columns = {uniqseq.columns[0]: "uniqseq"}, inplace = True)
     return uniqseq
 
-def load_tot_dist():
+def load_tot_dist(totdist_dir = "C:/Users/norab/Master/Data/meta_data/totalDistancesRefined.txt"):
     """
     Input: None
     Funtion: Load data. Path is specified in function for functoinality.
     Retun: Pd dataframe with values and gene names as indices.
     """
-    totdist_dir = "C:/Users/norab/Master/Data/meta_data/totalDistancesRefined.txt"
+    
     totdist = pd.read_csv(totdist_dir, "r", delimiter = ",", index_col = 0)
     totdist.rename(index=lambda s: re.sub('_HUMAN__full.*', '', s), 
                     columns = {totdist.columns[0]: "totdist"}, inplace = True)
-    totdist.rename(index=lambda s: re.sub('C.*trees/', '', s), 
+    totdist.rename(index=lambda s: re.sub('^.*trees/', '', s), 
                     columns = {totdist.columns[0]: "totdist"}, inplace = True)
     
     return totdist
 
 
-def load_SDRs(level = "all"):
+def load_SDRs(file_path = 'C:/Users/norab/Master/Data/SDR/SDR_all.csv'):
     """ 
-    Input: None
+    Input: path
     Return: pd DataFrame containing SDR values for super and sub popultions for each tree/gene
     
     """
-    # if level == "all":
-    #     file_path = 'C:/Users/norab/Master/Data/SDR/SDR_all.csv'
-    if level == "sub":
-        file_path = 'C:/Users/norab/Master/Data/SDR/SDRsub_all.csv'
-    elif level == "super":
-        file_path == 'C:/Users/norab/Master/Data/SDR/SDRsuper_all.csv'
-    elif level == "psuedo":
-        file_path = 'C:/Users/norab/Master/Data/SDRnullDist/nullDistSDRsub_23.06.2021_09.14.csv'
-        SDRs = pd.read_csv(file_path)
-        SDRs.columns = ['gene', 'psuedoSDR']
-    elif level == "all":
-        file_path = 'C:/Users/norab/Master/Data/SDRnullDist/nullDistSDRsub_23.06.2021_09.14.csv'# Change
     
-    
-    
-    #raw_SDRs.rename(index=lambda s: re.sub('^.*.*ENS', 'ENS', s), inplace = True)
-    #SDRs.columns = ['level', 'gene', 'SDR']
+    SDRs = pd.read_csv(file_path, index_col=0)
+    SDRs.columns = ['gene', 'psuedoSDR']
+    # SDRs.rename(index=lambda s: re.sub('^.*.*ENS', 'ENS', s), inplace = True)
+    # SDRs.columns = ['level', 'gene', 'SDR']
     
     return SDRs
     
@@ -83,7 +70,7 @@ def load_SDVs():
     Return: pd DataFrame containing SDV values for super and sub popultions for each tree/gene
     """
     
-    file_path = 'E:\Master\SDV\SDV_values_all.csv'
+    file_path = 'E:\Master\Data\SDV\SDV_values_all.csv'
     raw_SDVs = pd.read_csv(file_path, header=0, index_col=0)
     raw_SDVs.rename(index=lambda s: re.sub('^.*.*ENS', 'ENS', s), inplace = True)
     
