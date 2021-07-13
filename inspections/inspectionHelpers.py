@@ -60,12 +60,11 @@ def load_SDRs(file_path = 'C:/Users/norab/Master/Data/SDR/SDR_all.csv'):
     
     """
     
-    SDRs = pd.read_csv(file_path, header=0, index_col=False)
+    return pd.read_csv(file_path, header=0, index_col=False)
     
     # SDRs.rename(index=lambda s: re.sub('^.*.*ENS', 'ENS', s), inplace = True)
     # SDRs.columns = ['level', 'gene', 'SDR']
-    
-    return SDRs
+
     
 
 def load_SDVs(file_path = 'C:/Users/norab/Master/Data/SDV/SDV_all.csv'):
@@ -74,10 +73,9 @@ def load_SDVs(file_path = 'C:/Users/norab/Master/Data/SDV/SDV_all.csv'):
     Return: pd DataFrame containing SDV values for super and sub popultions for each tree/gene
     """
 
-    SDVs = pd.read_csv(file_path, header=0, index_col=False)
+    return pd.read_csv(file_path, header=0, index_col=False)
     #SDVs.rename(index=lambda s: re.sub('^.*.*ENS', 'ENS', s), inplace = True)
     
-    return SDVs
 
 def load_singleSDR(gene_name, load_all = False):
     """ 
@@ -97,9 +95,8 @@ def load_singleSDR(gene_name, load_all = False):
     SSDRs.columns = ['pop', f'SSDR_{gene_name}']
     return SSDRs
 
-def load_allSingleSDRs(num_rand_trees = 50):
+def load_allSingleSDRs(file_path = 'C:/Users/norab/Master/Data/singleSDRs/', num_rand_trees = 50):
     
-    file_path = 'C:/Users/norab/Master/Data/singleSDRs/'
     file_list = make_filelist(file_path)
     
     seed(num_rand_trees)
@@ -117,15 +114,23 @@ def load_allSingleSDRs(num_rand_trees = 50):
     return SSDR_all
     
     
-def load_SDRnull(file_path = 'C:/Users/norab/Master/Data/SDRnullDist/SDRnull_all.csv'):
+def load_SDRnull(file_path = 'C:/Users/norab/Master/Data/SDRnull/all/SDRnull_all_07.07.2021.csv'):
     """ 
     Input: Filepath
     Return: pd DataFrame containing SDR values for super and sub popultions for each tree/gene
     
     """    
-    SDRnull = pd.read_csv(file_path, header=0, index_col=None)
+    return pd.read_csv(file_path, header=0, index_col=None)
     
-    return SDRnull
+
+    
+def load_SDRnull47(file_path = 'C:/Users/norab/Master/Data/SDRnull/all/SDRnull47_all_12.07.2021.csv'):
+    """ 
+    Input: Filepath
+    Return: pd DataFrame containing SDR values for super and sub popultions for each tree/gene
+    """    
+    return pd.read_csv(file_path, header=0, index_col=None)
+
 
 def load_cd_mat(path):
     """
@@ -139,5 +144,4 @@ def load_cd_mat(path):
         Distance matrix
     """
     
-    cd = pd.read_csv(path, index_col = 0)
-    return cd
+    return pd.read_csv(path, index_col = 0)

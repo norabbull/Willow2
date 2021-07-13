@@ -5,11 +5,13 @@ Created on Wed Jun  2 06:45:58 2021
 @author: norab
 """
 
+from inspections.inspectionHelpers import *
 from src.treeInformation import treeInfo
 import pandas as pd
 import os
 from os.path import isfile, join
 import re
+import shutil
 
 
 
@@ -411,37 +413,58 @@ SDVall.to_csv('C:/Users/norab/Master/Data/SDV/SDV_all.csv', index = False, heade
 # Null dist
 # =============================================================================
 
-all_files = make_filelist('C:/Users/norab/Master/Data/SDRnullDist')
-SDRnullSuper_files = [f for f in all_files if 'SDRsuper' in f]
-SDRnullSub_files = [f for f in all_files if 'SDRsub' in f]
+SDRnullSuper_files = ['C:/Users/norab/Master/Data/SDRnull/all/nullDistSDRsuper_all_07.07.21.csv']
+SDRnullSub_files = ['C:/Users/norab/Master/Data/SDRnull/all/nullDistSDRsub_all_07.07.21.csv']
 
 # Load
-SDRnullSuper = pd.DataFrame(columns = ['gene', 'val'])
-SDRnullSub = pd.DataFrame(columns = ['gene', 'val'])
+SDRnullSuper = pd.DataFrame(columns = ['gene', 'SDR'])
+SDRnullSub = pd.DataFrame(columns = ['gene', 'SDR'])
 for f in SDRnullSuper_files: 
-    SDRnullSuper = SDRnullSuper.append(pd.read_csv(f, names = ['gene', 'val']))
+    SDRnullSuper = SDRnullSuper.append(pd.read_csv(f, names = ['gene', 'SDR']))
 for f in SDRnullSub_files: 
-    SDRnullSub = SDRnullSub.append(pd.read_csv(f, names = ['gene', 'val']))
+    SDRnullSub = SDRnullSub.append(pd.read_csv(f, names = ['gene', 'SDR']))
 
 SDRnullSuper.dropna(inplace=True)
 SDRnullSub.dropna(inplace=True)
 
 # Add level column
-SDRnullSuper.insert(0, 'level', 'super')
-SDRnullSub.insert(0, 'level', 'sub')
+SDRnullSuper.insert(0, 'level', 'psuedoSuper')
+SDRnullSub.insert(0, 'level', 'psuedoSub')
+
+#SDVpsuedo.insert(0, 'level', 'psuedo')
+SDRnullAll = pd.concat([SDRnullSuper, SDRnullSub])
+
+# Save
+SDRnullAll.to_csv('C:/Users/norab/Master/Data/SDRnull/all/SDRnull_all_07.07.2021.csv', index = False, header = True)
+
+# =============================================================================
+# Extract value for interspaced null Distribution 
+# =============================================================================
+
+SDRnullSuper_files = ['C:/Users/norab/Master/Data/SDRnull/all/nullDistSDRsuper_47genes_12.07.2021_12.38.csv']
+SDRnullSub_files = ['C:/Users/norab/Master/Data/SDRnull/all/nullDistSDRsub_47genes_12.07.2021_12.38.csv']
+
+# Load
+SDRnullSuper = pd.DataFrame(columns = ['gene', 'SDR'])
+SDRnullSub = pd.DataFrame(columns = ['gene', 'SDR'])
+for f in SDRnullSuper_files: 
+    SDRnullSuper = SDRnullSuper.append(pd.read_csv(f, names = ['gene', 'SDR']))
+for f in SDRnullSub_files: 
+    SDRnullSub = SDRnullSub.append(pd.read_csv(f, names = ['gene', 'SDR']))
+
+SDRnullSuper.dropna(inplace=True)
+SDRnullSub.dropna(inplace=True)
+
+# Add level column
+SDRnullSuper.insert(0, 'level', 'psuedoSuper')
+SDRnullSub.insert(0, 'level', 'psuedoSub')
 #SDVpsuedo.insert(0, 'level', 'psuedo')
 
 SDRnullAll = pd.concat([SDRnullSuper, SDRnullSub])
 
 # Save
-SDRnullSuper.to_csv('C:/Users/norab/Master/Data/SDRnullDist/SDRnullSuper.csv', index = False, header = True)
-SDRnullSub.to_csv('C:/Users/norab/Master/Data/SDRnullDist/SDRnullSub.csv', index = False, header = True)
-SDRnullAll.to_csv('C:/Users/norab/Master/Data/SDRnullDist/SDRnull_all.csv', index = False, header = True)
 
-
-# =============================================================================
-# Extract value for interspaced null Distribution 
-# =============================================================================
+SDRnullAll.to_csv('C:/Users/norab/Master/Data/SDRnull/all/SDRnull47_all_12.07.2021.csv', index = False, header = True)
 
 # =============================================================================
 # Load data
@@ -494,3 +517,27 @@ allGenes_fullpath = pd.DataFrame([f for f in all_files for g in allGenes if g in
 # save list of genes: 
 
 allGenes_fullpath.to_csv('E:\\Master\\Data\\SDRnull\\other\\nullSDR_47genes.csv', index = False, header = False)
+
+# =============================================================================
+# Get 50 genes with lowest SDR
+# =============================================================================
+
+SDRs = load_SDRs()
+SDRs_super = SDRs[SDRs['level'] == 'super'].sort_values(by = 'SDR')
+SDRs_sub = SDRs[SDRs['level'] == 'sub'].sort_values(by= 'SDR')
+SDRs_super70 = SDRs_super.iloc[0:70]
+SDRs_sub70 = SDRs_sub.iloc[0:70]
+genes = SDRs_super70['gene'].append(SDRs_sub70['gene'])
+genes.drop_duplicates(inplace=True)
+genes = genes.tolist()
+
+all_files = make_filelist('E:\\Master\\cophenetic_dists')
+genes_fullpath = pd.DataFrame([f for f in all_files for g in genes if g in f])
+genes_fullpath.to_csv('E:\\Master\\Data\\SDRnull\\other\\nullSDR_93lowestSDRGenes.csv', index = False, header = False)
+
+# Movie files from a folder to another
+
+for file in all_files:
+    for gene in genes:
+        if gene in file: 
+            shutil.copy(file, 'E:\\Master\\external_runs\\nora_data_software2\\data\\job_input\\cophenetic_dists_93genes')

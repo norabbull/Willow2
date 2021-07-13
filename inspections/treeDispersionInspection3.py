@@ -15,6 +15,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from functools import reduce 
 
+
 # =============================================================================
 # Load stuff 
 # =============================================================================
@@ -23,16 +24,19 @@ totdist = load_tot_dist()
 SDRs = load_SDRs()
 SDVs = load_SDVs()
 SDRnull = load_SDRnull()
+SDRnull47 = load_SDRnull47()
 
 
+SDRnull47super = SDRnull47[SDRnull47['level'] == 'super']
+SDRnull47sub = SDRnull47[SDRnull47['level'] == 'sub']
+len(SDRnull47super.gene.unique())
+
+SDRnull = SDRnull.drop_duplicates(subset='gene')
+SDRnullAll = SDRnull.append(SDRnull47)
 # Single SDRs	gene
 SSDR_NFYA = load_singleSDR("ENSG00000110700___RS13")
 SSDR_FGR =load_singleSDR("ENSG00000000938___FGR")
 random_trees_50 = load_allSingleSDRs()
-
-# Null dist data
-nullDistSuper = load_nullDist(level = "super")
-nullDistSub = load_nullDist(level = "sub")
 
 # =============================================================================
 # Merge into common df
@@ -41,6 +45,7 @@ nullDistSub = load_nullDist(level = "sub")
 # Merge
 data1 = totdist.merge(uniqseqs, on = 'gene')
 data2 = data1.merge(SDRs, on  = 'gene', how = 'outer')
+data3 = data2.merge(SDRnullAll, on = ['gene', 'level'], how = 'outer')
 data_all = data2.merge(SDVs, on = ['gene', 'level'], how = 'outer')
 
 # Wrangle
@@ -50,7 +55,6 @@ data_all.dropna(inplace=True)
 # Sort 
 data_all = data_all.sort_values(by=['SDR'])
 
-
 # =============================================================================
 # Plotting
 # =============================================================================
@@ -58,7 +62,6 @@ data_all = data_all.sort_values(by=['SDR'])
 # =============================================================================
 # X vs Y, dotplot, lineplot
 # =============================================================================
-
 
 (ggplot(data_all, aes('SDR', 'uniqseq', fill = 'level'))
  + geom_point()
@@ -94,7 +97,6 @@ data_all = data_all.sort_values(by=['SDR'])
 # Violin + points + boxplot
 # =============================================================================
 
-
 shift = 0.1
 
 def alt_sign(x):
@@ -103,7 +105,6 @@ def alt_sign(x):
 
 m1 = aes(x=stage('level', after_scale='x+shift*alt_sign(x)'))              # shift outward
 m2 = aes(x=stage('level', after_scale='x-shift*alt_sign(x)'), group='gene')  # shift inward
-
 
 (ggplot(data_all, aes('level', 'SDR', fill = 'level'))
  + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.65, show_legend = False)
@@ -137,27 +138,47 @@ m2 = aes(x=stage('level', after_scale='x-shift*alt_sign(x)'), group='gene')  # s
 )
 
 
-# =============================================================================
-# 
-# =============================================================================
-
-
 
 # =============================================================================
 #  Overlapping distribution plot
 # =============================================================================
 
-density = ggplot(data=data_all, 
+ggplot(data=data_all, 
        mapping=aes(x='SDR', fill='level')) + geom_density(adjust = 1/4, alpha=0.5)
 
-ggplot_build()
+# Test shit
+ggplot(data=data2, 
+       mapping=aes(x='SDR', fill='level')) + geom_density(adjust = 1/4, alpha=0.5)
 
+
+
+# Null dist, all
+ggplot(data=SDRnullAll, 
+       mapping=aes(x='SDR', fill='level')) + geom_density(adjust = 1/4, alpha=0.5)
+
+
+# Null dist, 47 genes
+ggplot(data=SDRnull47super, 
+       mapping=aes(x='SDR', fill='gene')) + geom_density(adjust = 1/4, alpha=0.5)
+
+# Null dist, 47 genes
+ggplot(data=SDRnull47sub, 
+       mapping=aes(x='SDR', fill='gene')) + geom_density(adjust = 1/4, alpha=0.5)
+
+ggplot(data=SDRnull47, 
+       mapping=aes(x='SDR', fill='level')) + geom_density(adjust = 1/4, alpha=0.5)
+
+
+# All SDRs
+ggplot(data=data_all, 
+       mapping=aes(x='SDR', fill='level')) + geom_density(adjust = 1/2, alpha=0.5) + geom_density(data=SDRnullAll, adjust = 1/2, alpha=0.5, color = 'darkgreen')
+
+# 
 # =============================================================================
 # Overlapping histogram plot
 # =============================================================================
  
-ggplot(allData) + 
-aes(x="SDR", fill = "level") + stat_bin(bins=100) + geom_bar()
+ggplot(data_all) + aes(x="SDR", fill = "level") + stat_bin(bins=100) + geom_bar()
 
 
 # =============================================================================
