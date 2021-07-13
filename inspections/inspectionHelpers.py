@@ -53,14 +53,20 @@ def load_tot_dist(totdist_dir = "C:/Users/norab/Master/Data/meta_data/totalDista
     return totdist
 
 
-def load_SDRs(file_path = 'C:/Users/norab/Master/Data/SDR/SDR_all.csv'):
+def load_SDRs(file_path = 'C:/Users/norab/Master/Data/SDR/SDR_all.csv', level='All'):
     """ 
     Input: path
     Return: pd DataFrame containing SDR values for super and sub popultions for each tree/gene
     
     """
+    SDRs = pd.read_csv(file_path, header=0, index_col=False)
     
-    return pd.read_csv(file_path, header=0, index_col=False)
+    if level == 'super':
+        return SDRs[SDRs['level'] == 'super']
+    elif level == 'sub':
+        return SDRs[SDRs['level'] == 'sub']
+    else:
+        return SDRs 
     
     # SDRs.rename(index=lambda s: re.sub('^.*.*ENS', 'ENS', s), inplace = True)
     # SDRs.columns = ['level', 'gene', 'SDR']
