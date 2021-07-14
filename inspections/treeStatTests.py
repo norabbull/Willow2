@@ -7,7 +7,7 @@ Created on Tue Jul 13 15:06:09 2021
 
 from inspections.inspectionHelpers import *
 from plotnine import *        # OBS: must change to all needed stuff only
-from scipy.stats import kstest, norm
+from scipy.stats import kstest, norm, stats, mannwhitneyu, wilcoxon
 import numpy as np
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
@@ -163,6 +163,193 @@ ks_statistic, p_value = kstest(my_data, 'norm'); print(ks_statistic, p_value)
 
 my_data = norm.rvs(size=500)
 shapiro(my_data)
+
 # =============================================================================
-# Test distributions against eachother - z test ot t test
+# Test distributions
 # =============================================================================
+
+"""
+So, distributions are not at all normally distributed. Will perform three tests:
+    1. Kruskal-Wallis H-test for independent samples: OBS! May not be appropriate 
+    cuz of paired samples
+    2. 
+    
+    
+Inspo: https://machinelearningmastery.com/nonparametric-statistical-significance-tests-in-python/
+"""
+# Data
+SDRsuperData = SDRsuper['SDR'].to_numpy()
+SDRsubData = SDRsub['SDR'].to_numpy()
+SDRnullSuperData = SDRnullSuper['SDR'].to_numpy()
+SDRnullSubData = SDRnullSub['SDR'].to_numpy()
+
+###########################   Kruskal Wallis  #################################
+
+"""
+OBS: Im not sure if this test is appropriate. 
+
+What: 
+    ...
+Assumptions: 
+    ...
+Hypothesis: 
+    ...
+    
+"""
+stats.kruskal(SDRsuperData, SDRnullSuperData)
+stats.kruskal(SDRsubData, SDRnullSubData)
+stats.kruskal(SDRsuperData, SDRsubData)
+
+#######################  Mann-Whitney U test   ################################
+
+"""
+What: 
+    Nonparametric test for determining whether two independent samples were
+    drawn from a population with the same distribution.
+    Sometimes called the Wilcoxon-Mann-Whitney test. 
+    
+    Determines if it is equally likely that any randomly selected observation 
+    from one sample will be greater or less than a sample in the other
+    distribution. If violated --> likely different distributions. 
+
+Assumptions: 
+    
+Hypothesis: 
+    H0: Sample distributions are equal
+    H1: Sample distributions are not equal
+
+"""
+
+stat, p = mannwhitneyu(SDRsuperData, SDRnullSuperData)
+print('Statistics=%.3f, p=%.3f' % (stat, p))
+# interpret
+alpha = 0.05
+if p > alpha:
+	print('Same distribution (fail to reject H0)')
+else:
+	print('Different distribution (reject H0)')
+    
+stat, p = mannwhitneyu(SDRsubData, SDRnullSubData)
+print('Statistics=%.3f, p=%.3f' % (stat, p))
+# interpret
+alpha = 0.05
+if p > alpha:
+	print('Same distribution (fail to reject H0)')
+else:
+	print('Different distribution (reject H0)')
+
+stat, p = mannwhitneyu(SDRsuperData, SDRsubData)
+print('Statistics=%.3f, p=%.3f' % (stat, p))
+# interpret
+alpha = 0.05
+if p > alpha:
+	print('Same distribution (fail to reject H0)')
+else:
+	print('Different distribution (reject H0)')
+
+"""
+    Comment: 
+        All H0 are rejected. Distributions are clearly different. 
+        
+"""
+
+
+#####################  Wilcoxon Signed-Rank Test  #############################
+
+
+
+"""
+
+Must wrangle a little first: 
+    Pair all gene samples for the three groups so they are on same indices. 
+    Can then perform test. Must be equal amount of samples. Remove samples
+    missing.
+
+
+
+What: 
+
+
+Assumptions: 
+    
+Hypothesis: 
+    H0: Sample distributions are equal
+    H1: Sample distributions are not equal
+
+"""
+
+# Data
+SDRsuper.rename(columns = {'SDR': 'SDRsuper'}, inplace= True)
+SDRsub.rename(columns = {'SDR': 'SDRsub'}, inplace= True)
+SDRnullSuper.rename(columns={'SDR':'SDRnullSuper'}, inplace=True)
+SDRnullSub.rename(columns={'SDR':'SDRnullSub'}, inplace=True)
+
+data = SDRsuper.merge(SDRsub, on = 'gene', how = 'inner')
+data = data.merge(SDRnullSuper, on = 'gene', how = 'inner')
+data = data.merge(SDRnullSub, on = 'gene', how = 'inner')
+data.drop_duplicates(subset='gene', inplace=True)
+
+# Data
+SDRsuperData = data['SDRsuper'].to_numpy()
+SDRsubData = data['SDRsub'].to_numpy()
+SDRnullSuperData = data['SDRnullSuper'].to_numpy()
+SDRnullSubData = data['SDRnullSub'].to_numpy()
+
+
+
+# Test
+
+stat, p = wilcoxon(SDRsuperData, SDRnullSuperData)
+print('Statistics=%.3f, p=%.3f' % (stat, p))
+# interpret
+alpha = 0.05
+if p > alpha:
+	print('Same distribution (fail to reject H0)')
+else:
+	print('Different distribution (reject H0)')
+    
+stat, p = wilcoxon(SDRsubData, SDRnullSuperData)
+print('Statistics=%.3f, p=%.3f' % (stat, p))
+# interpret
+alpha = 0.05
+if p > alpha:
+	print('Same distribution (fail to reject H0)')
+else:
+	print('Different distribution (reject H0)')
+
+stat, p = wilcoxon(SDRsuperData, SDRsubData)
+print('Statistics=%.3f, p=%.3f' % (stat, p))
+# interpret
+alpha = 0.05
+if p > alpha:
+	print('Same distribution (fail to reject H0)')
+else:
+	print('Different distribution (reject H0)')
+
+"""
+    Comment: 
+        All H0 are rejected. Distributions are clearly different. 
+        
+"""
+
+# =============================================================================
+# Find threshold
+# =============================================================================
+
+"""
+
+You may want to do a statistical test to find your threshold. However, I 
+think it also makes sense to find it just by selecting the 95 % quantile 
+from the null-distriution.
+"""
+
+# Data
+
+SDRnullSuperData = SDRnullSuper['SDR'].to_numpy()
+SDRnullSubData = SDRnullSub['SDR'].to_numpy()
+
+SDRnullSuper.SDR.quantile([0.01,0.99])
+np.percentile(SDRnullSubData, 1)
+
+
+

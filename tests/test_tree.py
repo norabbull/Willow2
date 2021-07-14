@@ -6,7 +6,6 @@ Created on Tue Jun  1 08:53:43 2021
 """
 
 import pandas as pd
-import copy
 from copy import deepcopy
 
 from src.treeInformation import treeInfo

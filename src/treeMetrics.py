@@ -88,8 +88,6 @@ class treeMetrics(treeInfo):
                     subBetSums[subPop2] = [i+j for i, j in zip(subBetSums[subPop2], [val, 1])]
             row_start += 1
             
-
-        # TO DO: Write test to check these values are correct for a small matrix
         self.pop_dists = {'supWith': supWithSums, 'supBet': supBetSums, 
                 'subWith': subWithSums, 'subBet': subBetSums}
 
