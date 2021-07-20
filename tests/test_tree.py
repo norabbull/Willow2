@@ -157,6 +157,8 @@ class TestTreeFunctions:
 
         """
         test_gene_small = 'C:\\Users\\norab\\Master\\Data\\real_tree_data\\dist_mat_test\\FGR_10x10.csv'
+        test_gene_IDS = 'E:\\Master\\cophenetic_dists\\ENSG00000010404___IDS___CopD.csv'         # Zero distance
+        test_gene_DAXX = 'E:\\Master\\cophenetic_dists\\ENSG00000227046___DAXX___CopD.csv'         # Zero distance
         pop_info = 'C:/Users/norab/Master/Data/real_tree_data/phydist_population_classes.tsv'
     
         tree = treeMetrics()
@@ -175,6 +177,18 @@ class TestTreeFunctions:
         assert supBet == meanTypeDists['supBet']
         assert subWith == meanTypeDists['subWith']
         assert subBet == meanTypeDists['subBet']
+        
+        tree2 = treeMetrics()
+        tree2.setup(test_gene_IDS, pop_info)
+        meanTypeDists = tree2.getMeanPopDists()
+        SDR = tree2.calcSDR()
+        
+        tree3 = treeMetrics()
+        tree3.setup(test_gene_DAXX, pop_info)
+        meanTypeDists = tree3.getMeanPopDists()
+        meanPopDists = tree3.getMeanPopDists()
+        SDR = tree3.calcSDR(random=True)
+        SDR 
         
     def test_calcMeanPopDists(self):
         """
@@ -328,6 +342,148 @@ class TestTreeFunctions:
         tree2.calcSDR()
         subSDRtrand = tree2.getSDRsub()
         superSDRrand = tree2.getSDRsuper()
+        
+    def test_nullSDR_DAXX(self):
+        
+        gene = 'E:/Master/cophenetic_dists/ENSG00000227046___DAXX___CopD.csv'
+        pop_info = 'C:/Users/norab/Master/Data/real_tree_data/phydist_population_classes.tsv'
+        tree = treeMetrics()
+        tree.setup(gene, pop_info)
+        
+        sample_info = tree.getSampleInfo()
+        sample_info_before = deepcopy(sample_info)
+        
+        tree.shuffleSampleInfo()
+        sample_info_shuffled = tree.getSampleInfo()
+        
+        meanTypeDist = tree.getMeanTypeDists()
+        popDists = tree.getPopDists()
+        tree.calcSDR()
+        tree.getSDRsuper()        
+        # Extract number of samples in each generated defined pop
+        # There will always be
+        d = pd.DataFrame.from_dict(sample_info).transpose()
+        d.rename(columns={0:'sample', 1:'super', 2:'sub'}, inplace = True)
+        k = d.super.value_counts()
+        
+# =============================================================================
+#         Manual calculation of SDR from DAXX gene
+# =============================================================================
+        # Distance from 1 AFR sample to all others: 0.00534
+        
+        # When in AFR:
+            # mean within:
+        # 1. Total distance from non-zero sample to all other within-samples: 
+            0.00534 * 670 = 3.5778
+        # 2. Total number of comparisons made within:
+            
+        #(671!)/(2! * (671-2)!) (calculated online: https://www.calculatorsoup.com/calculators/discretemathematics/combinations.php)
+            
+            224785 # AFR
+            135981 # EUR
+            132355  # EAS
+            120786 # SAS
+            60378  # AMR
+            
+            # Total number of within pairwise distances: 
+            224785 + 135981 + 132355 + 120786 + 60378 = 674285
+            
+            # mean within: 
+    
+            
+        # Mean between distance: 
+            2548-671 = 1877         # Num non-afr samples
+            # Num pairwise distances between AFR and other pops
+            1877*671 = 1259467
+            # Total between distance between the AFR and other pops: 
+            1877 * 0.00534 = 10.02318
+            
+            
+            # Same for other pops: 
+            2548-522 = 2026 # EUR
+            2026*522 = 1057572
+            522 * 0.00534 = 2.78748
+            
+            2548-515 = 2033 # EAS
+            2033*515 = 1046995
+            515 * 0.00534 = 2.7501
+            
+            2548-492 = 2056 # SAS
+            2056*429 = 882024
+            429 * 0.00534 = 2.29086
+            
+            2548-348 = 2200 # AMR
+            2200*348 = 765600
+            348 * 0.00534 = 1.85832
+            
+            # Total between distance:
+            10.02318 + 2.78748 + 2.7501 + 2.29086 + 1.85832 = 19.70994
+            # Total between comp = 
+            1259467 + 1057572 + 1046995 + 882024 + 765600 = 5011658
+
+        
+            # SDR
+            (3.5778 / 674285) / (19.70994 / 5011658)
+
+            # Note:
+            #   For between-distance calculation, all apirwise distance values
+            #   are saved twice; once for each of the populations. 
+            #   The number of pairwise distance comparisons is also saved twice,
+            #   which means that the final mean distance will be correct as the 
+            #   distance is divided by a double amount of pairwise comparisons. 
+            #   it is necessary to save it this way for other types of calculations.
+            
+# =============================================================================
+#             Shuffled:
+# =============================================================================
+            
+            # Funny samle: AFR___LWK___NA19437
+            sdrs = []
+            for _ in range(30):
+                
+                tree.shuffleSampleInfo()
+                sample_info_shuf = tree.getSampleInfo()
+                if sample_info_shuf[2547][1] == 'EUR':
+                    tree.calcSDR()
+                    sdrs.append(tree.getSDRsuper())
+                    meanTypeDist_shuf = tree.getMeanTypeDists()
+                    meanPopDist_shuf = tree.getMeanPopDists()
+                    print("Sample: ", sample_info_shuf[2547])
+                    print("MeanPopWith:", meanPopDist_shuf['supWith'])
+                    print("MeanPopBet:", meanPopDist_shuf['supBet'])
+                    print("MeanTypeWith:", meanTypeDist_shuf['supWith'])
+                    print("MeanTypeBet:", meanTypeDist_shuf['supBet'])
+                    print("SDR: ", tree.getSDRsuper())
+                    
+    def test_DAXX_sampleinfo(self):
+        
+        gene = 'E:/Master/cophenetic_dists/ENSG00000227046___DAXX___CopD.csv'
+        pop_info = 'C:/Users/norab/Master/Data/real_tree_data/phydist_population_classes.tsv'
+        tree = treeMetrics()
+        tree.setup(gene, pop_info)
+        
+        
+        save_info = pd.DataFrame(columns=['SDR', 'AFR', 'EUR', 'EAS', 'AMR', 'SAS'])
+        sample_info = tree.getSampleInfo()
+        tree.calcSDR()
+        
+        
+        d = pd.DataFrame.from_dict(sample_info).transpose()
+        d.rename(columns={0:'sample', 1:'super', 2:'sub'}, inplace = True)
+        counts = d.super.value_counts()
+        counts = counts.append(tree.getSDRsuper())
+        
+        save_info.append(counts)
+        
+        
+        
+        sample_info_before = deepcopy(sample_info)
+        
+        tree.shuffleSampleInfo()
+        sample_info_shuffled = tree.getSampleInfo()
+        
+
+    
         
         
 # if __name__ == "__main__":

@@ -111,7 +111,7 @@ class treeMetrics(treeInfo):
                 dist_summary[key] += dist_count[0]
                 count_summary[key] += dist_count[1]
         
-        self.mean_type_dists = {key: round(dist_summary[key] / count_summary[key], 8) 
+        self.mean_type_dists = {key: round(dist_summary[key] / count_summary[key], 10)  # Was 6 
                                 for key, val in dist_summary.items()}
              
         
@@ -133,7 +133,7 @@ class treeMetrics(treeInfo):
             
             for pop, dist_count in val.items():
                 if dist_count[1]:  
-                    type_means[pop] = round(dist_count[0] / dist_count[1], 6)
+                    type_means[pop] = round(dist_count[0] / dist_count[1], 10) # was 6
                 else:   # No distance calculated for this pop
                     type_means[pop] = 0
              
@@ -154,12 +154,10 @@ class treeMetrics(treeInfo):
                 or every single group (.. = True.)
         Testing: OK.   
         """
-        
-        # Dette blir feil. Du tar gjennomsnitt av gjennomsnitt. 
-        # Må bruke dists direkte, legge sammen alle og dele på total count. 
+
         if not self.mean_type_dists: 
             self.calcMeanTypeDists()
-        elif (self.mean_type_dists and self.randomPops):
+        elif (self.mean_type_dists and self.random_pops):
             self.calcMeanTypeDists()
         
         print("Mean type dists: ")
@@ -167,13 +165,13 @@ class treeMetrics(treeInfo):
             
         if self.mean_type_dists['supBet']:
             self.SDRsuper = round(self.mean_type_dists['supWith'] / 
-                                  self.mean_type_dists['supBet'], 6)
+                                  self.mean_type_dists['supBet'], 2) # was 6
         else: 
             self.SDRsuper = float('NaN')
         
         if self.mean_type_dists['subBet']:
             self.SDRsub = round(self.mean_type_dists['subWith'] / 
-                                self.mean_type_dists['subBet'], 6)
+                                self.mean_type_dists['subBet'], 2) # was 6
         else:
             self.SDRsub = float('NaN')
         

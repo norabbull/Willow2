@@ -12,7 +12,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import re
-
+import seaborn as sns
 #%% Load single gene matrix
 
 GNAT2_cd= load_cd_mat('E:/Master/cophenetic_dists/ENSG00000134183___GNAT2___CopD.csv')
@@ -28,11 +28,13 @@ OR6C6_cd = load_cd_mat('E:/Master/cophenetic_dists/ENSG00000188324___OR6C6___Cop
 MPP5_cd = load_cd_mat('E:/Master/cophenetic_dists/ENSG00000072415___MPP5___CopD.csv')
 LY96_cd = load_cd_mat('E:/Master/cophenetic_dists/ENSG00000154589___LY96___CopD.csv')
 HNRPR_cd = load_cd_mat('E:/Master/cophenetic_dists/ENSG00000282958___HNRPR___CopD.csv')
+DAXX_cd = load_cd_mat('E:/Master/cophenetic_dists/ENSG00000227046___DAXX___CopD.csv')
+DRB_cd = load_cd_mat('E:/Master/cophenetic_dists/ENSG00000196126___DRB___CopD.csv')
+SMALL_FAKE_cd = load_cd_mat('C:/Users/norab/Master/Data/test_data/test_fakeTrees/test_align_2supx2subX4samples___CopD.csv')
 
 
 #%% Get all info on one gene
 
-# TODO
 LY96_data = all_data1[all_data1['gene'] == 'ENSG00000154589___LY96']
 LY96_data = all_data5[all_data5['gene'] == 'ENSG00000154589___LY96']
 
@@ -47,8 +49,8 @@ ly96_SDRs_pops = calculateSDR(LY96_cd,ly96_inf,grouptypes,calc_SDRgroupwise=True
 #%% Load data
 
 # All data
-uniqseq = load_uniq_seqs('C:/Users/norab/MasterDisaster/Data/meta_data/9381_uniqseqs.txt')
-totdist = load_tot_dist('C:/Users/norab/MasterDisaster/Data/meta_data/totalDistancesRefined.txt')
+uniqseq = load_uniq_seqs('C:/Users/norab/Master/Data/meta_data/9381_uniqseqs.txt')
+totdist = load_tot_dist('C:/Users/norab/Master/Data/meta_data/totalDistancesRefined.txt')
 SDRs = load_SDRs('E:\Master\SDR\SDR_values_all.csv')
 SDVs = load_SDVs('E:\Master\SDV\SDV_values_all.csv')
 group_SDRs = load_groupSDRs('E:\Master\SDR\SDR_values_all_groups.csv')
@@ -263,8 +265,14 @@ geneUniverse.to_csv('C:/Users/norab/MasterDisaster/Data/go_enrichment/geneUniver
 
 
 
-#%% ggplot
+#%% Div shit
 
+
+DAXX_cd['AFR___LWK___NA19437'].unique()
+
+AFR-AFR
+AFR-EUR
+AKR-
 
 
 

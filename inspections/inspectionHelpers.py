@@ -130,10 +130,10 @@ def load_SDRnull(file_path = 'C:/Users/norab/Master/Data/SDRnull/all/SDRnull_all
     
     SDRs = pd.read_csv(file_path, header=0, index_col=False)
     
-    if level == 'super':
-        return SDRs[SDRs['level'] == 'psuedoSuper']
-    elif level == 'sub':
-        return SDRs[SDRs['level'] == 'psuedoSub']
+    if 'super' in level:
+        return SDRs[SDRs['level'] == 'nullSuper']
+    elif 'sub' in level:
+        return SDRs[SDRs['level'] == 'nullSuper']
     else:
         return SDRs 
         

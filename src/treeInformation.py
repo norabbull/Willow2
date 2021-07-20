@@ -29,7 +29,6 @@ class treeInfo:
         self.pop_dists = None
         self.mean_pop_dists = None
         self.mean_type_dists = None    
-        self.psuedo_group_sizes = None
         self.random_pops = False
                 
     def setup(self, dist_mat_file, pop_info_file):
@@ -95,33 +94,10 @@ class treeInfo:
     def shuffleSampleInfo(self):
         """
         Make randomly defined population groups. 
-        To be used for creatin gnull-distribution.
-        
-        num_groups = number of psuedo-populations to create. 
-        
-        How: 
-            - Create group identifiers
-            - Randomly add group identifier to sample name
-            - Set psuedoSuperPops and psuedoSubPops groups. This
-            infor will be used instead of sample info in calculations.
-            (Probably have to expand other functions to allow this.)
-            - Add pseudo-info to sample info!
+        To be used for creating null-distribution.
+            
         """
-        
-        # Create psuedo group indeifiers               
-
-        # psPops = [f'pseudo{num}/{num_pops}' for num in range(num_pops)]
-        # num_samples = int(round(len(self.sample_info) / num_pops, 0))
-        # psPops = psPops*num_samples
-        
-        # for ind in range(len(self.sample_info)):
-        #     self.sample_info[ind].append(psPops.pop(randrange(len(psPops))))
-        
-        # Shuffle all population information randmoly. 
-        
-        # 1. Get info, stor in list
-        # 2. Place sample randomly back into sampleInfo
-        
+          
         sup = [val[1] for val in self.sample_info.values()]
         sub = [val[2] for val in self.sample_info.values()]
         shuffle(sup)
@@ -132,57 +108,16 @@ class treeInfo:
             val[2] = sub.pop()
             self.sample_info[key] = val
         
-        self.randomPops = True
-        
-        
-               
-    def setSampleInfoDesc(self, num_pops): 
-        
-        self.psuedo_pop_sizes.append(num_pops)
+        self.random_pops = True
+        self.mean_pop_dists = None
+        self.mean_type_dists = None
+        self.pop_dists = None
+
                               
     def getSampleInfo(self): return self.sample_info
     def getPopInfo(self): return self.pop_info
     def getGeneName(self): return self.gene_name
     def getDistMat(self): return self.dist_mat 
-    def getSampleInfoDesc(self):
-        num_def_pops = len(self.sample_info[0]) - 1
-        print(f"There are {num_def_pops} defined.")
-        if self.psuedo_pop_sizes():
-            print("The psuedo-pop sizes are:  {self.psuedo_pop_sizes}.")
-            
-    
-    def countPopSamples(self, sample_info, popType = 'super'):
-        """
-        TO FINISH AND TEST:
-        Count number of samples for each super or sub population
-        popType can be 'super' or 'sub' or both
-        """
-        
-        #return sample_info
-        if popType == 'super':
-            result = pd.DataFrame([sup for name,sup,sub in sample_info.values()], 
-                                  columns = ['sampleCount'])
-            return result['sampleCount'].value_counts()
-        
-        elif popType == 'sub':
-            result = pd.DataFrame([sub for name,sup,sub in sample_info.values()], 
-                                  columns = ['sampleCount'])
-            return result['sampleCount'].value_counts()
-        
-        elif popType == 'all':
-            result1 = pd.DataFrame([sup for name,sup,sub in sample_info.values()], 
-                                  columns = ['sampleCount'])
-            result1 = result1['sampleCount'].value_counts()
-            result2 = pd.DataFrame([sub for name,sup,sub in sample_info.values()], 
-                                  columns = ['sampleCount'])
-            result2 = result2['sampleCount'].value_counts()
-            result = result1.append(result2)
-            
-            return result
-        
-        else: 
-            raise ValueError("popType is unvalid. Options: super, sub")
-    
 
 
 if __name__ == '__main__':

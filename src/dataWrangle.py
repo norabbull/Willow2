@@ -456,8 +456,8 @@ SDRnullSuper.dropna(inplace=True)
 SDRnullSub.dropna(inplace=True)
 
 # Add level column
-SDRnullSuper.insert(0, 'level', 'psuedoSuper')
-SDRnullSub.insert(0, 'level', 'psuedoSub')
+SDRnullSuper.insert(0, 'level', 'nullSuper')
+SDRnullSub.insert(0, 'level', 'nullSub')
 #SDVpsuedo.insert(0, 'level', 'psuedo')
 
 SDRnullAll = pd.concat([SDRnullSuper, SDRnullSub])
@@ -466,6 +466,133 @@ SDRnullAll = pd.concat([SDRnullSuper, SDRnullSub])
 
 SDRnullAll.to_csv('C:/Users/norab/Master/Data/SDRnull/all/SDRnull47_all_12.07.2021.csv', index = False, header = True)
 
+# =============================================================================
+# Extract value for null dist, 3 genes
+# =============================================================================
+
+SDRnullSuper_files = ['C:/Users/norab/Master/Data/SDRnull/all/nullDistSDRsub_3genes_14.07.2021_10.33.csv']
+SDRnullSub_files = ['C:/Users/norab/Master/Data/SDRnull/all/nullDistSDRsuper_3genes_14.07.2021_10.33.csv']
+
+# Load
+SDRnullSuper = pd.DataFrame(columns = ['gene', 'SDR'])
+SDRnullSub = pd.DataFrame(columns = ['gene', 'SDR'])
+for f in SDRnullSuper_files: 
+    SDRnullSuper = SDRnullSuper.append(pd.read_csv(f, names = ['gene', 'SDR']))
+for f in SDRnullSub_files: 
+    SDRnullSub = SDRnullSub.append(pd.read_csv(f, names = ['gene', 'SDR']))
+
+SDRnullSuper.dropna(inplace=True)
+SDRnullSub.dropna(inplace=True)
+
+# Add level column
+SDRnullSuper.insert(0, 'level', 'nullSuper')
+SDRnullSub.insert(0, 'level', 'nullSub')
+#SDVpsuedo.insert(0, 'level', 'psuedo')
+
+SDRnullAll = pd.concat([SDRnullSuper, SDRnullSub])
+
+# Save
+
+SDRnullAll.to_csv('C:/Users/norab/Master/Data/SDRnull/all/SDRnull3_all_14.07.2021.csv', index = False, header = True)
+
+# =============================================================================
+# Extract value for null dist, 93 genes
+# =============================================================================
+
+SDRnullSuper_files = ['C:/Users/norab/Master/Data/SDRnull/all/nullDistSDRsub_3genes_14.07.2021_10.33.csv']
+SDRnullSub_files = ['C:/Users/norab/Master/Data/SDRnull/all/nullDistSDRsuper_3genes_14.07.2021_10.33.csv']
+
+# Load
+SDRnullSuper = pd.DataFrame(columns = ['gene', 'SDR'])
+SDRnullSub = pd.DataFrame(columns = ['gene', 'SDR'])
+for f in SDRnullSuper_files: 
+    SDRnullSuper = SDRnullSuper.append(pd.read_csv(f, names = ['gene', 'SDR']))
+for f in SDRnullSub_files: 
+    SDRnullSub = SDRnullSub.append(pd.read_csv(f, names = ['gene', 'SDR']))
+
+SDRnullSuper.dropna(inplace=True)
+SDRnullSub.dropna(inplace=True)
+
+# Add level column
+SDRnullSuper.insert(0, 'level', 'nullSuper')
+SDRnullSub.insert(0, 'level', 'nullSub')
+#SDVpsuedo.insert(0, 'level', 'psuedo')
+
+SDRnullAll = pd.concat([SDRnullSuper, SDRnullSub])
+
+# Save
+
+SDRnullAll.to_csv('C:/Users/norab/Master/Data/SDRnull/all/SDRnull3_all_14.07.2021.csv', index = False, header = True)
+
+# =============================================================================
+# Separate genes for repeated SDR calculation
+# =============================================================================
+
+LIN37_super = SDRnullSuper[SDRnullSuper['gene'] == 'ENSG00000267796___LIN37']
+KRA22_super = SDRnullSuper[SDRnullSuper['gene'] == 'ENSG00000214518___KRA22']
+DAXX_super = SDRnullSuper[SDRnullSuper['gene'] == 'ENSG00000227046___DAXX']
+
+LIN37_sub = SDRnullSub[SDRnullSub['gene'] == 'ENSG00000267796___LIN37']
+KRA22_sub = SDRnullSub[SDRnullSub['gene'] == 'ENSG00000214518___KRA22']
+DAXX_sub = SDRnullSub[SDRnullSub['gene'] == 'ENSG00000227046___DAXX']
+
+LIN37_SDRnull_all = pd.concat([LIN37_super, LIN37_sub])
+KRA22_SDRnull_all = pd.concat([KRA22_super, KRA22_sub])
+DAXX_SDRnull_all = pd.concat([DAXX_super, DAXX_sub])
+
+LIN37_SDRnull_all['level'].replace('nullSuper', 'nullSuperLIN37', inplace = True)
+KRA22_SDRnull_all['level'].replace('nullSuper', 'nullSuperKRA22', inplace = True)
+DAXX_SDRnull_all['level'].replace('nullSuper', 'nullSuperDAXX', inplace = True)
+LIN37_SDRnull_all['level'].replace('nullSub', 'nullSubLIN37', inplace = True)
+KRA22_SDRnull_all['level'].replace('nullSub', 'nullSubKRA22', inplace = True)
+DAXX_SDRnull_all['level'].replace('nullSub', 'nullSubDAXX', inplace = True)
+
+LIN37_SDRnull_all.to_csv('C:/Users/norab/Master/Data/SDRnull/all/LIN37_nullSDR_all.csv', index = False, header = True)
+KRA22_SDRnull_all.to_csv('C:/Users/norab/Master/Data/SDRnull/all/KRA22_nullSDR_all.csv', index = False, header = True)
+DAXX_SDRnull_all.to_csv('C:/Users/norab/Master/Data/SDRnull/all/DAXX_nullSDR_all.csv', index = False, header = True)
+
+# Make gene as level
+LIN37_SDRnull_all['level'].replace('nullSuper', 'nullSuperLIN37', inplace = True)
+LIN37_SDRnull_all['level'].replace('nullSuper', 'nullSuperLIN37', inplace = True)
+LIN37_SDRnull_all['level'].replace('nullSuper', 'nullSuperLIN37', inplace = True)
+
+
+# =============================================================================
+# null Dist, fake genes
+# =============================================================================
+
+SDRnullSuper_files = ['C:/Users/norab/Master/Data/SDRnull/all/nullDistSDRsuper_fakeGenes_19.07.2021_16.24.csv']
+SDRnullSub_files = ['C:/Users/norab/Master/Data/SDRnull/all/nullDistSDRsub_fakeGenes_19.07.2021_16.24.csv']
+
+# Load
+SDRnullSuper = pd.DataFrame(columns = ['gene', 'SDR'])
+SDRnullSub = pd.DataFrame(columns = ['gene', 'SDR'])
+for f in SDRnullSuper_files: 
+    SDRnullSuper = SDRnullSuper.append(pd.read_csv(f, names = ['gene', 'SDR']))
+for f in SDRnullSub_files: 
+    SDRnullSub = SDRnullSub.append(pd.read_csv(f, names = ['gene', 'SDR']))
+
+SDRnullSuper.dropna(inplace=True)
+SDRnullSub.dropna(inplace=True)
+
+# Add level column
+SDRnullSuper.insert(0, 'level', 'nullSuper')
+SDRnullSub.insert(0, 'level', 'nullSub')
+#SDVpsuedo.insert(0, 'level', 'psuedo')
+
+
+SDRnullAll = pd.concat([SDRnullSuper, SDRnullSub])
+
+SDRnullAll.replace("/home/data4/job_input/cophenetic_distances_fakeGenes/test_align_5supx26subX52samples", "5supx26subX52samples", inplace= True)
+SDRnullAll.replace("/home/data4/job_input/cophenetic_distances_fakeGenes/test_align_2supx2subX4samples", "2supx2subX4samples", inplace= True)
+
+big = SDRnullAll[SDRnullAll['gene'] == '5supx26subX52samples']
+small = SDRnullAll[SDRnullAll['gene'] == '2supx2subX4samples']
+
+
+# Save
+big.to_csv('C:/Users/norab/Master/Data/SDRnull/all/all_5supx26subX52samples.csv', index = False, header = True)
+small.to_csv('C:/Users/norab/Master/Data/SDRnull/all/all_2supx2subX4samples.csv', index = False, header = True)
 # =============================================================================
 # Load data
 # =============================================================================
@@ -518,13 +645,14 @@ allGenes_fullpath = pd.DataFrame([f for f in all_files for g in allGenes if g in
 
 allGenes_fullpath.to_csv('E:\\Master\\Data\\SDRnull\\other\\nullSDR_47genes.csv', index = False, header = False)
 
+
+
 # =============================================================================
-# Get 50 genes with lowest SDR
+# Get 70 genes with lowest SDR
 # =============================================================================
 
-SDRs = load_SDRs()
-SDRs_super = SDRs[SDRs['level'] == 'super'].sort_values(by = 'SDR')
-SDRs_sub = SDRs[SDRs['level'] == 'sub'].sort_values(by= 'SDR')
+SDRs_super = load_SDRs(level='super').sort_values(by = 'SDR')
+SDRs_sub = load_SDRs(level='sub'.sort_values(by= 'SDR')
 SDRs_super70 = SDRs_super.iloc[0:70]
 SDRs_sub70 = SDRs_sub.iloc[0:70]
 genes = SDRs_super70['gene'].append(SDRs_sub70['gene'])

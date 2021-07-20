@@ -8,13 +8,13 @@ Created on Tue Jul 13 15:06:09 2021
 from inspections.inspectionHelpers import *
 from plotnine import *        # OBS: must change to all needed stuff only
 from scipy.stats import kstest, norm, stats, mannwhitneyu, wilcoxon
+from scipy.stats import skew, skewtest, kurtosis, kurtosistest
 import numpy as np
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 import pylab
 from statsmodels.stats import shapiro
-
-
+import matplotlib.pyplot as plt
 
 
 # =============================================================================
@@ -30,6 +30,7 @@ SDRnull = load_SDRnull()
 SDRnull47 = load_SDRnull47()
 SDRnullSuper = load_SDRnull(level='super')
 SDRnullSub = load_SDRnull(level='sub')
+
 # =============================================================================
 # Inspect and check SDR normality 
 # =============================================================================
@@ -329,6 +330,38 @@ else:
 """
     Comment: 
         All H0 are rejected. Distributions are clearly different. 
+        
+"""
+
+# =============================================================================
+# Measure symmettry of distribution
+# =============================================================================
+
+"""
+    Why: 
+        If distribution is symmetric, it is meaningful to calculate a CI, 
+        which may be a good way to set a treshold for which genes to include
+        in further analysis. 
+        If not, I need to find another way.
+"""
+# Skewness    
+
+skew(SDRnullSuperData)
+skewtest(SDRnullSuperData)
+skew(SDRnullSubData)
+skewtest(SDRnullSubData)
+
+# Kurtosis
+kurtosis(SDRnullSuperData)
+kurtosistest(SDRnullSuperData)
+kurtosis(SDRnullSubData)
+kurtosistest(SDRnullSubData)
+
+"""
+    Comment:
+        Null dist is highly skewed and have high kurtosis. 
+        Apparently many outliers. 
+        Need more data from genes, I think.
         
 """
 

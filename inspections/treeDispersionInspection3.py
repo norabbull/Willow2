@@ -25,6 +25,11 @@ SDRs = load_SDRs()
 SDVs = load_SDVs()
 SDRnull = load_SDRnull()
 SDRnull47 = load_SDRnull47()
+SDRnullDAXX = load_SDRnull(file_path ='C:/Users/norab/Master/Data/SDRnull/all/DAXX_nullSDR_all.csv', level = 'nullSuperDAXX')
+SDRnullKRA22 = load_SDRnull(file_path ='C:/Users/norab/Master/Data/SDRnull/all/KRA22_nullSDR_all.csv', level = 'nullSuperKRA22')
+SDRnullLIN37 = load_SDRnull(file_path ='C:/Users/norab/Master/Data/SDRnull/all/LIN37_nullSDR_all.csv', level = 'nullSuperLIN37')
+SDRnullSmallFake = load_SDRnull(file_path = 'C:/Users/norab/Master/Data/SDRnull/all/all_2supx2subX4samples.csv')
+SDRnullBigFake = load_SDRnull(file_path = 'C:/Users/norab/Master/Data/SDRnull/all/all_5supx26subX52samples.csv')
 
 
 SDRnull47super = SDRnull47[SDRnull47['level'] == 'super']
@@ -33,19 +38,27 @@ len(SDRnull47super.gene.unique())
 
 SDRnull = SDRnull.drop_duplicates(subset='gene')
 SDRnullAll = SDRnull.append(SDRnull47)
+
 # Single SDRs	gene
 SSDR_NFYA = load_singleSDR("ENSG00000110700___RS13")
 SSDR_FGR =load_singleSDR("ENSG00000000938___FGR")
 random_trees_50 = load_allSingleSDRs()
+
+
+# =============================================================================
+# Unique stuff
+# =============================================================================
+
+len(SDRnullDAXX.nullSDR.unique())
 
 # =============================================================================
 # Merge into common df
 # =============================================================================
 
 # Merge
-data1 = totdist.merge(uniqseqs, on = 'gene')
+data1 = totdist.merge(SDRs, on = 'gene')
 data2 = data1.merge(SDRs, on  = 'gene', how = 'outer')
-data3 = data2.merge(SDRnullAll, on = ['gene', 'level'], how = 'outer')
+#data3 = data2.merge(SDRnullAll, on = ['gene', 'level'], how = 'outer')
 data_all = data2.merge(SDVs, on = ['gene', 'level'], how = 'outer')
 
 # Wrangle
@@ -55,6 +68,12 @@ data_all.dropna(inplace=True)
 # Sort 
 data_all = data_all.sort_values(by=['SDR'])
 
+# =============================================================================
+# MERGE LIN37, DAXX, KRA22
+# =============================================================================
+
+data1 = SDRnullDAXX.append(SDRnullLIN37)
+DAXX_KRA22_LIN37 = data1.append(SDRnullKRA22)
 # =============================================================================
 # Plotting
 # =============================================================================
@@ -85,6 +104,12 @@ data_all = data_all.sort_values(by=['SDR'])
  + geom_point()
  + theme_classic()
  + labs(title='SDR vs uniqseq')
+)
+
+(ggplot(data_all, aes('SDV', 'uniqseq', fill = 'level'))
+ + geom_point()
+ + theme_classic()
+ + labs(title='SDV vs uniqseq')
 )
 
 # =============================================================================
@@ -167,6 +192,48 @@ ggplot(data=SDRnull47sub,
 
 ggplot(data=SDRnull47, 
        mapping=aes(x='SDR', fill='level')) + geom_density(adjust = 1/4, alpha=0.5)
+
+# Null dist, DAXX, KRA22, LIN37
+(ggplot(data=DAXX_KRA22_LIN37, mapping=aes(x='nullSDR', fill='level')) 
+ + geom_density(adjust = 1/4, alpha=0.5)
+ + labs(title = 'nullSDR: DAXX, KRA22, LIN37')
+ )
+
+(ggplot(data=SDRnullDAXX, mapping=aes(x='nullSDR', fill='level')) 
+ + geom_density(adjust = 1/4, alpha=0.5)
+ + labs(title = 'nullSDR: DAXX')
+ )
+
+(ggplot(data=SDRnullKRA22, mapping=aes(x='nullSDR', fill='level')) 
+ + geom_density(adjust = 1/4, alpha=0.5)
+ + labs(title = 'nullSDR: KRA22')
+ )
+
+(ggplot(data=SDRnullLIN37, mapping=aes(x='nullSDR', fill='level')) 
+ + geom_density(adjust = 1/4, alpha=0.5)
+ + labs(title = 'nullSDR: LIN37')
+ )
+
+
+SDRs[SDRs['gene'] == 'ENSG00000227046___DAXX']
+SDRs[SDRs['gene'] == 'ENSG00000267796___LIN37']
+SDRs[SDRs['gene'] == 'ENSG00000214518___KRA22']
+
+SDR_DAXX_super = SDRnullDAXX[SDRnullDAXX['level'] == 'nullSuperDAXX']
+un = SDR_DAXX_super['nullSDR'].unique()
+
+
+# Fake trees
+(ggplot(data=SDRnullSmallFake, mapping=aes(x='SDR', fill='level')) 
+ + geom_histogram(alpha = 0.5, size = 0.7 )
+ + labs(title = 'nullSDR: small fake')
+ )
+
+(ggplot(data=SDRnullBigFake, mapping=aes(x='SDR', fill='level')) 
+ + geom_density(adjust = 1/4, alpha=0.5)
+ + labs(title = 'nullSDR: big fake')
+ )
+
 
 
 # All SDRs
@@ -258,6 +325,8 @@ genes = allData['gene']
     ggplot(SDRs_ps, aes(x='SDR', color = 'level')
     + geom_histogram()
 ))
+
+
 
 
 
