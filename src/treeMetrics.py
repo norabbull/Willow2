@@ -61,10 +61,18 @@ class treeMetrics(treeInfo):
     #             Within
     # =============================================================================
                 if subPop1 == subPop2:        # Same super pop, same sub pop
-                    # Super
-                    supWithSums[supPop1] = [i+j for i, j in zip(supWithSums[supPop1], [val, 1])]  
-                    # Sub
-                    subWithSums[subPop1] = [i+j for i, j in zip(subWithSums[subPop1], [val, 1])] 
+                    if supPop1 == supPop2:
+                        # Super
+                        supWithSums[supPop1] = [i+j for i, j in zip(supWithSums[supPop1], [val, 1])]  
+                        # Sub
+                        subWithSums[subPop1] = [i+j for i, j in zip(subWithSums[subPop1], [val, 1])] 
+                    else:
+                        # Super
+                        supBetSums[supPop1] = [i+j for i, j in zip(supBetSums[supPop1], [val, 1])]  
+                        supBetSums[supPop2] = [i+j for i, j in zip(supBetSums[supPop2], [val, 1])]  
+                        # Sub
+                        subWithSums[subPop1] = [i+j for i, j in zip(subWithSums[subPop1], [val, 1])] 
+                        
     # =============================================================================
     #             Within and Between
     # =============================================================================
@@ -111,7 +119,13 @@ class treeMetrics(treeInfo):
                 dist_summary[key] += dist_count[0]
                 count_summary[key] += dist_count[1]
         
-        self.mean_type_dists = {key: round(dist_summary[key] / count_summary[key], 10)  # Was 6 
+        print("supWith distance:", dist_summary['supWith'])
+        print("supBet distance:", dist_summary['supBet'])
+        print("supWith:", count_summary['supWith'])
+        print("supBet:", count_summary['supBet'])
+        
+
+        self.mean_type_dists = {key: round(dist_summary[key] / count_summary[key], 8)  # Was 8 
                                 for key, val in dist_summary.items()}
              
         
@@ -133,7 +147,7 @@ class treeMetrics(treeInfo):
             
             for pop, dist_count in val.items():
                 if dist_count[1]:  
-                    type_means[pop] = round(dist_count[0] / dist_count[1], 10) # was 6
+                    type_means[pop] = round(dist_count[0] / dist_count[1], 6) # was 6
                 else:   # No distance calculated for this pop
                     type_means[pop] = 0
              
@@ -160,18 +174,16 @@ class treeMetrics(treeInfo):
         elif (self.mean_type_dists and self.random_pops):
             self.calcMeanTypeDists()
         
-        print("Mean type dists: ")
-        print(self.mean_type_dists)
             
         if self.mean_type_dists['supBet']:
             self.SDRsuper = round(self.mean_type_dists['supWith'] / 
-                                  self.mean_type_dists['supBet'], 2) # was 6
+                                  self.mean_type_dists['supBet'], 6) # was 6
         else: 
             self.SDRsuper = float('NaN')
         
         if self.mean_type_dists['subBet']:
             self.SDRsub = round(self.mean_type_dists['subWith'] / 
-                                self.mean_type_dists['subBet'], 2) # was 6
+                                self.mean_type_dists['subBet'], 6) # was 6
         else:
             self.SDRsub = float('NaN')
         
@@ -345,8 +357,7 @@ class treeMetrics(treeInfo):
         sampleCount['gene'] = self.getGeneName()
         
         return sampleCount
-    
-    
+        
     def getPopDists(self):
         if not self.pop_dists: self.calcPopDists()
         return self.pop_dists

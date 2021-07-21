@@ -26,6 +26,7 @@ SDVs = load_SDVs()
 SDRnull = load_SDRnull()
 SDRnull47 = load_SDRnull47()
 SDRnullDAXX = load_SDRnull(file_path ='C:/Users/norab/Master/Data/SDRnull/all/DAXX_nullSDR_all.csv', level = 'nullSuperDAXX')
+SDRnullDAXX2 = load_SDRnull(file_path='E:/Master/test_runs/nullSDR_test/test_21.07.21/job_output/test_DAXX_nullSDRsuper_21.07.2021_12.50.csv')
 SDRnullKRA22 = load_SDRnull(file_path ='C:/Users/norab/Master/Data/SDRnull/all/KRA22_nullSDR_all.csv', level = 'nullSuperKRA22')
 SDRnullLIN37 = load_SDRnull(file_path ='C:/Users/norab/Master/Data/SDRnull/all/LIN37_nullSDR_all.csv', level = 'nullSuperLIN37')
 SDRnullSmallFake = load_SDRnull(file_path = 'C:/Users/norab/Master/Data/SDRnull/all/all_2supx2subX4samples.csv')
@@ -50,6 +51,8 @@ random_trees_50 = load_allSingleSDRs()
 # =============================================================================
 
 len(SDRnullDAXX.nullSDR.unique())
+
+len(SDRnullDAXX2.nullSDR.unique())
 
 # =============================================================================
 # Merge into common df
@@ -119,8 +122,9 @@ DAXX_KRA22_LIN37 = data1.append(SDRnullKRA22)
 
 
 # =============================================================================
-# Violin + points + boxplot
+# Next level violin plots
 # =============================================================================
+
 
 shift = 0.1
 
@@ -128,8 +132,36 @@ def alt_sign(x):
     "Alternate +1/-1 if x is even/odd"
     return (-1) ** x
 
-m1 = aes(x=stage('level', after_scale='x+shift*alt_sign(x)'))              # shift outward
-m2 = aes(x=stage('level', after_scale='x-shift*alt_sign(x)'), group='gene')  # shift inward
+m1 = aes(x=stage('Level', after_scale='x+shift*alt_sign(x)'))              # shift outward
+m2 = aes(x=stage('Level', after_scale='x-shift*alt_sign(x)'), group='gene')  # shift inward
+
+
+# Violine + points + lines between sub and super
+(ggplot(SDRall, aes('Level', 'value', fill = 'Level'))
+ + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.8, show_legend = False)
+ + geom_point(m2, color='none', alpha=0.6, size=1.5, show_legend=False)
+ + geom_line(m2, color='gray', size=0.65, alpha=0.6)
+ + theme_classic()
+ + theme(figure_size=(8, 6))
+ + labs(title='SDR values for 8782 genes (all)')
+)
+
+# Violin + points + boxplot
+(ggplot(SDRall, aes('Level', 'value', fill = 'Level'))
+ + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.65, show_legend = False)
+ + geom_boxplot(width = shift, alpha=0.7, size = 0.65, show_legend = False)
+ + scale_fill_manual(values=['dodgerblue', 'darkorange'])
+ + theme_classic()
+ + theme(figure_size=(8, 6))
+ + labs(title='SDR values for 8782 genes (all)')
+)
+
+
+# =============================================================================
+# Violin + points + boxplot
+# =============================================================================
+
+
 
 (ggplot(data_all, aes('level', 'SDR', fill = 'level'))
  + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.65, show_legend = False)
@@ -212,6 +244,11 @@ ggplot(data=SDRnull47,
 (ggplot(data=SDRnullLIN37, mapping=aes(x='nullSDR', fill='level')) 
  + geom_density(adjust = 1/4, alpha=0.5)
  + labs(title = 'nullSDR: LIN37')
+ )
+
+(ggplot(data=SDRnullDAXX2, mapping=aes(x='nullSDR')) 
+ + geom_density(adjust = 1/100, alpha=0.5)
+ + labs(title = 'nullSDR: DAXX2')
  )
 
 
@@ -326,7 +363,11 @@ genes = allData['gene']
     + geom_histogram()
 ))
 
-
+(
+    ggplot(SDRnullDAXX2, aes(x='nullSDR'))
+    + geom_histogram(alpha = 0.7, size = 0.7, bins = 5)
+    + theme_xkcd()     
+)
 
 
 

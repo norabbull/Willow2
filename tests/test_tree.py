@@ -342,7 +342,8 @@ class TestTreeFunctions:
         tree2.calcSDR()
         subSDRtrand = tree2.getSDRsub()
         superSDRrand = tree2.getSDRsuper()
-        
+    
+
     def test_nullSDR_DAXX(self):
         
         gene = 'E:/Master/cophenetic_dists/ENSG00000227046___DAXX___CopD.csv'
@@ -377,7 +378,7 @@ class TestTreeFunctions:
             0.00534 * 670 = 3.5778
         # 2. Total number of comparisons made within:
             
-        #(671!)/(2! * (671-2)!) (calculated online: https://www.calculatorsoup.com/calculators/discretemathematics/combinations.php)
+            #(671!)/(2! * (671-2)!) (calculated online: https://www.calculatorsoup.com/calculators/discretemathematics/combinations.php)
             
             224785 # AFR
             135981 # EUR
@@ -388,16 +389,12 @@ class TestTreeFunctions:
             # Total number of within pairwise distances: 
             224785 + 135981 + 132355 + 120786 + 60378 = 674285
             
-            # mean within: 
-    
-            
-        # Mean between distance: 
+            # Mean between distance: 
             2548-671 = 1877         # Num non-afr samples
             # Num pairwise distances between AFR and other pops
             1877*671 = 1259467
             # Total between distance between the AFR and other pops: 
             1877 * 0.00534 = 10.02318
-            
             
             # Same for other pops: 
             2548-522 = 2026 # EUR
@@ -420,9 +417,8 @@ class TestTreeFunctions:
             10.02318 + 2.78748 + 2.7501 + 2.29086 + 1.85832 = 19.70994
             # Total between comp = 
             1259467 + 1057572 + 1046995 + 882024 + 765600 = 5011658
-
         
-            # SDR
+        # 3. SDR:
             (3.5778 / 674285) / (19.70994 / 5011658)
 
             # Note:
@@ -434,12 +430,12 @@ class TestTreeFunctions:
             #   it is necessary to save it this way for other types of calculations.
             
 # =============================================================================
-#             Shuffled:
+#             Shuffled inspection:
 # =============================================================================
             
             # Funny samle: AFR___LWK___NA19437
             sdrs = []
-            for _ in range(30):
+            for _ in range(20):
                 
                 tree.shuffleSampleInfo()
                 sample_info_shuf = tree.getSampleInfo()
@@ -448,41 +444,57 @@ class TestTreeFunctions:
                     sdrs.append(tree.getSDRsuper())
                     meanTypeDist_shuf = tree.getMeanTypeDists()
                     meanPopDist_shuf = tree.getMeanPopDists()
+                    
+                    # print("Pop dists: ", tree.getPopDists())
                     print("Sample: ", sample_info_shuf[2547])
-                    print("MeanPopWith:", meanPopDist_shuf['supWith'])
-                    print("MeanPopBet:", meanPopDist_shuf['supBet'])
-                    print("MeanTypeWith:", meanTypeDist_shuf['supWith'])
-                    print("MeanTypeBet:", meanTypeDist_shuf['supBet'])
+                    # print("MeanPopWith:", meanPopDist_shuf['supWith'])
+                    # print("MeanPopBet:", meanPopDist_shuf['supBet'])
+                    # print("MeanTypeWith:", meanTypeDist_shuf['supWith'])
+                    # print("MeanTypeBet:", meanTypeDist_shuf['supBet'])
                     print("SDR: ", tree.getSDRsuper())
                     
     def test_DAXX_sampleinfo(self):
         
-        gene = 'E:/Master/cophenetic_dists/ENSG00000227046___DAXX___CopD.csv'
-        pop_info = 'C:/Users/norab/Master/Data/real_tree_data/phydist_population_classes.tsv'
-        tree = treeMetrics()
-        tree.setup(gene, pop_info)
+        gene = 'C:/Users/norab/OneDrive/Skrivebord/ENSG00000227046___DAXX___CopD.csv'
+        pop_info = 'C:/Users/norab/Master/Data/real_tree_data/phydist_population_classes.tsv'     
+        save_info2 = pd.DataFrame(columns=['SDR', 'AFR', 'EUR', 'EAS', 'AMR', 'SAS','sample_in'])
+        
+        for i in range(100):
+            print("Tree nr: ", i)
+            
+            tree = treeMetrics()
+            tree.setup(gene, pop_info)
+        
+            sample_info = tree.getSampleInfo()
+            tree.calcSDR()
+            df = pd.DataFrame.from_dict(sample_info).transpose()
+            df.rename(columns={0:'sample', 1:'super', 2:'sub'}, inplace = True)
+            counts = df.super.value_counts().to_frame()
+            counts.rename(columns={'super': f'normal_{i}'}, inplace=True)
+            counts.at['SDR', f'normal_{i}'] = tree.getSDRsuper()
+            counts.at['sample_in',f'normal_{i}'] = sample_info[2547][1]
+            
+            save_info2 = save_info2.append(counts.transpose())
+            
+            for k in range(10):
+                print("Round nr: ", k)
+                tree.shuffleSampleInfo()
+                tree.calcSDR()
+                
+                sample_info= tree.getSampleInfo()
+                df = pd.DataFrame.from_dict(sample_info).transpose()
+                df.rename(columns={0:'sample', 1:'super', 2:'sub'}, inplace = True)
+                counts = df.super.value_counts().to_frame()
+                counts.rename(columns={'super': f'shuf_{i}_{k}'}, inplace=True)
+                counts.at['SDR', f'shuf_{i}_{k}'] = tree.getSDRsuper()
+                counts.at['sample_in', f'shuf_{i}_{k}'] = sample_info[2547][1]
+                save_info2 = save_info2.append(counts.transpose())
+            
+        save_info2.to_csv('C:/Users/norab/Master/save_info2_SDR.csv')
         
         
-        save_info = pd.DataFrame(columns=['SDR', 'AFR', 'EUR', 'EAS', 'AMR', 'SAS'])
-        sample_info = tree.getSampleInfo()
-        tree.calcSDR()
-        
-        
-        d = pd.DataFrame.from_dict(sample_info).transpose()
-        d.rename(columns={0:'sample', 1:'super', 2:'sub'}, inplace = True)
-        counts = d.super.value_counts()
-        counts = counts.append(tree.getSDRsuper())
-        
-        save_info.append(counts)
-        
-        
-        
-        sample_info_before = deepcopy(sample_info)
-        
-        tree.shuffleSampleInfo()
-        sample_info_shuffled = tree.getSampleInfo()
-        
-
+        def test_nullSDR(self):
+            E:\Master\cophenetic_dists_30samples
     
         
         
