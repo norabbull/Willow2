@@ -239,7 +239,6 @@ class treeMetrics(treeInfo):
         self.SDVsub = round(np.array(list(self.singleSubSDRs.values())).var(ddof=1), 4)
     
     def calcNonZeroTotal(self, 
-                         dist_mat, 
                          percent = True):
         """
 
@@ -253,10 +252,10 @@ class treeMetrics(treeInfo):
             
         Note: This does the same as what u did in R. Have all values alread. 
         """
-        nonZero_row = pd.DataFrame((dist_mat != 0).astype(int).sum(axis=1))
+        nonZero_row = pd.DataFrame((self.dist_mat != 0).astype(int).sum(axis=1))
         nonZeroCount = int(nonZero_row.sum(axis=0))
         
-        num_entries = (dist_mat.shape[0] * dist_mat.shape[1]) - dist_mat.shape[0]
+        num_entries = (self.dist_mat.shape[0] * self.dist_mat.shape[1]) - self.dist_mat.shape[0]
         nonZeroPercent = nonZeroCount / num_entries
         if percent:    
             return nonZeroPercent
@@ -264,9 +263,7 @@ class treeMetrics(treeInfo):
             return nonZeroCount
         
     
-    def calcNonZerosForSamples(self, 
-                               dist_mat, 
-                               percent = True):
+    def calcNonZerosForSamples(self, percent = True):
         """
         Input:
             dist_mat : DataFrame with cophenetic distances for a tree
@@ -276,7 +273,7 @@ class treeMetrics(treeInfo):
             percent and count per row. 
         """
          
-        nonZero_row = pd.DataFrame((dist_mat != 0).astype(int).sum(axis=1), columns = ['nonZero_count'])
+        nonZero_row = pd.DataFrame((self.dist_mat != 0).astype(int).sum(axis=1), columns = ['nonZero_count'])
         nonZero_row['percent'] = round(nonZero_row['nonZero_count'] / (nonZero_row.shape[0] - 1), 4)
         
         return nonZero_row

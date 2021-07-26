@@ -30,6 +30,8 @@ class treeInfo:
         self.mean_pop_dists = None
         self.mean_type_dists = None    
         self.random_pops = False
+        self.uniqseq_map = None
+        self.uniqseq_count= None
                 
     def setup(self, dist_mat_file, pop_info_file):
         self.setDistMat(dist_mat_file)
@@ -113,11 +115,24 @@ class treeInfo:
         self.mean_type_dists = None
         self.pop_dists = None
 
-                              
+    def setUniqseqMap(self, uniqseq_map_file):
+        """
+        Set info on number of sequences there are of each unique sequence
+        that makes up the tree. 
+        """
+        # Read file
+        file = pd.read_csv(uniqseq_map_file, header = None)
+        
+        # Counts
+        self.uniqseq_count = len(file[0])
+        self.uniqseq_map = sorted(file.count(axis=1), reverse=True)
+        
     def getSampleInfo(self): return self.sample_info
     def getPopInfo(self): return self.pop_info
     def getGeneName(self): return self.gene_name
-    def getDistMat(self): return self.dist_mat 
+    def getDistMat(self): return self.dist_mat
+    def getUniqseqMap(self): return self.uniqseq_map
+    def getUniqseqCount(self): return self.uniqseq_count
 
 
 if __name__ == '__main__':

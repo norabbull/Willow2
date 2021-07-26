@@ -64,9 +64,20 @@ class TestRunStuff(unittest.TestCase):
     
     def test_runCalcSDRnullDist():
         
-        config_file = 'E:/Master/test_runs/SDR_nullDist_test/test_25.06.21/test_makeNullDistSDR.yml'
+        config_file = 'E:/Master/test_runs/nullSDR_test/test_25.06.21/test_makeNullDistSDR.yml'
         run = RunStuff(config_file)
         run.main()
+        
+        # Test 2
+        config_file = 'E:/Master/test_runs/nullSDR_test/test_21.07.21/configs/main_config_test_nullSDR_47genes.yml'
+        run = RunStuff(config_file)
+        run.main()
+        
+        # Test 3
+        config_file = 'E:/Master/test_runs/nullSDR_test/test_21.07.21/configs/main_config_test_nullSDR_DAXX.yml'
+        run = RunStuff(config_file)
+        run.main()
+        
 
     
         

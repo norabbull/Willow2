@@ -430,6 +430,57 @@ class TestTreeFunctions:
             #   it is necessary to save it this way for other types of calculations.
             
 # =============================================================================
+#             America
+# =============================================================================
+# 1. Total distance from non-zero sample to all other within-samples: 
+            0.00534 * 348 = 1.85832
+        # 2. Total number of comparisons made within:
+            
+            #(671!)/(2! * (671-2)!) (calculated online: https://www.calculatorsoup.com/calculators/discretemathematics/combinations.php)
+            
+            224785 # AFR
+            135981 # EUR
+            132355  # EAS
+            120786 # SAS
+            60378  # AMR
+            
+            # Total number of within pairwise distances: 
+            224785 + 135981 + 132355 + 120786 + 60378 = 674285
+            
+            # Mean between distance: 
+            2548-671 = 1877         # Num non-afr samples
+            # Num pairwise distances between AFR and other pops
+            1877*671 = 1259467
+            # Total between distance between the AFR and other pops: 
+            671 * 0.00534 = 3.58314
+            
+            # Same for other pops: 
+            2548-522 = 2026 # EUR
+            2026*522 = 1057572
+            522 * 0.00534 = 2.78748
+            
+            2548-515 = 2033 # EAS
+            2033*515 = 1046995
+            515 * 0.00534 = 2.7501
+            
+            2548-492 = 2056 # SAS
+            2056*429 = 882024
+            429 * 0.00534 = 2.29086
+            
+            2548-348 = 2200 # AMR
+            2200*348 = 765600
+            2200 * 0.00534 = 11.748
+            
+            # Total between distance:
+            3.58314 + 2.78748 + 2.7501 + 2.29086 + 11.748 = 23.15958
+            # Total between comp = 
+            1259467 + 1057572 + 1046995 + 882024 + 765600 = 5011658
+        
+        # 3. SDR:
+            (1.85832/ 674285) / (23.15958 / 5011658)
+        # AFR (3.5778 / 674285) / (19.70994 / 5011658)
+        
+# =============================================================================
 #             Shuffled inspection:
 # =============================================================================
             
@@ -495,9 +546,25 @@ class TestTreeFunctions:
         
         def test_nullSDR(self):
             E:\Master\cophenetic_dists_30samples
-    
         
         
+        def test_setUnigseqSampleMap(self):
+            """
+            
+            
+            """
+            # Initate tree
+            gene = 'C:/Users/norab/Master/Data/real_tree_data/dist_mat_subset/ENSG00000001167___NFYA___CopD.csv'
+            pop_info = 'C:/Users/norab/Master/Data/real_tree_data/phydist_population_classes.tsv'
+            map_NFYA = 'E:/Master/Data/other/uniqseq_maps/maps/ENSG00000001167___NFYA_HUMAN__uniq_samplemap.tsv'
+            tree = treeInfo()
+            tree.setup(gene, pop_info)
+            tree.setUniqseqMap(map_NFYA)
+            uniqseq_map = tree.getUniqseqMap()     
+            uniqseq_count = tree.getUniqseqCount()
+            
+            
+            
 # if __name__ == "__main__":
     
 #     test = TestTreeFunctions()

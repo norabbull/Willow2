@@ -19,11 +19,13 @@ from functools import reduce
 # =============================================================================
 # Load stuff 
 # =============================================================================
-uniqseqs = load_uniq_seqs()
-totdist = load_tot_dist()
+uniqseqs = load_uniqseqs()
+totdist = load_totdist()
 SDRs = load_SDRs()
 SDVs = load_SDVs()
 SDRnull = load_SDRnull()
+
+
 SDRnull47 = load_SDRnull47()
 SDRnullDAXX = load_SDRnull(file_path ='C:/Users/norab/Master/Data/SDRnull/all/DAXX_nullSDR_all.csv', level = 'nullSuperDAXX')
 SDRnullDAXX2 = load_SDRnull(file_path='E:/Master/test_runs/nullSDR_test/test_21.07.21/job_output/test_DAXX_nullSDRsuper_21.07.2021_12.50.csv')
@@ -51,7 +53,6 @@ random_trees_50 = load_allSingleSDRs()
 # =============================================================================
 
 len(SDRnullDAXX.nullSDR.unique())
-
 len(SDRnullDAXX2.nullSDR.unique())
 
 # =============================================================================
@@ -60,7 +61,7 @@ len(SDRnullDAXX2.nullSDR.unique())
 
 # Merge
 data1 = totdist.merge(SDRs, on = 'gene')
-data2 = data1.merge(SDRs, on  = 'gene', how = 'outer')
+data2 = data1.merge(SDVs, on  = ['gene', 'level']).drop_duplicates()
 #data3 = data2.merge(SDRnullAll, on = ['gene', 'level'], how = 'outer')
 data_all = data2.merge(SDVs, on = ['gene', 'level'], how = 'outer')
 
@@ -85,10 +86,11 @@ DAXX_KRA22_LIN37 = data1.append(SDRnullKRA22)
 # X vs Y, dotplot, lineplot
 # =============================================================================
 
-(ggplot(data_all, aes('SDR', 'uniqseq', fill = 'level'))
- + geom_point()
+(ggplot(data2, aes('SDV', fill = 'level'))
+ + geom_density()
+ + geom_density(aes('SDR'))
  + theme_classic()
- + labs(title='SDR vs uniqseq')
+ + labs(title='SDV')
 )
 
 (ggplot(data_all, aes('SDR', 'totdist', fill = 'level'))
@@ -200,8 +202,11 @@ m2 = aes(x=stage('Level', after_scale='x-shift*alt_sign(x)'), group='gene')  # s
 #  Overlapping distribution plot
 # =============================================================================
 
-ggplot(data=data_all, 
-       mapping=aes(x='SDR', fill='level')) + geom_density(adjust = 1/4, alpha=0.5)
+(ggplot(data=data1, 
+       mapping=aes(x='SDR', fill='level')) 
+ + geom_density(alpha=0.5)
+ + labs(title="SDR distributions ")
+ )
 
 # Test shit
 ggplot(data=data2, 
@@ -248,7 +253,7 @@ ggplot(data=SDRnull47,
 
 (ggplot(data=SDRnullDAXX2, mapping=aes(x='nullSDR')) 
  + geom_density(adjust = 1/100, alpha=0.5)
- + labs(title = 'nullSDR: DAXX2')
+ + labs(title = 'nullSDR: DAXX')
  )
 
 

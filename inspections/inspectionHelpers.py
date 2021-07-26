@@ -21,7 +21,7 @@ def make_filelist(input_files):
                      if isfile(join(input_files, f))]
     return files
 
-def load_uniq_seqs(file_path = "C:/Users/norab/Master/Data/meta_data/9381_uniqseqs.txt"):
+def load_uniqseqs(file_path = 'C:/Users/norab/Master/Data/meta_data/9381_uniqseqs.txt'):
     """
     Input: None
     Funtion: Load data. Path is specified in function for functoinality.
@@ -35,14 +35,14 @@ def load_uniq_seqs(file_path = "C:/Users/norab/Master/Data/meta_data/9381_uniqse
     uniqseq.rename(columns = {"index": "gene"}, inplace=True)
     return uniqseq
 
-def load_tot_dist(totdist_dir = "C:/Users/norab/Master/Data/meta_data/totalDistancesRefined.txt"):
+def load_totdist(path= "C:/Users/norab/Master/Data/meta_data/totalDistancesRefined.txt"):
     """
     Input: None
     Funtion: Load data. Path is specified in function for functoinality.
     Retun: Pd dataframe with values and gene names as indices.
     """
     
-    totdist = pd.read_csv(totdist_dir, "r", delimiter = ",", index_col = 0)
+    totdist = pd.read_csv(path, "r", delimiter = ",", index_col = 0)
     totdist.rename(index=lambda s: re.sub('_HUMAN__full.*', '', s), 
                     columns = {totdist.columns[0]: "totdist"}, inplace = True)
     totdist.rename(index=lambda s: re.sub('^.*trees/', '', s), 
@@ -52,7 +52,14 @@ def load_tot_dist(totdist_dir = "C:/Users/norab/Master/Data/meta_data/totalDista
     
     return totdist
 
-
+def load_totdist_pops(path = 'C:/Users/norab/Master/data/other_measures/totdist_pops_all.csv', get_info = False):
+    desc = """Informtion on total distance within each defined population
+                for all genes.  """
+    if get_info: 
+        print(desc)
+    
+    return pd.read_csv(path)
+    
 def load_SDRs(file_path = 'C:/Users/norab/Master/Data/SDR/SDR_all.csv', level='All'):
     """ 
     Input: path
@@ -67,22 +74,17 @@ def load_SDRs(file_path = 'C:/Users/norab/Master/Data/SDR/SDR_all.csv', level='A
         return SDRs[SDRs['level'] == 'sub']
     else:
         return SDRs 
+
+
+def load_SDVs(file_path = 'C:/Users/norab/Master/Data/SDV/SDV_all.csv', get_info = False):
     
-    # SDRs.rename(index=lambda s: re.sub('^.*.*ENS', 'ENS', s), inplace = True)
-    # SDRs.columns = ['level', 'gene', 'SDR']
-
-    
-
-def load_SDVs(file_path = 'C:/Users/norab/Master/Data/SDV/SDV_all.csv'):
-    """
-    Input: None
-    Return: pd DataFrame containing SDV values for super and sub popultions for each tree/gene
-    """
-
+    if get_info: 
+        print("""pd DataFrame containing SDV values for super and sub popultions 
+              for each tree/gene""")
+        
     return pd.read_csv(file_path, header=0, index_col=False)
-    #SDVs.rename(index=lambda s: re.sub('^.*.*ENS', 'ENS', s), inplace = True)
-    
 
+    
 def load_singleSDR(gene_name, load_all = False):
     """ 
     Input: None
@@ -161,3 +163,44 @@ def load_cd_mat(path):
     """
     
     return pd.read_csv(path, index_col = 0)
+
+def load_uniqseq_map(folder_path):
+    
+    files = make_filelist(folder_path)
+    files = files[0:10]
+    
+    all_genes = pd.DataFrame(columns = ['gene', 'uniqseq_count'])
+    for f in files:
+        try: 
+            file = pd.read_csv(f, header = None, sep = '\s', index_col = 0)
+            file['uniqseq_count'] = file['uniqseq_count'].apply(lambda x: len(x.split(',')))
+            gene_name = file.index[0]
+            gene_name = re.sub('_HUMAN.*$','', gene_name)
+            file.insert(0, 'gene', gene_name)
+            all_genes = all_genes.append(file)
+        except: 
+            print("Something weird with: ", f)
+            
+    return 
+    
+
+#%%
+# Test shit
+test = load_uniqseq_map('E:/Master/Data/other/uniqseq_maps/maps/')
+
+test = make_filelist('E:/Master/Data/other/uniqseq_maps/maps/')
+
+
+f_working = pd.read_csv('E:/Master/Data/other/uniqseq_maps/maps/ENSG00000136518___ACL6A_HUMAN__uniq_samplemap.tsv', sep = '\s', header = None, index_col = 0)
+f_noWork = pd.read_csv('E:/Master/Data/other/uniqseq_maps/maps/ENSG00000205922___ONEC3_HUMAN__uniq_samplemap.tsv', header = None,sep = '\s', index_col=0)
+
+f = pd.read_csv('E:/Master/Data/other/uniqseq_maps/maps/ENSG00000136518___ACL6A_HUMAN__uniq_samplemap.tsv', sep = '\s', index_col = 0, header= None)
+f.columns = ['uniqseq_count']
+f['uniqseq_count']= f['uniqseq_count'].apply(lambda x: len(x.split(',')))
+gene_name = f.index[0]
+gene_name = re.sub('_HUMAN.*$','', gene_name)
+f.insert(0, 'gene', gene_name)
+
+
+    
+    

@@ -376,7 +376,7 @@ if __name__ == '__main__':
     # Test on lenovo computer
     #configFilepath = 'E:/Master/jobs/debug_calcSDRnullDist_28.06.yml'
     
-    configFilepath = sys.argv[1]
+    #configFilepath = sys.argv[1]
     run = RunStuff(configFilepath)
 
     run.main()

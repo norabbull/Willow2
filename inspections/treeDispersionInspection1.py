@@ -5,14 +5,23 @@ Created on Wed May 12 10:05:17 2021
 """
 
 from inspections.inspectionHelpers import *
-from tsrc.getTreeInfo import *
-from SDR_SDV.calculateSDRandSDV import *
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import seaborn as sns
 import re
 import seaborn as sns
+from plotnine import ggplot, aes, geom_line, geom_violin
+from plotnine import *
+
+
+"""
+Inspections: 
+    - Single gene distance matrices
+    - totdist, uniqseq, SDR, SDV epxloration and play
+
+"""
+
 #%% Load single gene matrix
 
 GNAT2_cd= load_cd_mat('E:/Master/cophenetic_dists/ENSG00000134183___GNAT2___CopD.csv')
@@ -49,14 +58,13 @@ ly96_SDRs_pops = calculateSDR(LY96_cd,ly96_inf,grouptypes,calc_SDRgroupwise=True
 #%% Load data
 
 # All data
-uniqseq = load_uniq_seqs('C:/Users/norab/Master/Data/meta_data/9381_uniqseqs.txt')
-totdist = load_tot_dist('C:/Users/norab/Master/Data/meta_data/totalDistancesRefined.txt')
-SDRs = load_SDRs('E:\Master\SDR\SDR_values_all.csv')
+uniqseq = load_uniqseqs()
+totdist = load_totdist()
+SDRsuper = load_SDRs('C:/Users/norab/Master/Data/SDR/SDRsuper_all.csv')
+SDRsub = load_SDRs('C:/Users/norab/Master/Data/SDR/SDRsub_all.csv')
 SDVs = load_SDVs('E:\Master\SDV\SDV_values_all.csv')
 group_SDRs = load_groupSDRs('E:\Master\SDR\SDR_values_all_groups.csv')
-group_totdists = load_groupTotdists('E:\Master\otherTreeData\group_totdists_all.csv')
-
-all_data = load_allData('C:/Users/norab/MasterDisaster/Data/real_tree_data/allTreeInfo.csv')
+totdists_pops = load_totdist_pops()
 
 #%% 
 # Small subset data
@@ -73,53 +81,70 @@ all_data3 =  all_data2.drop(all_data2[all_data2.SDR > 10].index)
 all_data4 = all_data3[~all_data3.isin([np.nan, np.inf, -np.inf]).any(1)]
 all_data5 =  all_data4.drop(all_data4[all_data4.totdist <= 0.019].index) # At least 50 samples w/ more than 50 samples aving dists
 
-#%% Filtering - SDR insepction
+#%% Inspect SDR, totdist, uniqseq
 
-# Join dfs
-# result = pd.concat([totdist, uniqseq, SDRs, SDVs], axis=1, join="inner")
-result = pd.merge(uniqseq, group_SDRs_filter1, left_index = True, right_on="gene")
-result = pd.merge(totdist,result, left_index = True, right_on="gene")
-# Drop na rows (dont do for analysing different columns)
-result.dropna(subset=result.columns, inplace = True)
-#result.dropna(subset=[result.columns], inplace = True)
+result = pd.merge(totdist,uniqseq,on="gene")
+result = result.merge(SDRsuper, on= 'gene')
+result = result.merge(SDRsub, on ='gene')
 
-# Sort for uniqseq
-result2 = result.sort_values('uniqseq')
-result['log_uniqseq'] = np.log10(result['uniqseq'])
+# Ratio of SDR super and sub (probably uneccesaary)
+#result['ratioSupSub'] = SDRratioSupSub['ratioSupSub']
 
-# Without original uiqseq (only log)
-result2 = result.drop(['uniqseq'], axis= 1)
+# Filter for genes with less than 30 samples having distances to any other samples
+result = result[result['totdist'] > 0.0122549]
 
-# Without SDR > 1 for super and sub
-result3 = result2[result2.SDR_super <= 1]
-result3 = result3[result3.SDR_sub <= 1]
+# =============================================================================
+# La stå
+# =============================================================================
+# Full
+(ggplot(result, aes('uniqseq', 'totdist', fill = 'SDRsub'))
+ + geom_point(alpha = 0.7, stroke= .05, size = 3)
+ + theme_classic()
+ + labs(title='SUB: non-zero sample distances VS nr. unique sequences')
+)
 
-# SDR < 0.5 and > 0
-result4 = result3[result3.SDR_super < 0.6]
-result4 = result4[result4.SDR_sub != 0]
+(ggplot(result, aes('uniqseq', 'totdist', fill = 'SDR'))
+ + geom_point(alpha = 0.7, stroke= .05, size = 3)
+ + theme_classic()
+ + labs(title='SUPER: non-zero sample distances VS nr. unique sequences')
+)
 
-# totdist > 0.39 (this corresponds to 1000 samples)
-result5 = result4[result4.totdist > 0.39]
-result6 = result5[result5.uniqseq > 150]
+# Xlimited
+
+(ggplot(result, aes('uniqseq', 'totdist', fill = 'SDRsub'))
+ + geom_point(alpha = 0.7, stroke= .05, size = 4)
+ + theme_classic()
+ + labs(title='SUB: non-zero sample distances VS nr. unique sequences')
+ + xlim(0,30)
+)
+
+(ggplot(result, aes('uniqseq', 'totdist', fill = 'SDR'))
+ + geom_point(alpha = 0.7, stroke= .05, size = 4)
+ + theme_classic()
+ + labs(title='SUPER: non-zero sample distances VS nr. unique sequences')
+ + xlim(0,30)
+)
 
 
-#%% Filtering - groupSDR + nonZero totDist
-
-# Many matrices with all zeros; Percent nonZeroForPop = 0 and SDR = 1. 
-# Filter out: 
-
-gSDR_TD1 = group_SDRs_totdists.drop(group_SDRs_totdists[group_SDRs_totdists.SDR ==1].index)
-# Remove entries where SDR = 1
-
+(ggplot(result, aes('uniqseq', 'totdist', fill = 'SDR'))
+ + geom_point(alpha = 0.7, stroke= .01, size = 5 )
+ + theme_classic()
+ + labs(title='SUPER: totdist vs uniqseq')
+ + xlim(0,30)
+)
 
 
+(ggplot(result, aes('uniqseq', 'totdist', fill = 'ratioSupSub'))
+ + geom_point(alpha = 0.7, stroke= .01, size = 5 )
+ + theme_classic()
+ + labs(title='SUPER: totdist vs uniqseq')
+ + xlim(0,100)
+)
 
-#%% Rename columns (if necessary for visual purposes)
+SDRratioSupSub = pd.DataFrame(result['SDR'] / result['SDRsub'])
+SDRratioSubSup = pd.DataFrame(result['SDRsub'] / result['SDR'], column)
+SDRratioSupSub.columns = ['ratioSupSub']
 
-geneNames = totdist.index.values.tolist()
-ind = list(range(0,len(geneNames)))
-geneNamesDict = dict(zip(ind, geneNames))
-uniqseq.rename(index=geneNamesDict)
 
 #%% Plot
 
@@ -198,7 +223,7 @@ sns.pairplot(result, hue='pop')
 # Heatmap
 # =============================================================================
 
-# VAV2 ; totdist = 0,737422 , uniqseq = 244 (OBS! Low), SDR super = 0.3339, SDR sub = 0.3061, also higher variance than others
+# VAV2 ; totdist = 0,737422 , uniqseq = 244, SDR super = 0.3339, SDR sub = 0.3061, also higher variance than others
 
 sns.heatmap(VAV2_cd)
 
@@ -257,22 +282,11 @@ geneUniverse= pd.DataFrame(geneUniverse.drop_duplicates('gene'))
 
 #  SDRSuper 0.7 treshold 
 genes07 = SDRfilter07['gene']
-genes
+
 # Export 
 
 genes07.to_csv('C:/Users/norab/MasterDisaster/Data/go_enrichment/superSDRgenes07.csv', index = False)
 geneUniverse.to_csv('C:/Users/norab/MasterDisaster/Data/go_enrichment/geneUniverse.csv', index = False)
-
-
-
-#%% Div shit
-
-
-DAXX_cd['AFR___LWK___NA19437'].unique()
-
-AFR-AFR
-AFR-EUR
-AKR-
 
 
 
