@@ -122,7 +122,7 @@ def load_allSingleSDRs(file_path = 'C:/Users/norab/Master/Data/singleSDRs/', num
     return SSDR_all
     
     
-def load_SDRnull(file_path = 'C:/Users/norab/Master/Data/SDRnull/all/SDRnull_all_07.07.2021.csv',
+def load_SDRnull(file_path = 'C:/Users/norab/Master/Data/SDRnull/all/SDRnull_allGenes_22.07.21.csv',
                  level = "All"):
     """ 
     Input: Filepath
@@ -135,7 +135,7 @@ def load_SDRnull(file_path = 'C:/Users/norab/Master/Data/SDRnull/all/SDRnull_all
     if 'super' in level:
         return SDRs[SDRs['level'] == 'nullSuper']
     elif 'sub' in level:
-        return SDRs[SDRs['level'] == 'nullSuper']
+        return SDRs[SDRs['level'] == 'nullSub']
     else:
         return SDRs 
         
@@ -164,43 +164,58 @@ def load_cd_mat(path):
     
     return pd.read_csv(path, index_col = 0)
 
-def load_uniqseq_map(folder_path):
-    
+def load_uniqseq_map(folder_path = 'E:/Master/Data/other/uniqseq_maps/maps/', genes = None):
+    """
+    returns df with number of each unique sequence for each gene. 
+    list of genes should be passed, otherwise all genes in specified 
+    folder are included.  
+
+    """
     files = make_filelist(folder_path)
-    files = files[0:10]
     
+    if genes:
+        
+        files = [f for f in files for g in genes if g in f]
+         
     all_genes = pd.DataFrame(columns = ['gene', 'uniqseq_count'])
     for f in files:
         try: 
-            file = pd.read_csv(f, header = None, sep = '\s', index_col = 0)
+            file = pd.read_csv(f, header = None, sep = '\s', index_col = 0, engine='python')
+            file.columns = ['uniqseq_count']
             file['uniqseq_count'] = file['uniqseq_count'].apply(lambda x: len(x.split(',')))
-            gene_name = file.index[0]
-            gene_name = re.sub('_HUMAN.*$','', gene_name)
+            file.sort_values(by='uniqseq_count', inplace = True, ascending = False)
+            gene_name = re.sub('_HUMAN.*$','', file.index[0])
             file.insert(0, 'gene', gene_name)
-            all_genes = all_genes.append(file)
+            all_genes = all_genes.append(file, ignore_index=True)
         except: 
             print("Something weird with: ", f)
             
-    return 
+    return all_genes
+    
+    
+if __name__ == '__main__':
+    genes = ['ENSG00000166347___CYB5', 'ENSG00000185946___RNPC3', 'ENSG00000160049___DFFA', 'ENSG00000143278___F13B', 'ENSG00000185101___ANO9']
+    test = load_uniqseq_map('E:/Master/Data/other/uniqseq_maps/maps/')
     
 
 #%%
 # Test shit
-test = load_uniqseq_map('E:/Master/Data/other/uniqseq_maps/maps/')
 
-test = make_filelist('E:/Master/Data/other/uniqseq_maps/maps/')
-
-
-f_working = pd.read_csv('E:/Master/Data/other/uniqseq_maps/maps/ENSG00000136518___ACL6A_HUMAN__uniq_samplemap.tsv', sep = '\s', header = None, index_col = 0)
-f_noWork = pd.read_csv('E:/Master/Data/other/uniqseq_maps/maps/ENSG00000205922___ONEC3_HUMAN__uniq_samplemap.tsv', header = None,sep = '\s', index_col=0)
-
-f = pd.read_csv('E:/Master/Data/other/uniqseq_maps/maps/ENSG00000136518___ACL6A_HUMAN__uniq_samplemap.tsv', sep = '\s', index_col = 0, header= None)
-f.columns = ['uniqseq_count']
-f['uniqseq_count']= f['uniqseq_count'].apply(lambda x: len(x.split(',')))
-gene_name = f.index[0]
-gene_name = re.sub('_HUMAN.*$','', gene_name)
-f.insert(0, 'gene', gene_name)
+# test = make_filelist('E:/Master/Data/other/uniqseq_maps/maps/')
+# test = load_uniqseq_map('E:/Master/Data/other/uniqseq_maps/maps/')
 
 
+
+# f_working = pd.read_csv('E:/Master/Data/other/uniqseq_maps/maps/ENSG00000136518___ACL6A_HUMAN__uniq_samplemap.tsv', sep = '\s', header = None, index_col = 0)
+# f_noWork = pd.read_csv('E:/Master/Data/other/uniqseq_maps/maps/ENSG00000205922___ONEC3_HUMAN__uniq_samplemap.tsv', header = None,sep = '\s', index_col=0)
+
+# f = pd.read_csv('E:/Master/Data/other/uniqseq_maps/maps/ENSG00000136518___ACL6A_HUMAN__uniq_samplemap.tsv', sep = '\s', index_col = 0, header= None)
+# f.columns = ['uniqseq_count']
+# f['uniqseq_count']= f['uniqseq_count'].apply(lambda x: len(x.split(',')))
+# gene_name = re.sub('_HUMAN.*$','', f.index[0])
+# f.insert(0, 'gene', gene_name)
+
+# all_genes = pd.DataFrame(columns = ['gene', 'uniqseq_count'])
+# all_genes = all_genes.append(f, ignore_index=True)
     
     

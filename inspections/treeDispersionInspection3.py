@@ -24,6 +24,7 @@ totdist = load_totdist()
 SDRs = load_SDRs()
 SDVs = load_SDVs()
 SDRnull = load_SDRnull()
+uniqseq_counts = load_uniqseq_map(genes = genes)
 
 
 SDRnull47 = load_SDRnull47()
@@ -71,6 +72,9 @@ data_all.dropna(inplace=True)
 
 # Sort 
 data_all = data_all.sort_values(by=['SDR'])
+
+# SDR data
+SDRdata = SDRnull.append(SDRs)
 
 # =============================================================================
 # MERGE LIN37, DAXX, KRA22
@@ -202,10 +206,10 @@ m2 = aes(x=stage('Level', after_scale='x-shift*alt_sign(x)'), group='gene')  # s
 #  Overlapping distribution plot
 # =============================================================================
 
-(ggplot(data=data1, 
+(ggplot(data=SDRnull, 
        mapping=aes(x='SDR', fill='level')) 
  + geom_density(alpha=0.5)
- + labs(title="SDR distributions ")
+ + labs(title="SDR null distributions ")
  )
 
 # Test shit
