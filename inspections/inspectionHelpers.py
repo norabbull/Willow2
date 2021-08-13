@@ -82,7 +82,9 @@ def load_SDVs(file_path = 'C:/Users/norab/Master/Data/SDV/SDV_all.csv', get_info
         print("""pd DataFrame containing SDV values for super and sub popultions 
               for each tree/gene""")
         
-    return pd.read_csv(file_path, header=0, index_col=False)
+    SDVs = pd.read_csv(file_path, header=0, index_col=False)
+    
+    return SDVs.drop_duplicates(subset=['gene', 'SDV'])
 
     
 def load_singleSDR(gene_name, load_all = False):
