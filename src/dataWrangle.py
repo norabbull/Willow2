@@ -241,6 +241,7 @@ liste.to_csv('C:\\Users\\norab\\Master\\data\\runstop_save\\unprocessed_files_SD
 
 # Extract SDRsub and SDRsuper file paths
 
+
 all_files = make_filelist('E:\\Master\\data\\SDRnull')
 SDRsuper_files = [f for f in all_files if 'SDRsuper' in f]
 SDRsub_files = [f for f in all_files if 'SDRsub' in f]
@@ -264,7 +265,6 @@ SDRsub.to_csv('E:\\Master\\current_run\\SDRsub_all.csv', index = False, header =
 # Merge SDR null dist calc files to one
 # =============================================================================
 
-all_files = make_filelist('E:\\Master\\data\\SDRnull')
 SDRsuper_files = [f for f in all_files if 'SDRsuper' in f]
 SDRsub_files = [f for f in all_files if 'SDRsub' in f]
 
@@ -412,7 +412,7 @@ SDVall.to_csv('C:/Users/norab/Master/data/SDV/SDV_all.csv', index = False, heade
 # Null dist
 # =============================================================================
 
-all_files = make_filelist('C:/Users/norab/Master/data/SDRnull/runs/run_93genes')
+all_files = make_filelist('C:/Users/norab/Master/data/SDRnull/runs/run_47genes')
 SDRsuper_files = [f for f in all_files if 'SDRsuper' in f]
 SDRsub_files = [f for f in all_files if 'SDRsub' in f]
 
@@ -435,9 +435,9 @@ SDRsub.insert(0, 'level', 'nullSub')
 SDRall = pd.concat([SDRsub, SDRsuper])
 
 # Save
-SDRsuper.to_csv('C:/Users/norab/Master/data/SDRnull/all/SDRnullSuper_93genes.csv', index = False, header = True)
-SDRsub.to_csv('C:/Users/norab/Master/data/SDRnull/all/SDRnullSub_93genes.csv', index = False, header = True)
-SDRall.to_csv('C:/Users/norab/Master/data/SDRnull/all/SDRnullAll_93genes.csv', index = False, header = True)
+SDRsuper.to_csv('C:/Users/norab/Master/data/SDRnull/all/SDRnullSuper_47genes.csv', index = False, header = True)
+SDRsub.to_csv('C:/Users/norab/Master/data/SDRnull/all/SDRnullSub_47genes.csv', index = False, header = True)
+SDRall.to_csv('C:/Users/norab/Master/data/SDRnull/all/SDRnullAll_47genes.csv', index = False, header = True)
 
 # =============================================================================
 # Extract value for interspaced null Distribution 

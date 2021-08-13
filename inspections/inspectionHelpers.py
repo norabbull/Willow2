@@ -123,13 +123,19 @@ def load_allSingleSDRs(file_path = 'C:/Users/norab/Master/Data/singleSDRs/', num
     
     
 def load_SDRnull(file_path = 'C:/Users/norab/Master/Data/SDRnull/all/SDRnull_allGenes_22.07.21.csv',
-                 level = "All"):
+                 level = "All",
+                 gene_set = "All"):
     """ 
     Input: Filepath
     Return: pd DataFrame containing SDR values for super and sub popultions for each tree/gene
     
     """ 
     
+    if gene_set == "47genes":
+        file_path = "C:/Users/norab/Master/Data/SDRnull/all/SDRnullAll_47genes.csv"
+    elif gene_set == "93genes":
+        file_path = "C:/Users/norab/Master/Data/SDRnull/all/SDRnullAll_93genes.csv"
+        
     SDRs = pd.read_csv(file_path, header=0, index_col=False)
     
     if 'super' in level:
@@ -140,14 +146,6 @@ def load_SDRnull(file_path = 'C:/Users/norab/Master/Data/SDRnull/all/SDRnull_all
         return SDRs 
         
     
-
-    
-def load_SDRnull47(file_path = 'C:/Users/norab/Master/Data/SDRnull/all/SDRnull47_all_12.07.2021.csv'):
-    """ 
-    Input: Filepath
-    Return: pd DataFrame containing SDR values for super and sub popultions for each tree/gene
-    """    
-    return pd.read_csv(file_path, header=0, index_col=None)
 
 
 def load_cd_mat(path):
