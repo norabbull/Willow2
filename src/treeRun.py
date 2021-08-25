@@ -31,6 +31,7 @@ class RunStuff:
         self.func = self.config_file.get('func').strip()
         self.input_folder = self.config_file.get('input_folder').strip()
         self.output_folder = self.config_file.get('output_folder').strip()
+        self.skip_genes = self.output_folder + self.config_file.get('skip_genes').strip()
         
         logger.info("RUN INITIATED SUCCESSFULLY")
 
@@ -403,7 +404,7 @@ if __name__ == '__main__':
 
     logger = logging.getLogger(__name__)
     
-    run = RunStuff(configFilepath)
+    run = RunStuff(config_file)
     run.main()
     
     
