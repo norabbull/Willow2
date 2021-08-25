@@ -41,7 +41,8 @@ class treeInfo:
         
     def setDistMat(self, dist_mat_file):
         self.dist_mat = pd.read_csv(dist_mat_file, index_col = 0, dtype={'a': str})
-        
+    
+    @classmethod
     def setGeneName(self, dist_mat_file):
         """
         Input: 
@@ -129,6 +130,8 @@ class treeInfo:
         
     def getSampleInfo(self): return self.sample_info
     def getPopInfo(self): return self.pop_info
+    
+    @classmethod
     def getGeneName(self): return self.gene_name
     def getDistMat(self): return self.dist_mat
     def getUniqseqMap(self): return self.uniqseq_map

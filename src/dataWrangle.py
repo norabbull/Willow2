@@ -5,14 +5,14 @@ Created on Wed Jun  2 06:45:58 2021
 @author: norab
 """
 
-from inspections.inspectionHelpers import *
+from inspection.inspectionHelpers import *
 from src.treeInformation import treeInfo
 import pandas as pd
 import os
 from os.path import isfile, join
 import re
 import shutil
-
+import numpy as np
 
 
 #%% Helpers
@@ -578,3 +578,64 @@ for file in all_files:
     for gene in genes:
         if gene in file: 
             shutil.copy(file, 'E:\\Master\\external_runs\\nora_data_software2\\data\\job_input\\cophenetic_dists_93genes')
+            
+            
+#%% Null distribution calculations
+
+import math
+prob = 0.05
+var_p = prob * (1 - prob)
+num_perm_samples = 100      # 70 = empirical p val = 0.1
+var_p_n = var_p / num_perm_samples
+sd_p_n = math.sqrt(var_p_n)
+
+# 0.025 quantile
+max(0, (prob-1.96*sd_p_n))
+
+# 0.0975 quantile of true empirical p-val
+prob + 1.96 * sd_p_n
+
+
+
+# Find genes with already enough values: 
+
+SDRs = load_SDRs()
+# SDVs = load_SDVs()
+SDRnullAll = load_SDRnull()
+SDRnull93 = load_SDRnull(gene_set="93genes")
+SDRnull47 = load_SDRnull(gene_set="47genes")
+# SDRnull47super = SDRnull47[SDRnull47['level'] == 'super']
+# SDRnull47sub = SDRnull47[SDRnull47['level'] == 'sub']
+
+# Merge all SDRnull data
+SDRnullTotal = SDRnullAll.append(SDRnull47)
+SDRnullTotal = SDRnullTotal.append(SDRnull93)
+
+SDR_counts = SDRnullTotal['gene'].value_counts().to_frame()
+SDR_counts['gene'] = SDR_counts.Index
+enough_vals = SDR_counts[SDR_counts['gene'] > 8 ]
+enough_vals_genes = enough_vals.index.to_list()
+
+
+file = 'E:/Master/external_runs/nora_data_software/data/job_input/cophenetic_dists_47genes/ENSG00000110628___S22AI___CopD.csv'
+
+for gene in enough_vals_genes:
+    print(gene in file)
+
+for 
+skip_gene = any(gene in dist_file for gene in genes)
+
+input_files =  'E:\\Master\\cophenetic_dists'
+file_list = make_filelist(input_files)
+file_list_stripped = [f.strip() for f in file_list]
+
+
+gene_names = [geneName(gene) for gene in file_list_stripped]
+skip_genes = [file_list_stripped[i] for i in np.arange(0,200,10)]
+
+gene_name == gene
+
+
+
+
+

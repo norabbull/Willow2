@@ -275,6 +275,7 @@ class TestTreeFunctions:
         OK.
         """
         test_gene = 'E:/Master/cophenetic_dists/ENSG00000175336___APOF___CopD.csv'
+        
         pop_info = 'C:/Users/norab/Master/Data/real_tree_data/phydist_population_classes.tsv'
     
         tree = treeMetrics()
@@ -544,9 +545,6 @@ class TestTreeFunctions:
         save_info2.to_csv('C:/Users/norab/Master/save_info2_SDR.csv')
         
         
-        def test_nullSDR(self):
-            E:\Master\cophenetic_dists_30samples
-        
         
         def test_setUnigseqSampleMap(self):
             """
@@ -562,7 +560,8 @@ class TestTreeFunctions:
             tree.setUniqseqMap(map_NFYA)
             uniqseq_map = tree.getUniqseqMap()     
             uniqseq_count = tree.getUniqseqCount()
-            
+        
+        
             
             
 # if __name__ == "__main__":
