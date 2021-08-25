@@ -31,3 +31,20 @@ k = test_files.get('pop_info').strip()
 
 if '.csv' in 'E:/Master/jobs/job_calcSDRnull/job_output/unprocessed_genes_30.06.2021_13.36.csv':
     print('yes')
+    
+    
+    
+
+import sys
+  
+# stdout assigned to a variable
+var = sys.stdout
+arr = ['geeks', 'for', 'geeks']
+  
+# printing everything in the same line
+for i in arr:
+    var.write(i)
+  
+# printing everything in a new line
+for j in arr:
+    var.write('\n'+j)

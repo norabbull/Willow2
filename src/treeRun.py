@@ -19,33 +19,20 @@ import logging.config
     
 class RunStuff:
     
-    def __init__(self, configFilepath):
+    def __init__(self, config_file):
         
-        # Load config arguments
-        configFilepath = configFilepath.strip()
-        with open(configFilepath, 'r') as c:
-            self.config_file = yaml.safe_load(c)
-
+        self.config_file = config_file
+        
         for key, val in self.config_file.items():
             if 'datetime' in str(val): 
                 self.config_file[key] = val.replace('datetime', datetime.now().strftime("%d.%m.%Y_%H.%M"))
         
         # Set function to run
-        self.func = self.config_file.get('func')
+        self.func = self.config_file.get('func').strip()
+        self.input_folder = self.config_file.get('input_folder').strip()
+        self.output_folder = self.config_file.get('output_folder').strip()
         
-        # Quick fix logger
-        file_handler = logging.FileHandler(filename=self.config_file.get('output_folder') + self.config_file.get('output_log'))
-        stdout_handler = logging.StreamHandler(sys.stdout)
-        handlers = [file_handler, stdout_handler]
-        
-        logging.basicConfig(
-            level=logging.DEBUG, 
-            format='[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s',
-            handlers=handlers
-        )
-
-        self.logger = logging.getLogger()
-        self.logger.info("RUN INITIATED")
+        logger.info("RUN INITIATED SUCCESSFULLY")
 
     def make_filelist(self, input_files):
 
@@ -60,7 +47,7 @@ class RunStuff:
                 
         return files
         
-    def run_calcSDR(self, random=False, skip_genes = None):
+    def run_calcSDR(self, skip_genes = None, random=False):
         """
         random: If groups should be random or not. Used to calculate null distribution.
         skip_genes: list of gene names to be skiped from calculation. 
@@ -68,14 +55,13 @@ class RunStuff:
         """
         
         try:
-            input_folder = self.config_file.get('input_folder').strip()
-            input_cd_folder = self.config_file.get('input_cd_folder').strip()
-            group_info = input_folder + self.config_file.get('input_group_info').strip()
             
-            output_folder = self.config_file.get('output_folder').strip()
-            output_super = output_folder + self.config_file.get('output_super').strip()
-            output_sub = output_folder + self.config_file.get('output_sub').strip()
-            output_unprocessed = of + self.config_file.get('output_unprocessed').strip()
+            input_cd_folder = self.config_file.get('input_cd_folder').strip()
+            group_info = self.input_folder + self.config_file.get('input_group_info').strip()
+            
+            output_super = self.output_folder + self.config_file.get('output_super').strip()
+            output_sub = self.output_folder + self.config_file.get('output_sub').strip()
+            output_unprocessed = self.output_folder + self.config_file.get('output_unprocessed').strip()
                      
             file_list = self.make_filelist(input_cd_folder)
 
@@ -156,21 +142,21 @@ class RunStuff:
         input_files = self.config_file.get('input_files')
         group_info = self.config_file.get('input_group_info')
         SSDR_output_dir = self.config_file.get('output_SSDR')
-        save_unprocessed = self.config_file.get('output_unprocessed')
+        output_unprocessed = self.config_file.get('output_unprocessed')
                
         file_list = self.make_filelist(input_files)
 
         ind = 1
         ind_len = len(file_list)
             
-        print("Files to procescs:\n", file_list)
+        logger.info("Files to process:\n", file_list)
 
         try:
             while file_list:
                 dist_file = file_list.pop().strip()
                 
-                print("File processed: ", dist_file)   # TO DO: convert to log  
-                print(f"Number: {ind} / {ind_len}")
+                logger.info("File processed: ", dist_file)   # TO DO: convert to log  
+                logger.info(f"Number: {ind} / {ind_len}")
                 
                 tree = treeMetrics()
                 tree.setup(dist_file, group_info)
@@ -197,7 +183,7 @@ class RunStuff:
 
         except Exception: 
            
-            self.logger.exception(f"File disrupted: {dist_file} ")    
+            logger.exception(f"File disrupted: {dist_file} ")    
             with open(output_unprocessed, 'w+') as f: 
                 write = csv.writer(f) 
                 write.writerow(dist_file)
@@ -367,16 +353,19 @@ class RunStuff:
 
         # logging.info('New session...', extra={'function':self.func})
         
+        if self.skip_genes: 
+            sg = pd.read_csv(self.skip_genes)
+            self.skip_genes = list(sg['gene'])
         if self.func == "calcSDR":
-            self.run_calcSDR()
+            self.run_calcSDR(self.skip_genes)
         elif self.func == "calcSDV":
             self.run_calcSDV()
         elif self.func == "calcSingleSDRs":
             self.run_calcSingleSDRs()
         elif self.func == "calcSDRnull":
-            num_rand_trees = int(self.config_file.get('num_rand_trees'))
+            num_rand_trees = int(self.config_file.get('num_rand_trees'))                
             for _ in range(num_rand_trees):
-                self.run_calcSDR(random = True)
+                self.run_calcSDR(skip_genes = self.skip_genes, random = True)
         elif self.func == "calcTest":
             self.run_calcTest()
         else:
@@ -391,9 +380,30 @@ if __name__ == '__main__':
     # Test on lenovo computer
     #configFilepath = 'E:/Master/jobs/debug_calcSDRnullDist_28.06.yml'
     
-    #configFilepath = sys.argv[1]
-    run = RunStuff(configFilepath)
+    # Config file argument
+    configFilepath = sys.argv[1]
+    
+    # Load config arguments
+    configFilepath = configFilepath.strip()
+    
+    with open(configFilepath, 'r') as c:
+        config_file = yaml.safe_load(c)
+        
+    # Initiate logger
+            # Quick fix logger
+    file_handler = logging.FileHandler(filename=config_file.get('output_folder') + config_file.get('output_log'))
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    handlers = [file_handler, stdout_handler]
+    
+    logging.basicConfig(
+        level=logging.DEBUG, 
+        format='[%(asctime)s] {%(name)s:%(lineno)d} %(levelname)s - %(message)s',
+        handlers=handlers
+    )
 
+    logger = logging.getLogger(__name__)
+    
+    run = RunStuff(configFilepath)
     run.main()
     
     

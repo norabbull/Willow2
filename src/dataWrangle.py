@@ -614,10 +614,10 @@ SDRnullTotal = SDRnullTotal.append(SDRnull93)
 SDR_counts = SDRnullTotal['gene'].value_counts().to_frame()
 SDR_counts['gene'] = SDR_counts.Index
 enough_vals = SDR_counts[SDR_counts['gene'] > 8 ]
-enough_vals_genes = enough_vals.index.to_list()
-
-
-file = 'E:/Master/external_runs/nora_data_software/data/job_input/cophenetic_dists_47genes/ENSG00000110628___S22AI___CopD.csv'
+enough_vals_genes = enough_vals.index.to_frame()
+enough_vals_genes.to_csv('E:/Master/external_runs/data_software_SDRnull_allGenes_x1000/data/job_input/skip_genes.csv', index = False, header =  ['gene'])
+read_genes = pd.read_csv('E:/Master/external_runs/data_software_SDRnull_allGenes_x1000/data/job_input/skip_genes.csv')
+genes = list(read_genes['gene'])
 
 for gene in enough_vals_genes:
     print(gene in file)
