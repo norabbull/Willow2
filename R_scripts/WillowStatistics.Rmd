@@ -1,0 +1,29 @@
+---
+title: "Willow_statistics"
+author: "Nora Bull"
+date: "25 8 2021"
+output: html_document
+---
+
+
+
+### Willow statistics
+
+
+
+
+```{r}
+prob = 0.05
+var_p = prob * (1 - prob)
+num_perm_samples = 1000      # 70 = empirical p val = 0.1
+var_p_n = var_p / num_perm_samples
+sd_p_n = sqrt(var_p_n)
+
+# 0.025 quantile
+max(0, (prob-1.96*sd_p_n))
+
+# 0.0975 quantile of true empirical p-val
+prob + 1.96 * sd_p_n
+
+```
+

@@ -35,6 +35,7 @@ class RunStuff:
         
         logger.info("RUN INITIATED SUCCESSFULLY")
 
+    @classmethod
     def make_filelist(self, input_files):
 
         if isinstance(input_files, str):
@@ -73,7 +74,6 @@ class RunStuff:
       
             for cd_file in file_list:
                 try:         
-                  #  dist_file = dist_file.strip()
                                   
                     print("File processed: ", cd_file)
                     print(f"Number: {ind} / {ind_len}")
@@ -86,9 +86,10 @@ class RunStuff:
                         tree.setGeneName(cd_file)
                         gene_name = tree.getGeneName()
                         skip_gene = any(gene_name == gene for gene in skip_genes)    
+                        if skip_gene: 
+                            continue            # Skips loop for gene
                     
                     tree.setup(cd_file, group_info)
-                    
                     
                     if random: 
                         tree.shuffleSampleInfo()
