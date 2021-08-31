@@ -8,12 +8,14 @@ Created on Wed Jun 23 08:28:05 2021
     - 
 """
 
-from inspections.inspectionHelpers import *
+from inspection.inspectionHelpers import *
 from plotnine import ggplot, aes, geom_point, geom_line, labs
 from plotnine import *
 import numpy as np
 import matplotlib.pyplot as plt
 from functools import reduce 
+from src.treeInformation import treeInfo
+from src.treeRun import RunStuff
 
 
 #%% Load stuff
@@ -40,6 +42,10 @@ SDRnullTotal.drop_duplicates(inplace=True)
 SDRnullTotalSuper = SDRnullTotal[SDRnullTotal['level'] == 'nullSuper']
 SDRnullTotalSub = SDRnullTotal[SDRnullTotal['level'] == 'nullSub']
 
+#%% Test
+
+mat = treeInfo.getDistMat("E:/Master/cophenetic_dists/ENSG00000063177___RL18___CopD.csv")
+
 
 #%% Process loaded stuff
 
@@ -50,6 +56,58 @@ data_all = data_all.merge(uniqseqs, on = ['gene'])
 data_all.drop_duplicates(inplace=True)
 
 #%% Threshold
+selection1 = data_all[data_all['totdist'] > 0.0157]    # Genes with less than 20 samples with values filtered out
+selection1.sort_values(by=['SDR'], inplace=True, ignore_index=True)
+df.sort_values(by=['col1'])
+
+"""
+    Select top 1600 genes with regards to SDR. 
+    Selection is made for sub-and super level simultaneously, since
+    there will be a large overlap and the goal is to make a rough selection
+    based on computitional capacity. 
+    Largest SDR after selection is still ~ 0.8, which is high. 
+
+"""
+selection2 = selection1[selection1.index < 1600]
+genes = list(set(list(selection2['gene'])))
+
+# Also skip genes with already enough values: 
+read_genes = pd.read_csv('E:/Master/external_runs/data_software_SDRnull_allGenes_x1000/data/job_input/skip_genes.csv')
+skip_genes = list(read_genes['gene'])
+
+"""
+transfer selected genes to own folder. 
+"""
+
+genes_to_run_list = [g for g in genes if not g in skip_genes]
+genes_to_run = pd.DataFrame(genes_to_run)
+
+genes_to_run.to_csv('E:/Master/data/SDRnull/other/SDRnull_genes.csv', index = False)
+
+
+#%% 
+
+import shutil, os
+
+# Make filelist of all files you need 
+
+os.mkdir('E:/Master/cophenetic_dists_SDRnullGenes')
+all_files = RunStuff.make_filelist("E:/Master/cophenetic_dists")
+
+for f in all_files:
+    print(f)
+    for g in genes_to_run_list:
+        print(g)
+        if g in f: 
+            shutil.copy(f, 'E:/Master/cophenetic_dists_SDRnullGenes')
+
+
+
+
+
+
+
+#%% Treshold 2 (Outdated)
 
 """
     Create genesets based on SDRnull quantiles.
@@ -89,7 +147,7 @@ genes_q99_sub = SDRsub[SDRsub['SDR'] <= float(SDRsub_q99)]
 
 """
 
-3000 / 2458
+
 # totdist_SDR = SDRs.merge(totdist, on = 'gene')
 # totdist_SDR_filtered = totdist_SDR[totdist_SDR['totdist'] >= 0.012205]
 # totdist_SDR_filtered_2 = totdist_SDR[totdist_SDR['totdist'] <= 0.012205]

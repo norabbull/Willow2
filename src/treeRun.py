@@ -12,7 +12,7 @@ import yaml
 import sys
 import os
 from os.path import isfile, join
-from treeMetrics import treeMetrics
+from src.treeMetrics import treeMetrics
 import logging
 import logging.config
 
@@ -49,7 +49,7 @@ class RunStuff:
                 
         return files
         
-    def run_calcSDR(self, skip_genes = None, random=False):
+    def run_calcSDR(self, random=False):
         """
         random: If groups should be random or not. Used to calculate null distribution.
         skip_genes: list of gene names to be skiped from calculation. 
@@ -64,68 +64,88 @@ class RunStuff:
             output_super = self.output_folder + self.config_file.get('output_super').strip()
             output_sub = self.output_folder + self.config_file.get('output_sub').strip()
             output_unprocessed = self.output_folder + self.config_file.get('output_unprocessed').strip()
-                     
+            
             file_list = self.make_filelist(input_cd_folder)
-
+            skip_genes = self.input_folder + self.config_file.get('skip_genes').strip()
+            select_genes = self.input_folder + self.config_file.get('select_genes').strip()
+            
+            
+            if '.csv' in select_genes:
+                select_genes= pd.read_csv(select_genes, header=None)
+                select_genes.columns = ['gene']
+                select_genes= list(select_genes['gene'])
+                
+                keep_files = []
+                for file in file_list:
+                    if any(gene in file for gene in select_genes):
+                        keep_files.append(file)
+                        file_list = keep_files
+            
+            if '.csv' in skip_genes:
+                skip_genes= pd.read_csv(skip_genes, header=None)
+                skip_genes.columns = ['gene']
+                skip_genes= list(skip_genes['gene'])
+                
+                remove_files = []
+                for file in file_list:
+                    if any(gene in file for gene in skip_genes):
+                        remove_files.append(file)
+        
+                file_list = [f for f in file_list if f not in remove_files]
+            #logger.info(file_list)
+            
             ind = 1
             ind_len = len(file_list)
-                
-            print("Files to process:\n", file_list)
-      
-            for cd_file in file_list:
-                try:         
-                                  
-                    print("File processed: ", cd_file)
-                    print(f"Number: {ind} / {ind_len}")
-                    ind += 1
-                    
-                    tree = treeMetrics()
-                    
-                    if skip_genes:
-                        
-                        tree.setGeneName(cd_file)
-                        gene_name = tree.getGeneName()
-                        skip_gene = any(gene_name == gene for gene in skip_genes)    
-                        if skip_gene: 
-                            continue            # Skips loop for gene
-                    
-                    tree.setup(cd_file, group_info)
-                    
-                    if random: 
-                        tree.shuffleSampleInfo()
-                    
-                    tree.calcSDR()
-                    
-                    supSDR = tree.getSDRsuper()
-                    subSDR = tree.getSDRsub()
-                    
-                    print("Super SDR: ", supSDR)
-                    print("Sub SDR: ", subSDR)
-                    print("1st sample: ", tree.getSampleInfo()[0])
-                    
-                    supSDR = [tree.getGeneName(), supSDR]
-                    subSDR = [tree.getGeneName(), subSDR]
             
-                    with open(output_super, 'a', newline='') as f:   # write to file    
-                        writer = csv.writer(f)
-                        writer.writerow(supSDR)
+            if random: 
+                num_iter = int(self.config_file.get('num_rand_trees'))
+            else:
+                num_iter = 1
+
+            for i in range(num_iter):
+                for cd_file in file_list:
+                    try:         
                         
-                    with open(output_sub, 'a', newline='') as f:   # write to file    
-                        writer = csv.writer(f)
-                        writer.writerow(subSDR)
+                        #logger.info("File processed: {0}".format(cd_file))
+                        #logger.info("File number: {0} / {1}".format(ind, ind_len))
+                        #logger.info("Iter round: {0}".format(i))
+                        ind +=1
     
-                except Exception: 
-                   
-                    #self.logger.exception(f"File disrupted: {dist_file} ")    
-                    with open(output_unprocessed, 'w+') as f: 
-                        write = csv.writer(f) 
-                        write.writerow(cd_file)
+                        tree = treeMetrics()
+                        tree.setup(cd_file.strip(), group_info)
                         
-                    pass
+                        if random: 
+                            tree.shuffleSampleInfo()
+    
+                        tree.calcSDR()
+                        
+                        supSDR = tree.getSDRsuper()
+                        subSDR = tree.getSDRsub()
+                        
+                        supSDR = [tree.getGeneName(), supSDR]
+                        subSDR = [tree.getGeneName(), subSDR]
+                    
+                        with open(output_super, 'a', newline='') as f:   # write to file    
+                            writer = csv.writer(f)
+                            writer.writerow(supSDR)
+                            
+                        with open(output_sub, 'a', newline='') as f:   # write to file    
+                            writer = csv.writer(f)
+                            writer.writerow(subSDR)
+        
+                    except Exception: 
+                       
+                        #logger.exception("File disrupted:", cd_file)
+                        file = str(cd_file)
+                        
+                        with open(output_unprocessed, 'a') as f: 
+                            f.write(file)
+                            #open text file
+                        pass
                 
         except Exception as e: 
-            self.logger.exception(e)
-
+            #logger.exception(e)
+            print(e)
        
     def run_calcSingleSDRs(self, random = False):
         
@@ -157,8 +177,8 @@ class RunStuff:
             while file_list:
                 dist_file = file_list.pop().strip()
                 
-                logger.info("File processed: ", dist_file)   # TO DO: convert to log  
-                logger.info(f"Number: {ind} / {ind_len}")
+                logger.info("File processed: {0}".format(dist_file))   # TO DO: convert to log  
+                logger.info("Number: {0} / {1}".format(ind, ind_len))
                 
                 tree = treeMetrics()
                 tree.setup(dist_file, group_info)
@@ -273,42 +293,7 @@ class RunStuff:
         """
         Test function to check functionality of program.
         """
-        try:
-            logging.basicConfig(filename = self.config_file.get('output_folder') + self.config_file.get('output_log'), 
-                                level=logging.DEBUG,
-                                format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                                filemode = 'w+')
-    
-            input_files = self.config_file.get('input_files').strip()
-            group_info = self.config_file.get('input_group_info').strip()
-            output_folder = self.config_file.get('output_folder').strip()
-            measure_output = self.config_file.get('output_SDRsuper').strip()
-            save_unprocessed = self.config_file.get('output_unprocessed').strip()
-                
-            file_list = self.make_filelist(input_files)
-            
-            print("File list: ")
-            print(file_list)
-    
-            dist_file = file_list.pop().strip()
-            print("File processed: ", dist_file)   # TO DO: convert to log  
-    
-            tree = treeMetrics()
-            tree.setup(dist_file, group_info)
-            print("Gene name: ", tree.getGeneName())
-            print("Sample info: ", tree.getSampleInfo())
-            
-            rand_num = [15.05]
-            
-            with open(output_folder + measure_output, 'a', newline='') as f:   # write to file    
-                writer = csv.writer(f)
-                writer.writerow(rand_num)
-            
-            self.logger.info("Successful run.")
-            
-        except Exception as e:
-            self.logger.exception(e)
-            
+        return self.run_calcSDR(random=True)
         
 
     # def run_CalcNonZeroForPop(self):
@@ -352,38 +337,30 @@ class RunStuff:
     
 
     def main(self):
-
-        # logging.info('New session...', extra={'function':self.func})
         
-        if self.skip_genes: 
-            sg = pd.read_csv(self.skip_genes)
-            self.skip_genes = list(sg['gene'])
         if self.func == "calcSDR":
-            self.run_calcSDR(self.skip_genes)
+            self.run_calcSDR()
         elif self.func == "calcSDV":
             self.run_calcSDV()
         elif self.func == "calcSingleSDRs":
             self.run_calcSingleSDRs()
         elif self.func == "calcSDRnull":
-            num_rand_trees = int(self.config_file.get('num_rand_trees'))                
-            for _ in range(num_rand_trees):
-                self.run_calcSDR(skip_genes = self.skip_genes, random = True)
+            self.run_calcSDR(random = True)
         elif self.func == "calcTest":
-            self.run_calcTest()
+            return self.run_calcTest()
         else:
-            self.logger.error("Not a valid function option. Change in main_config file." +
+            logger.error("Not a valid function option. Change in main_config file." +
                               "options are: calcSDR, calcSDV, calcSingleSDRs, calcNullSDR and calcTest")
 
-        
-        # logging.info('Session finished: ', datetime.now().strftime("%d.%m.%Y_%H.%M"))
+        logger.info('Session finished successfully: {0}'.format(datetime.now().strftime("%d.%m.%Y_%H.%M")))
 
 if __name__ == '__main__':
     
     # Test on lenovo computer
-    #configFilepath = 'E:/Master/jobs/debug_calcSDRnullDist_28.06.yml'
+    configFilepath = 'E:/Master/jobs/job_test/job_input/main_config_calcTest_skip_select.yml'
     
     # Config file argument
-    configFilepath = sys.argv[1]
+    #configFilepath = sys.argv[1]
     
     # Load config arguments
     configFilepath = configFilepath.strip()
@@ -391,9 +368,8 @@ if __name__ == '__main__':
     with open(configFilepath, 'r') as c:
         config_file = yaml.safe_load(c)
         
-    # Initiate logger
-            # Quick fix logger
-    file_handler = logging.FileHandler(filename=config_file.get('output_folder') + config_file.get('output_log'))
+    log = (config_file.get('output_folder') + config_file.get('output_log')).replace('datetime', datetime.now().strftime("%d.%m.%Y_%H.%M"))
+    file_handler = logging.FileHandler(filename=log)
     stdout_handler = logging.StreamHandler(sys.stdout)
     handlers = [file_handler, stdout_handler]
     
@@ -406,6 +382,4 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     
     run = RunStuff(config_file)
-    run.main()
-    
-    
+    file_list = run.main()

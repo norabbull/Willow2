@@ -617,7 +617,7 @@ enough_vals = SDR_counts[SDR_counts['gene'] > 8 ]
 enough_vals_genes = enough_vals.index.to_frame()
 enough_vals_genes.to_csv('E:/Master/external_runs/data_software_SDRnull_allGenes_x1000/data/job_input/skip_genes.csv', index = False, header =  ['gene'])
 read_genes = pd.read_csv('E:/Master/external_runs/data_software_SDRnull_allGenes_x1000/data/job_input/skip_genes.csv')
-genes = list(read_genes['gene'])
+skip_genes = list(read_genes['gene'])
 
 for gene in enough_vals_genes:
     print(gene in file)

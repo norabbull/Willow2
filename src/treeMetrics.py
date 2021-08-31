@@ -119,12 +119,6 @@ class treeMetrics(treeInfo):
                 dist_summary[key] += dist_count[0]
                 count_summary[key] += dist_count[1]
         
-        print("supWith distance:", dist_summary['supWith'])
-        print("supBet distance:", dist_summary['supBet'])
-        print("supWith:", count_summary['supWith'])
-        print("supBet:", count_summary['supBet'])
-        
-
         self.mean_type_dists = {key: round(dist_summary[key] / count_summary[key], 8)  # Was 8 
                                 for key, val in dist_summary.items()}
              

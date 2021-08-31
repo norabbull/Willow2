@@ -9,10 +9,10 @@ import pandas as pd
 import numpy as np
 import os
 from os.path import join, isfile
-from geneTree.treeInformation import treeInfo
-from geneTree.treeMetrics import treeMetrics
+from src.treeInformation import treeInfo
+from src.treeMetrics import treeMetrics
 from datetime import datetime
-
+from src.treeRun import RunStuff
 
 test_gene_small = 'C:\\Users\\norab\\MasterDisaster\\Data\\real_tree_data\\dist_mat_test\\FGR_10x10.csv'
 pop_info = '    \n    C:/Users/norab/MasterDisaster/Data/real_tree_data/phydist_population_classes.tsv'
@@ -48,3 +48,35 @@ for i in arr:
 # printing everything in a new line
 for j in arr:
     var.write('\n'+j)
+    
+    
+# Test if this skip_genes thing work: 
+    
+configFilepath = 'E:/Master/jobs_template/job_input/main_config_template_calcTest.yml'
+
+file_list = RunStuff.make_filelist('E:/Master/cophenetic_dists_47genes/')
+read_genes = pd.read_csv('E:/Master/external_runs/data_software_SDRnull_allGenes_x1000/data/job_input/skip_genes.csv')
+skip_genes = list(read_genes['gene'])[0:5]
+file_list = file_list[0:5]
+skip_genes.append('ENSG00000108849___PAHO')
+for cd_file in file_list:
+
+    tree = treeMetrics()
+    
+    if skip_genes:
+        
+        tree.setGeneName(cd_file)
+        gene_name = tree.getGeneName()
+        print(gene_name)
+        skip_gene = any(gene_name == gene for gene in skip_genes)    
+        print(skip_gene)
+        
+        if skip_gene:
+            continue
+    
+    print("LOOOOL")
+            
+        # if skip_gene: 
+        #     continue
+
+                    
