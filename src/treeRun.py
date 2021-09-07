@@ -357,10 +357,10 @@ class RunStuff:
 if __name__ == '__main__':
     
     # Test on lenovo computer
-    configFilepath = 'E:/Master/jobs/job_test/job_input/main_config_calcTest_skip_select.yml'
+   #configFilepath = 'E:/Master/jobs/job_test/job_input/main_config_calcTest_skip_select.yml'
     
     # Config file argument
-    #configFilepath = sys.argv[1]
+    configFilepath = sys.argv[1]
     
     # Load config arguments
     configFilepath = configFilepath.strip()
@@ -382,4 +382,4 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     
     run = RunStuff(config_file)
-    file_list = run.main()
+    run.main()

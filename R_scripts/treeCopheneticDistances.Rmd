@@ -6,16 +6,18 @@ output: html_document
 ---
 
 
-## Pipeline for calculating cophenetic distances for all trees in a folder
+## Calculate cophenetic distances for all trees in a folder
 
 Imports
 ```{r}
 library(ape)
+
 ```
 
 
 Function to calculate and save matrix
 ```{r}
+
 calcAndSave <- function(file) {
   
   tree<-read.tree(file)
@@ -24,55 +26,25 @@ calcAndSave <- function(file) {
         return(NULL)
   } else {
   pairDist <- cophenetic(tree)
-  path <- "C:/Users/norab/MasterDisaster/Data/real_tree_data/cophenetic_dists/"
+  path <- "C:/Users/norab/Master/WillowShare/data/cophenetic_distances/"   # SAVE FILES TO THIS DIRECTORY
   name <-  gsub("^.*ninja_trees/", "", file)
   name <- gsub("_HUMAN__full_aln.tre$", "", name)
   filename <- paste0(path, name)
   filename <- paste0(filename, "___CopD.csv")
-  
+  print("File: ", filename)
   write.csv(pairDist, file=filename, row.names=TRUE, col.names=TRUE, sep = ",", quote = F)
   }
 }
 ```
 
 
-
-Import trees
+Make list of newick tree files to be processed
 ```{r}
-files <- list.files(path="C:/Users/norab/MasterDisaster/Data/real_tree_data/ninja_trees", pattern=".*ENSG00000144118___RALB__.*", full.names=TRUE, recursive=FALSE)
-file <- list(file)
-tree <- read.tree(file)
-pairDist <- cophenetic(tree)
-nrow(pairDist)
+files <- list.files(path="C:/Users/norab/Master/WillowShare/data/ninja_trees", full.names=TRUE, recursive=FALSE)
+
 ```
 
 Apply function to all trees, save output on the go
 ```{r}
-treeDistVals <- sapply(file, calcAndSave)
-```
-
-treeDistVals <- sapply(files, calc_nonZero)
-
-
-
-test-box
-```{r}
-file <- "C:/Users/norab/MasterDisaster/Data/real_tree_data/ninja_trees/ENSG00000144118___RALB_HUMAN__full_aln.tre"
-path <- "C:/Users/norab/MasterDisaster/Data/copheneticDists/"
-name <-  gsub("^.*ninja_trees/", "", file)
-name <- gsub("_HUMAN__full_aln.tre$", "", name)
-filename <- paste0(path, name)
-filename <- paste0(filename, "___CopD.txt")
-k <- gsub("^.*ninja_trees/", "", tree2)
-print(filename)
-print(name)
-```
-```{r}
-file <- "C:/Users/norab/MasterDisaster/Data/real_tree_data/ninja_trees_selection/ENSG00000006210___X3CL1_HUMAN__full_aln.tre"
-path <- "C:/Users/norab/MasterDisaster/Data/real_tree_data/cophenetic_dists/"
-name <-  gsub("^.*ninja_trees_selection/", "", file)
-name <- gsub("_HUMAN__full_aln.tre$", "", name)
-filename <- paste0(path, name)
-filename <- paste0(filename, "___CopD.txt")
-print(filename)
+treeDistVals <- sapply(files, calcAndSave)
 ```

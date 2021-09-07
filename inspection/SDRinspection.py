@@ -33,8 +33,8 @@ SDRs = load_SDRs()
 SDRnullAll = load_SDRnull()
 SDRnull93 = load_SDRnull(gene_set="93genes")
 SDRnull47 = load_SDRnull(gene_set="47genes")
-# SDRnull47super = SDRnull47[SDRnull47['level'] == 'super']
-# SDRnull47sub = SDRnull47[SDRnull47['level'] == 'sub']
+SDRnull47super = SDRnull47[SDRnull47['level'] == 'super']
+SDRnull47sub = SDRnull47[SDRnull47['level'] == 'sub']
 
 # Merge all SDRnull data
 SDRnullTotal = SDRnullAll.append(SDRnull47)
@@ -45,21 +45,29 @@ SDRnullTotal = SDRnullTotal.append(SDRnull93)
 
 # Remove duplicate values SDR93
 
-SDRnull93 = SDRnull93.drop_duplicates(
-  subset = ['gene', 'SDR']).reset_index(drop = True)
+# SDRnull93 = SDRnull93.drop_duplicates(
+#   subset = ['gene', 'SDR']).reset_index(drop = True)
 
-SDRnull47 = SDRnull47.drop_duplicates(
-  subset = ['gene', 'SDR']).reset_index(drop = True)
+# SDRnull47 = SDRnull47.drop_duplicates(
+#   subset = ['gene', 'SDR']).reset_index(drop = True)
 
-SDRnullAll = SDRnullAll.drop_duplicates(
-  subset = ['gene', 'SDR']).reset_index(drop = True)
+# SDRnullAll = SDRnullAll.drop_duplicates(
+#   subset = ['gene', 'SDR']).reset_index(drop = True)
 
-SDRnullTotal = SDRnullTotal.drop_duplicates(
-  subset = ['gene', 'SDR']).reset_index(drop = True)
+# SDRnullTotal = SDRnullTotal.drop_duplicates(
+#   subset = ['gene', 'SDR']).reset_index(drop = True)
 
 # Conert to numpy
-SDRnullTotal['SDR'] = SDRnullTotal.SDR.round(4)
-SDRnullTotal
+SDRnullTotalSuper = SDRnullTotal[SDRnullTotal['level'] == "nullSuper"]
+SDRnullTotalSub = SDRnullTotal[SDRnullTotal['level'] == "nullSub"]
+
+SDRnullTotalSuper.drop(columns = ['level'], inplace = True)
+SDRnullTotalSub.drop(columns = ['level'], inplace = True)
+
+# Save 
+SDRnullTotalSuper.to_csv('C:/Users/norab/Master/data/SDRnull/all/SDRnullTotalSuper_22.07.21.csv', index = False)
+SDRnullTotalSub.to_csv('C:/Users/norab/Master/data/SDRnull/all/SDRnullTotalSub_22.07.21.csv', index = False)
+
 
 
 #%% Merge stuff

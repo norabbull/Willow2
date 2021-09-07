@@ -58,7 +58,7 @@ data_all.drop_duplicates(inplace=True)
 #%% Threshold
 selection1 = data_all[data_all['totdist'] > 0.0157]    # Genes with less than 20 samples with values filtered out
 selection1.sort_values(by=['SDR'], inplace=True, ignore_index=True)
-df.sort_values(by=['col1'])
+
 
 """
     Select top 1600 genes with regards to SDR. 
@@ -69,42 +69,19 @@ df.sort_values(by=['col1'])
 
 """
 selection2 = selection1[selection1.index < 1600]
-genes = list(set(list(selection2['gene'])))
+gene_selection = list(set(list(selection2['gene'])))
+gene_selection = pd.DataFrame(gene_selection)
 
-# Also skip genes with already enough values: 
+# Save to computer and to disk
+gene_selection.to_csv('E:/Master/data/SDRnull/other/SDRnull_genes_selection.csv', index = False)
+gene_selection.to_csv('C:/Users/norab/Master/data/SDRnull/other/SDRnull_gene_selection.csv', index = False)
+
+# Filter out genes with already enough values: 
 read_genes = pd.read_csv('E:/Master/external_runs/data_software_SDRnull_allGenes_x1000/data/job_input/skip_genes.csv')
 skip_genes = list(read_genes['gene'])
-
-"""
-transfer selected genes to own folder. 
-"""
-
 genes_to_run_list = [g for g in genes if not g in skip_genes]
 genes_to_run = pd.DataFrame(genes_to_run)
-
-genes_to_run.to_csv('E:/Master/data/SDRnull/other/SDRnull_genes.csv', index = False)
-
-
-#%% 
-
-import shutil, os
-
-# Make filelist of all files you need 
-
-os.mkdir('E:/Master/cophenetic_dists_SDRnullGenes')
-all_files = RunStuff.make_filelist("E:/Master/cophenetic_dists")
-
-for f in all_files:
-    print(f)
-    for g in genes_to_run_list:
-        print(g)
-        if g in f: 
-            shutil.copy(f, 'E:/Master/cophenetic_dists_SDRnullGenes')
-
-
-
-
-
+genes_to_run.to_csv('E:/Master/data/SDRnull/other/SDRnull_genes_toRun.csv', index = False)
 
 
 #%% Treshold 2 (Outdated)

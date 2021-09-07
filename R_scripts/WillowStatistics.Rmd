@@ -11,19 +11,133 @@ output: html_document
 
 
 
+# Iports
+```{r}
+library(dplyr)
+```
 
 ```{r}
 prob = 0.05
 var_p = prob * (1 - prob)
-num_perm_samples = 1000      # 70 = empirical p val = 0.1
+num_perm_samples = 273      # 70 = empirical p val = 0.1
 var_p_n = var_p / num_perm_samples
 sd_p_n = sqrt(var_p_n)
 
 # 0.025 quantile
-max(0, (prob-1.96*sd_p_n))
+low_q = max(0, (prob-1.96*sd_p_n))
 
 # 0.0975 quantile of true empirical p-val
-prob + 1.96 * sd_p_n
+high_q = prob + 1.96 * sd_p_n
+
+print(low_q)
+print(high_q)
+```
+
+So, true empirical p-value for 100 samples is between 0.007 and 0.09. 
+So, it is basically at largest at ~ 9 % level. 
+
+For 1000 samples, it is only dropped to 0.036 - 0.0635, so around 3% more 
+confidence. It is not worth the computitional time, which is unfeasible. 
+
+
+
+
+Cumulative distribution function
+
+- Calculate p-value for each distribution.
+- Creat function 
+```{r}
+
+# Example:
+X = rnorm(100) # X is a sample of 100 normally distributed random variables
+P = ecdf(X)    # P is a function giving the empirical CDF of X
+P(-1)         # This returns the empirical CDF at zero (should be close to 0.5)
+[1] 0.52
+plot(P)        # Draws a plot of the empirical CDF (see below)
+
+
+# My data: 
+
+SDRnull_values = []         # Numerical vector of nullSDR values for gene
+P = ecdf(SDRnull_values)    # The function giving empirical CDF of SDRnull_values
+p_val = P(SDRtrue)          # Returns empirical CDF at SDRtrue, ie. calculated SDR for populations
+                            # Save p val for next step - multiple testing correcting
+plot(P)                     # Plot the shit (dont do for all, make an example or two...)
+
+
+```
+
+
+### Extract relevant SDRnull values
+```{r}
+
+# Read all SDRnull data
+SDRnull_all_super <- read.csv("C:/Users/norab/Master/data/SDRnull/all/SDRnullTotalSuper_22.07.21.csv")
+SDRnull_all_sub <- read.csv("C:/Users/norab/Master/data/SDRnull/all/SDRnullTotalSub_22.07.21.csv")
+
+# Read list of relevant genes
+SDRnull_genes <- read.csv("C:/Users/norab/Master/data/SDRnull/other/SDRnull_gene_selection.csv")
+colnames(SDRnull_genes) <- c("gene")
+
+# Extract SDRnull data for selected genes
+
+# Info
+gene_nr <- table(SDRnull_all_super['gene'])
+max(gene_nr)
+
+# Get generated SDRnull for selected genes only
+SDRnull_selection_super <- dplyr::filter(SDRnull_all_super, SDRnull_all_super$gene %in% SDRnull_genes$gene)
+SDRnull_selection_sub <- dplyr::filter(SDRnull_all_sub, SDRnull_all_sub$gene %in% SDRnull_genes$gene)
+
+# Next: filter genes with more than 
+CFAH_example <- filter(SDRnull_selection_super, gene == "ENSG00000000971___CFAH")
+
+# Load SDRs for population groups
+SDRsuper <- read.csv("C:/Users/norab/Master/data/SDR/SDRsuper_all.csv", header = TRUE)
+SDRsub <- read.csv("C:/Users/norab/Master/data/SDR/SDRsub_all.csv", header = TRUE)
+
+
+
+SDR_CFAH <- filter(SDRsuper, gene == "ENSG00000000971___CFAH")
+
+
+
+```
+
+
+# Testing CDF calcultion for CFAH
+```{r}
+#SDRnull_values = []         # Numerical vector of nullSDR values for gene
+P_CFAH = ecdf(CFAH_example$SDRnull)    # The function giving empirical CDF of SDRnull_values
+p_val_CFAH = P_CFAH(SDR_CFAH$SDR)          # Returns empirical CDF at SDRtrue, ie. calculated SDR for populations
+                            # Save p val for next step - multiple testing correcting
+plot(P_CFAH)                     # Plot the shit (dont do for all, make an example or two...)
+
+
+
+
+
+```
+
+
+
+
+
+Test-box
+```{r}
+all_genes <- SDRnull_all_sub[0:10, 0:2]
+gene_selection_vector <- SDRnull_genes[0:9, 0:1]
+gene_selection_vector[10] <- "ENSG00000075643___MOCOS"
+intersect_genes_test <- intersect(SDRnull_genes$gene, SDRnull_all_sub$gene)
+
+intersect(all_genes$gene, gene_selection_vector)
+
+subset_test <- subset(SDRnull_all_sub,  )
+
+S <- cards()
+
+
+
 
 ```
 
