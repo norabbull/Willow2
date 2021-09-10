@@ -1,0 +1,15 @@
+THIS IS A COMMENTED TEMPLATE. NO TABS CAN EXIST IN FUNCTIONAL CONFIG YAML-FILE. 
+---
+ func: 'calcFunc'							# Function to run. Options: ....
+ input_folder: 'E:/Master/jobs_template/job_input'			# Path to of job_input folder			
+ input_group_info: 'phydist_population_classes.tsv'			# Filename of group information file. Located in job_input folder. 
+ input_cd_folder: 'E:/Master/cophenetic_dists/'     			# Path to cophenetic distance matrix files
+ output_folder: 'E:/Master/jobs_template/job_output/job_datetime'	# Path to job_output folder
+ output_log: 'log_jobName_datetime.log'					# Log file (created automatically)
+ output_super: 'jobNameSuper_datetime.csv'				# Name of file to output calculated values for group level "super" (created automatically)
+ output_sub: 'jobNameSub_datetime.csv'					# Name of file to output calculated values for group level "sub" (created automatically)
+ output_unprocessed: 'unprocessed_files_JobName_datetime.csv'		# Name of file to output list of unprocessed files upon disruption (not functioning yet)
+ LOGGER_SECTION = 'Logger'						# Logger argument (check if functioning)
+ num_rand_trees: 10							# Number of random trees to calculate for func-option SDRnull
+ skip_genes: 'None							# csv file list of genes to be skipped. Default 0 means no skipped genes. Column name must be "gene"
+ select_genes: 'None'

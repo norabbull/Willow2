@@ -1,0 +1,91 @@
+---
+title: "treeCopheneticDistances"
+author: "Nora Bull"
+date: "6 5 2021"
+output: html_document
+---
+
+
+## Calculate cophenetic distances for all trees in a folder
+
+Imports
+```{r}
+library(ape)
+
+```
+
+
+Function to calculate and save matrix
+```{r}
+
+calcAndSave <- function(file) {
+  
+  tree<-read.tree(file)
+  
+  if(is.null(tree)) {
+        return(NULL)
+  } else {
+  pairDist <- cophenetic(tree)
+  path <- "C:/Users/norab/Master/WillowProject/R_scripts/ninja_trees_output/"   # SAVE FILES TO THIS DIRECTORY
+  name <-  gsub("^.*ninja_trees/", "", file)
+  name <- gsub("_HUMAN__full_aln.tre$", "", name)
+  filename <- paste0(path, name)
+  filename <- paste0(filename, "___CopD.csv")
+  print(c("File: ", filename))
+  write.csv(pairDist, file=filename, row.names=TRUE, col.names=TRUE, sep = ",", quote = F)
+  }
+}
+```
+
+
+Make list of newick tree files to be processed
+```{r}
+files <- list.files(path="C:/Users/norab/Master/WillowProject/R_scripts/ninja_trees", full.names=TRUE, recursive=FALSE)
+
+
+
+```
+
+Apply function to all trees, save output on the go
+```{r}
+treeDistVals <- sapply(files, calcAndSave)
+```
+
+
+
+### XUAN
+
+Function to calculate and save matrix
+```{r}
+
+calcAndSave <- function(file) {
+  
+  tree<-read.tree(file)
+  
+  if(is.null(tree)) {
+        return(NULL)
+  } else {
+  pairDist <- cophenetic(tree)
+  path <- "C:/Users/norab/Master/WillowProject/R_scripts/xuan_output/"   # SAVE FILES TO THIS DIRECTORY
+  name <-  gsub("^.*xuan_trees/", "", file)
+  name <- gsub(".tre$", "", name)
+  filename <- paste0(path, name)
+  filename <- paste0(filename, "___CopD.csv")
+  
+  write.csv(pairDist, file=filename, row.names=TRUE, col.names=TRUE, sep = ",", quote = F)
+  }
+}
+```
+
+
+Make list of newick tree files to be processed
+```{r}
+files <- list.files(path="C:/Users/norab/Master/WillowProject/R_scripts/xuan_trees", full.names=TRUE, recursive=FALSE)
+files[1]
+
+```
+
+Apply function to all trees, save output on the go
+```{r}
+treeDistVals <- sapply(files, calcAndSave)
+```

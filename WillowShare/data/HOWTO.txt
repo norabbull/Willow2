@@ -1,0 +1,18 @@
+OUTDATED!!!
+
+
+
+How to run a program: 
+
+Execution of Willow: 
+
+- All programs are run through exexcution of treeRun.py.
+- main_config.yaml configuration file specifies all custom pathways reuired for the calculation. 
+- The path to this config file is given as the only argument upon execution. 
+- The execution happens through running the shell script.
+
+
+It is therefore, upon every exectution, important to check the following: 
+ 1. All paths in the yaml config file are correct.
+ 2. The correct yaml file is given in the shell script. 
+ 

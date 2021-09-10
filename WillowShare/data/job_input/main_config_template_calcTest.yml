@@ -1,0 +1,14 @@
+---
+ func: 'calcTest'
+ input_folder: 'E:/Master/jobs_template/job_input'
+ input_group_info: 'phydist_population_classes.tsv'
+ input_cd_folder: 'E:/Master/cophenetic_dists_30samples/'
+ output_folder: 'E:/Master/jobs_template/job_output/job_datetime'
+ output_log: 'calcTest_log_datetime.log'
+ output_super: 'calcTestSuper_datetime.csv'
+ output_sub: 'calcTestSub_datetime.csv'
+ output_unprocessed: 'calcTest_unprocessed_files_datetime.csv'
+ LOGGER_SECTION = 'Logger'
+ num_rand_trees: 10
+ skip_genes: 'None'
+ select_genes: 'None'
