@@ -13,7 +13,7 @@ from os.path import isfile, join
 import re
 import shutil
 import numpy as np
-
+import copy
 
 #%% Helpers
 
@@ -635,6 +635,98 @@ skip_genes = [file_list_stripped[i] for i in np.arange(0,200,10)]
 
 gene_name == gene
 
+#%% Final SDRnull wrangle
+
+
+"""
+    - Read all data into coomon df
+    - Make dict with gene as key and list with SDR values as elements
+    - Write each dict to file
+
+"""
+
+all_files = make_filelist("C:/Users/norab/Master/data/SDRnull/all/SDRnull_selection_x100")
+
+all_files_super = set(f for f in all_files if 'Super' in f)
+all_files_sub = set(f for f in all_files if 'Sub' in f)
+
+# Load
+SDRsuper = pd.DataFrame(columns = ['gene', 'SDRnull'])
+SDRsub = pd.DataFrame(columns = ['gene', 'SDRnull'])
+
+for f in all_files_super: 
+    SDRsuper = SDRsuper.append(pd.read_csv(f, names = ['gene', 'SDRnull']))
+for f in all_files_sub: 
+    SDRsub = SDRsub.append(pd.read_csv(f, names = ['gene', 'SDRnull']))
+
+SDRsuper.dropna(inplace=True)
+SDRsub.dropna(inplace=True)
+
+# Save
+SDRsuper.to_csv('E:\\Master\\data\\SDRnull\\nullDistSDRsuper_all_07.07.21.csv', index = False, header = False)
+SDRsub.to_csv('E:\\Master\\data\\SDRnull\\nullDistSDRsub_all_07.07.21.csv', index = False, header = False)
+
+
+all_genes = set(SDRsuper['gene'])
+
+
+
+# Add values from SDRnullTotal from genes in gene selection
+
+# Make gene dict of selected genes
+gene_selection = pd.read_csv('C:/Users/norab/Master/data/SDRnull/other/SDRnull_gene_selection.csv')
+gene_selection.columns = ['gene']
+gene_selection = dict(gene_selection['gene'])
+gene_selection = dict((v,k) for k,v in gene_selection.items())
+gene_selection = gene_selection.fromkeys(gene_selection, [])
+
+gene_selection_super = copy.deepcopy(gene_selection)
+gene_selection_sub = copy.deepcopy(gene_selection)
+
+# Load all SDRnull data
+
+SDRnullTotalSuper = pd.read_csv('C:/Users/norab/Master/data/SDRnull/all/SDRnullTotalSuper_22.07.21.csv')
+SDRnullTotalSub = pd.read_csv('C:/Users/norab/Master/data/SDRnull/all/SDRnullTotalSub_22.07.21.csv')
+
+SuperSelection = SDRnullTotalSuper[SDRnullTotalSuper['gene'].isin(gene_selection.keys())]
+SubSelection = SDRnullTotalSub[SDRnullTotalSub['gene'].isin(gene_selection.keys())]
+
+# Add data together
+
+SDRsuper = SDRsuper.append(SuperSelection)
+SDRsub = SDRsub.append(SubSelection)
+
+SDRsuper.index = SDRsuper['gene']
+SDRsub.index = SDRsub['gene']
+SDRsuper = pd.DataFrame(SDRsuper)
+SDRsub = pd.DataFrame(SDRsub['SDRnull'])
+
+# Check
+unique = list(set(SDRsuper.index)) # Correct. there are 1055 genes in the df.
+
+# Fill gene selection dict with values
+
+superValues = dict()
+for gene in unique:
+    values = list(SDRsuper[SDRsuper.index == gene]['SDRnull'])
+    superValues[gene] = values
+    
+subValues = dict()
+for gene in unique:
+    values = list(SDRsub[SDRsub.index == gene]['SDRnull'])
+    subValues[gene] = values
+    
+
+for key, val in superValues.items():
+    df = pd.DataFrame(val)
+    filename = 'C:/Users/norab/Master/data/SDRnull/refined_values/super/SDRnullSuper_' + key + '.csv'
+    df.to_csv(filename, index = False, header = ['SDRnull'])
+
+
+for key, val in subValues.items():
+    df = pd.DataFrame(val)
+    filename = 'C:/Users/norab/Master/data/SDRnull/refined_values/sub/SDRnullSub_' + key + '.csv'
+    df.to_csv(filename, index = False, header = ['SDRnull'])
 
 
 

@@ -21,7 +21,7 @@ from src.treeRun import RunStuff
 #%% Load stuff
 
 uniqseqs = load_uniqseqs()
-# uniqseq_counts = load_uniqseq_map()  # Should specify gene set. Otherwise far too many. 
+uniqseq_counts = load_uniqseq_map(genes = ['ENSG00000284869___SELB'])  # Should specify gene set. Otherwise far too many. 
 totdist = load_totdist()
 SDRs = load_SDRs()
 SDVs = load_SDVs()
@@ -42,6 +42,9 @@ SDRnullTotal.drop_duplicates(inplace=True)
 SDRnullTotalSuper = SDRnullTotal[SDRnullTotal['level'] == 'nullSuper']
 SDRnullTotalSub = SDRnullTotal[SDRnullTotal['level'] == 'nullSub']
 
+sSDR_OPLA = load_singleSDR('ENSG00000110628___S22AI')
+
+sSDR_OPLA = load_singleSDR('ENSG00000158710___TAGL2')
 #%% Test
 
 mat = treeInfo.getDistMat("E:/Master/cophenetic_dists/ENSG00000063177___RL18___CopD.csv")
@@ -55,6 +58,9 @@ data_all = data_all.merge(SDVs, on = ['gene', 'level'])
 data_all = data_all.merge(uniqseqs, on = ['gene'])
 data_all.drop_duplicates(inplace=True)
 
+
+
+data_all[data_all['gene'] == 'ENSG00000284869___SELB']
 #%% Threshold
 selection1 = data_all[data_all['totdist'] > 0.0157]    # Genes with less than 20 samples with values filtered out
 selection1.sort_values(by=['SDR'], inplace=True, ignore_index=True)

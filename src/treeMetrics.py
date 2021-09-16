@@ -103,11 +103,7 @@ class treeMetrics(treeInfo):
     def calcMeanTypeDists(self):
         """
         Calculates mean distance between all pairwise samples within a
-        classification type. A classification type is either 
-        Question I repeatedly ask myself: 
-            Should I add all and divide by total count or find mean of 
-            the individual populations first before adding the means and 
-            do a mean of means? 
+        classification type.
         """
         if not self.pop_dists: self.calcPopDists()
         
