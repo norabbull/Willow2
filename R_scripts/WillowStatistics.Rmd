@@ -75,9 +75,14 @@ plot(P)                     # Plot the shit (dont do for all, make an example or
 ```{r}
 
 # Dummy
-#SDRnullFile <- superFiles[3]
-#pvalSaveFile <- file_super
-#SDRs <- SDRsuper
+SDRnullFile <- superFiles[3]
+SDRnullFile <- "C:/Users/norab/Master/Data/SDRnull/refined_values/super/SDRnullSuper_ENSG00000178814___OPLA.csv"
+SDRnullFile <- "C:/Users/norab/Master/Data/SDRnull/refined_values/super/SDRnullSuper_ENSG00000134121___NCHL1.csv"
+SDRnullFile <- "C:/Users/norab/Master/Data/SDRnull/refined_values/super/SDRnullSuper_ENSG00000284869___SELB.csv"
+
+
+pvalSaveFile <- file_super
+SDRs <- SDRsuper
 
 calcAndSave_pval <- function(SDRnullFile, SDRs, pvalSaveFile) {
   
@@ -90,7 +95,7 @@ calcAndSave_pval <- function(SDRnullFile, SDRs, pvalSaveFile) {
   P = ecdf(SDRnullData$SDRnull)    # The function giving empirical CDF of SDRnull_values
   p_val = P(SDRval)                # Returns empirical CDF at SDRtrue, ie. calculated SDR for populations
                                    # Save p val for next step - multiple testing correcting
-  #plot(P)                         # Plot the shit (dont do for all, make an example or two...
+  plot(P)                         # Plot the shit (dont do for all, make an example or two...
   # Save p val to file
   cat(c(gene.name, p_val), file = pvalSaveFile, sep = ",", append = TRUE)
   cat('\n', file = pvalSaveFile, append=TRUE)
@@ -141,6 +146,9 @@ keep_genes_super <- p_vals_super$gene[p_vals_super$pval_adj < 0.001]
 ```
 
 
+```{r}
+
+```
 
 
 
@@ -182,6 +190,13 @@ SDR_CFAH <- filter(SDRsuper, gene == "ENSG00000000971___CFAH")
 
 
 
+```{r}
+
+
+any(SUPERdata$gene == "ENSG00000110700___RS13")
+SUPERdata[SUPERdata$gene ==  "ENSG00000110700___RS13",] 
+
+```
 
 
 

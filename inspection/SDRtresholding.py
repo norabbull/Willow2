@@ -17,11 +17,21 @@ from functools import reduce
 from src.treeInformation import treeInfo
 from src.treeRun import RunStuff
 
+#%% load all data table
+
+uniqseqs = load_uniqseqs()
+totdist = load_totdist()
+SDRs = load_SDRs()
+SDVs = load_SDVs()
+data_all = totdist.merge(SDRs, on = 'gene')
+data_all = data_all.merge(SDVs, on = ['gene', 'level'])
+data_all = data_all.merge(uniqseqs, on = ['gene'])
+data_all.drop_duplicates(inplace=True)
 
 #%% Load stuff
 
 uniqseqs = load_uniqseqs()
-uniqseq_counts = load_uniqseq_map(genes = ['ENSG00000284869___SELB'])  # Should specify gene set. Otherwise far too many. 
+uniqseq_counts = load_uniqseq_map(genes = gene_selection)  # Should specify gene set. Otherwise far too many. 
 totdist = load_totdist()
 SDRs = load_SDRs()
 SDVs = load_SDVs()
@@ -30,6 +40,8 @@ SDRnull93 = load_SDRnull(gene_set="93genes")
 SDRnull47 = load_SDRnull(gene_set="47genes")
 # SDRnull47super = SDRnull47[SDRnull47['level'] == 'super']
 # SDRnull47sub = SDRnull47[SDRnull47['level'] == 'sub']
+gene_selection = list(pd.read_csv('C:/Users/norab/Master/data/SDRnull/other/SDRnull_gene_selection.csv', names = ["gene"])['gene'])
+gene_selection = gene_selection[1:]
 
 SDRsuper = SDRs[SDRs['level'] == 'super']
 SDRsub = SDRs[SDRs['level'] == 'sub']
@@ -42,9 +54,15 @@ SDRnullTotal.drop_duplicates(inplace=True)
 SDRnullTotalSuper = SDRnullTotal[SDRnullTotal['level'] == 'nullSuper']
 SDRnullTotalSub = SDRnullTotal[SDRnullTotal['level'] == 'nullSub']
 
-sSDR_OPLA = load_singleSDR('ENSG00000110628___S22AI')
-
+sSDR_S22AI = load_singleSDR('ENSG00000110628___S22AI')
 sSDR_OPLA = load_singleSDR('ENSG00000158710___TAGL2')
+
+#%% 
+RS13_smallclade = pd.read_csv('C:/Users/norab/OneDrive/Skrivebord/RS13.csv', sep = ",",header=None)
+RS13_smallclade = RS13_smallclade.to_list()
+
+
+
 #%% Test
 
 mat = treeInfo.getDistMat("E:/Master/cophenetic_dists/ENSG00000063177___RL18___CopD.csv")
@@ -61,6 +79,22 @@ data_all.drop_duplicates(inplace=True)
 
 
 data_all[data_all['gene'] == 'ENSG00000284869___SELB']
+
+
+#%%
+
+
+from collections import defaultdict
+
+uniqseq_counts_dict = defaultdict(list)
+for row in uniqseq_counts.iterrows():
+    r = list(row[1])
+    val = r[1]
+    gene= r[0]
+    
+    uniqseq_counts_dict[gene].append(val)
+
+
 #%% Threshold
 selection1 = data_all[data_all['totdist'] > 0.0157]    # Genes with less than 20 samples with values filtered out
 selection1.sort_values(by=['SDR'], inplace=True, ignore_index=True)
@@ -225,6 +259,5 @@ sub_q99_totdistFiltered = totdist_sub_q99[totdist_sub_q99['totdist'] >= 0.012205
  + theme(axis_text_x=element_text(rotation=90, hjust=1))
  )
 
-8
 
 
