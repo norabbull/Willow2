@@ -192,6 +192,10 @@ def load_uniqseq_map(folder_path = 'E:/Master/Data/other/uniqseq_maps/maps/', ge
             
     return all_genes
     
+
+def get_gene_entry(gene, df):
+
+    return df[df['gene'].str.contains(gene)]
     
 if __name__ == '__main__':
     genes = ['ENSG00000166347___CYB5', 'ENSG00000185946___RNPC3', 'ENSG00000160049___DFFA', 'ENSG00000143278___F13B', 'ENSG00000185101___ANO9']

@@ -142,15 +142,56 @@ SUPERdata <- inner_join(p_vals_super, SDRsuper, by = "gene")
 SUBdata <- inner_join(p_vals_sub, SDRsub, by = "gene")
 
 throw_genes_super <- p_vals_super$gene[p_vals_super$pval_adj > 0.001 ] 
-keep_genes_super <- p_vals_super$gene[p_vals_super$pval_adj < 0.001]
+keep_genes_super <- SUPERdata[SUPERdata$pval_adj < 0.001,]
+keep_genes_sub <- SUBdata[SUBdata$pval_adj < 0.001,]
+
+keep_genes_super_SDRlimit0.8 <- SUPERdata[SUPERdata$SDR < 0.8,]
+```
+
+# Save gene list
+```{r}
+genes = keep_genes_super_SDRlimit0.8$gene
+genes2 <- sapply(genes, function (x) gsub("^ENS.*___", "", x))
+
+# Save
+lapply(genes2, write, "C:/Users/norab/Master/data/SDR/SDR1005_significantGenes_SDRlimit0.8.csv", append=TRUE)
+
+
+```
+
+#Plot null dist to check
+```{r}
+SDRnullFile <- "C:/Users/norab/Master/Data/SDRnull/refined_values/super/SDRnullSuper_ENSG00000134121___NCHL1.csv"
+SDRsuper <- read.csv("C:/Users/norab/Master/data/SDR/SDRsuper_all.csv", header = TRUE)
+
+
+SDRnullData <- read.csv(SDRnullFile) # Swap to file
+gene.name <- gsub("^.*_EN", "EN", SDRnullFile)
+gene.name <- gsub(".csv$", "", gene.name)
+SDRval <- SDRsuper$SDR[SDRsuper$gene == gene.name]
+P = ecdf(SDRnullData$SDRnull)    # The function giving empirical CDF of SDRnull_values
+p_val = P(SDRval)                # Returns empirical CDF at SDRtrue, ie. calculated SDR for populations
+                                   # Save p val for next step - multiple testing correcting
+plot(P, main = "SDRnull: NCHL1         SDR = 0.9757", xlab = "SDR", ylab = "cumulative %")  
+
 ```
 
 
 ```{r}
+SDRnullFile <- "C:/Users/norab/Master/Data/SDRnull/refined_values/sub/SDRnullSub_ENSG00000168653___NDUS5.csv"
+SDRsub <- read.csv("C:/Users/norab/Master/data/SDR/SDRsub_all.csv", header = TRUE)
+
+
+SDRnullData <- read.csv(SDRnullFile) # Swap to file
+gene.name <- gsub("^.*_EN", "EN", SDRnullFile)
+gene.name <- gsub(".csv$", "", gene.name)
+SDRval <- SDRsub$SDR[SDRsub$gene == gene.name]
+P = ecdf(SDRnullData$SDRnull)    # The function giving empirical CDF of SDRnull_values
+p_val = P(SDRval)                # Returns empirical CDF at SDRtrue, ie. calculated SDR for populations
+                                   # Save p val for next step - multiple testing correcting
+plot(P, main = "SDRnull: NDUS5         SDR = 0.953", xlab = "SDR", ylab = "cumulative %")  
 
 ```
-
-
 
 ### Extract relevant SDRnull values
 ```{r}
