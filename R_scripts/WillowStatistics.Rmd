@@ -145,16 +145,27 @@ throw_genes_super <- p_vals_super$gene[p_vals_super$pval_adj > 0.001 ]
 keep_genes_super <- SUPERdata[SUPERdata$pval_adj < 0.001,]
 keep_genes_sub <- SUBdata[SUBdata$pval_adj < 0.001,]
 
-keep_genes_super_SDRlimit0.8 <- SUPERdata[SUPERdata$SDR < 0.8,]
+keep_genes_super_SDR_50 <- SUPERdata[SUPERdata$SDR < 0.62,]
 ```
 
 # Save gene list
 ```{r}
-genes = keep_genes_super_SDRlimit0.8$gene
+genes = keep_genes_super$gene
+genes50 = keep_genes_super_SDR_50$gene
 genes2 <- sapply(genes, function (x) gsub("^ENS.*___", "", x))
+genes3 <-  sapply(genes, function (x) gsub("___.*$", "", x))
+genes50lowest <- sapply(genes50, function (x) gsub("___.*$", "", x))
 
 # Save
 lapply(genes2, write, "C:/Users/norab/Master/data/SDR/SDR1005_significantGenes_SDRlimit0.8.csv", append=TRUE)
+lapply(genes, write, "C:/Users/norab/Master/data/SDR/SDR1005_significantGenesFullname.csv", append=TRUE)
+lapply(genes3, write, "C:/Users/norab/Master/data/SDR/SDR1005_significantGenesFullname_ENS.csv", append=TRUE)
+lapply(genes50lowest, write, "C:/Users/norab/Master/data/SDR/50LowestSignificantGenes_ENS.csv", append=TRUE)
+
+
+lapply(SUPERdata, write, "C:/Users/norab/Master/data/SDR/SDR1005_significantGenesSUPER.csv", append=TRUE)
+write.table(SUBdata, file = "C:/Users/norab/Master/data/SDR/SDR1005_significantGenesSUB.csv", quote = FALSE, sep = ",", row.names = FALSE)
+
 
 
 ```

@@ -79,4 +79,43 @@ for cd_file in file_list:
         # if skip_gene: 
         #     continue
 
-                    
+
+#%% if -else philosophy
+
+
+
+
+test_objekt = [0, 0, 3]
+
+if test_objekt: 
+    print(True)
+else: 
+    print(False)
+
+
+
+
+
+
+True = 4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

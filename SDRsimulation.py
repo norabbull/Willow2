@@ -178,20 +178,15 @@ SDR = simSDR3(g,num_g,perm = p)
 
 
 (ggplot(SDRresults3, aes('SDR', 'Group_size', fill = 'Perm'))
- + geom_point()
+ + geom_point(alpha=1, size=2,stroke = 0.1, color = 'indigo')
 # + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.65, show_legend = False)
 # + geom_boxplot(width = shift, alpha=0.7, size = 0.65, show_legend = False)
-# + scale_fill_manual(values=['dodgerblue', 'darkorange'])
+ #+ scale_fill_manual(values=['dodgerblue', 'darkorange'])
  + theme_classic()
  + theme(figure_size=(8, 6))
  + labs(title='SDR simulation')
+ + geom_label(x = "SDR", y = "Group size")
 )
-
-
-
-
-
-
 
 
 

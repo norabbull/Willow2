@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 # Load stuff 
 # =============================================================================
 
-# uniqseqs = load_uniqseqs()
+uniqseqs = load_uniqseqs()
 # uniqseq_counts = load_uniqseq_map()
 # totdist = load_totdist()
 SDRs = load_SDRs()
