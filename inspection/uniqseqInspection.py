@@ -88,10 +88,10 @@ seqdata_NDKB = find_uniqseq_groups('ENSG00000243678___NDKB')
 #%% ggplots
 
 
-ggplot(seqdata_OPLA) + geom_bar(aes(x='seq', fill='sub')) 
+ggplot(seqdata_OPLA) + geom_bar(aes(x='seq', fill='super')) 
 ggplot(seqdata_SELB) + geom_bar(aes(x='seq', fill='super')) 
-ggplot(seqdata_KRA22) + geom_bar(aes(x='seq', fill='super')) 
-ggplot(seqdata_KRA22) + geom_bar(aes(x='seq', fill='sub')) 
+ggplot(seqdata_KRA22) + geom_bar(aes(x='seq', fill='super')) + labs(title = "KRA22, SUPER") + theme(axis_text_x=element_text(rotation=90, hjust=1))
+ggplot(seqdata_KRA22) + geom_bar(aes(x='seq', fill='sub')) + labs(title = "KRA22, SUB") + theme(axis_text_x=element_text(rotation=90, hjust=1))
 ggplot(seqdata_PTK6) + geom_bar(aes(x='seq', fill='sub')) 
 ggplot(seqdata_TAGL2) + geom_bar(aes(x='seq', fill='super')) 
 ggplot(seqdata_CADM3) + geom_bar(aes(x='seq', fill='super')) 

@@ -110,8 +110,8 @@ selection1.sort_values(by=['SDR'], inplace=True, ignore_index=True)
 """
 selection2 = selection1[selection1.index < 1600]
 gene_selection = list(set(list(selection2['gene'])))
-gene_selection = pd.DataFrame(gene_selection)
-
+gene_selection = pd.DataFrame(gene_selection, columns = ['gene'])
+gene_selection = gene_selection.drop_duplicates()
 # Save to computer and to disk
 gene_selection.to_csv('E:/Master/data/SDRnull/other/SDRnull_genes_selection.csv', index = False)
 gene_selection.to_csv('C:/Users/norab/Master/data/SDRnull/other/SDRnull_gene_selection.csv', index = False)
@@ -123,6 +123,30 @@ genes_to_run_list = [g for g in genes if not g in skip_genes]
 genes_to_run = pd.DataFrame(genes_to_run)
 genes_to_run.to_csv('E:/Master/data/SDRnull/other/SDRnull_genes_toRun.csv', index = False)
 
+"""
+    Filtering process: 
+        - Many more than the found ones are likely significant.
+        - WHat I did: 
+                What I wanted: To end up with approximatly 1000 genes to test with
+                    the lowest SDRs for both super and sub populations. 
+                1. Filtered out the genes ith less than 20 samples having a distance
+                to any other sample in the tree. This is 1/3 of the samllest sbu-population group. 
+                2. Selected the 1600 genes with lowest SDR, for both super and sub added. 
+                3. As this list conatined SDR values for both super and sub, some genes were 
+                duplicated in the list. After dropping duplicates, 1055 genes remained, containing the genes with 
+                lowest SDRs in an added list of super and sub populations. 
+                And since I were to run SDRnull distribution for these genes anyways, I could do both super and sub for
+                both genes, regardless of which of the SDR values it was selected for. 
+                If I were to select the gene list of 1000 lowest super SDRs AND 1000 lowest sub SDR, 
+                I would end up with far more genes, being computitionally too expensive with repsect to time I hade
+                to calculate this. 
+                So the genes in the SUPER list that end up non-significant are likely selected to the lit
+                because of a low SUB - pop SDR. 
+        - Interesting: Which ones are not significant?
+
+
+
+"""
 
 #%% Treshold 2 (Outdated)
 

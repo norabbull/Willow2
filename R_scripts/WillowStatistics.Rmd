@@ -21,7 +21,7 @@ library(plyr)
 ```{r}
 prob = 0.05
 var_p = prob * (1 - prob)
-num_perm_samples = 109      # 70 = empirical p val = 0.1
+num_perm_samples = 100      # 70 = empirical p val = 0.1
 var_p_n = var_p / num_perm_samples
 sd_p_n = sqrt(var_p_n)
 
@@ -235,6 +235,7 @@ SDRsub <- read.csv("C:/Users/norab/Master/data/SDR/SDRsub_all.csv", header = TRU
 
 
 SDR_CFAH <- filter(SDRsuper, gene == "ENSG00000000971___CFAH")
+SDR_RBL1 <- sum(filter(keep_genes_super, gene == "ENSG00000080839___RBL1"))
 
 
 
@@ -247,10 +248,27 @@ SDR_CFAH <- filter(SDRsuper, gene == "ENSG00000000971___CFAH")
 
 any(SUPERdata$gene == "ENSG00000110700___RS13")
 SUPERdata[SUPERdata$gene ==  "ENSG00000110700___RS13",] 
+SUPERdata[SUPERdata$gene ==  "ENSG00000080839___RBL1",]
+SUBdata[SUBdata$gene ==  "ENSG00000080839___RBL1",]
+SDRsuper[SDRsuper$gene ==  "ENSG00000080839___RBL1",]
+p_vals_super[p_vals_super$gene ==  "ENSG00000080839___RBL1",]
+
 
 ```
 
 
+
+# Plot null distribution
+
+```{r}
+install.packages("ggplot")
+library(ggplot2)
+# Filled Density Plot
+ggplot(SDRnull, aes(x = SDRnull)) + 
+       geom_histogram(color = "red", # Curve color
+                    fill = "purple",  # Area color
+                    alpha = 0.5)   # Area transparency
+```
 
 
 

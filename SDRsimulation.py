@@ -158,11 +158,11 @@ for g2 in range(2,100):
 
 SDRresults3 = pd.DataFrame(columns = ['Group_size', 'Num_groups', 'Perm', 'SDR'])
 #for g1 in range(2,50):
-for g in range(2,100):
+for g in range(2,200):
     for ng in range(2,3):
         p = 0
         while p < (g):
-            SDR = simSDR3(g, num_g = ng, perm = p)
+            SDR = simSDR3(g, num_g = ng, perm = p, dist = 500)
             SDRresults3.loc[len(SDRresults3)] = [g, ng, p, SDR]
             p += 1
             
@@ -177,16 +177,35 @@ SDR = simSDR3(g,num_g,perm = p)
 #%% Plot
 
 
-(ggplot(SDRresults3, aes('SDR', 'Group_size', fill = 'Perm'))
+(ggplot(SDRresults3, aes('SDR', 'Group_size', size = 'Perm', color = 'Perm'))
  + geom_point(alpha=1, size=2,stroke = 0.1, color = 'indigo')
 # + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.65, show_legend = False)
 # + geom_boxplot(width = shift, alpha=0.7, size = 0.65, show_legend = False)
  #+ scale_fill_manual(values=['dodgerblue', 'darkorange'])
- + theme_classic()
+# + theme_classic()
  + theme(figure_size=(8, 6))
  + labs(title='SDR simulation')
- + geom_label(x = "SDR", y = "Group size")
 )
+
+(ggplot(SDRresults3, aes('Perm', 'Group_size', fill = 'SDR'))
+ + geom_point(alpha=1, size=3,stroke = 0.1, color = 'indigo')
+# + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.65, show_legend = False)
+# + geom_boxplot(width = shift, alpha=0.7, size = 0.65, show_legend = False)
+ #+ scale_fill_manual(values=['dodgerblue', 'darkorange'])
+# + theme_classic()
+ + theme(figure_size=(8, 6))
+ + labs(title='SDR simulation')
+)
+
+
+# The simulation demonstartes how group size affects the SDR value to a large degree. 
+# So reading an SDR value by itself is not necessarily very meaningful, it must be seen in realtion
+# to the group sizes. 
+# EG. if You only have 25 samples in total, a few permutations from one calde to another will affect the SDR value alot. 
+# But if you have A group sample of 100, one permutation fourt or back wont make the big difference. 
+# But this is likely to also turn up in the statistical testing as well.
+# I will simulate p values, but hasn't gottne that far. 
+# So what this really demonstrates is the well established cocept that sample size is important.
 
 
 
