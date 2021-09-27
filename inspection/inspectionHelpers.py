@@ -13,7 +13,6 @@ from os.path import isfile, join
 from copy import deepcopy
 from random import shuffle, seed
 
-
 def make_filelist(input_files):
 
     if isinstance(input_files, str):     

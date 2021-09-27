@@ -17,8 +17,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from plotnine import ggplot, aes, geom_point, geom_line, labs
 from plotnine import *  # TO DO: change
-
-
+from inspection.inspectionHelpers import *
 
 #%% 
 
@@ -206,6 +205,59 @@ SDR = simSDR3(g,num_g,perm = p)
 # But this is likely to also turn up in the statistical testing as well.
 # I will simulate p values, but hasn't gottne that far. 
 # So what this really demonstrates is the well established cocept that sample size is important.
+
+
+#%% Calculate p - values
+
+"""
+    1. Construct distance matrices for 100 hypothetical trees
+    with increasing number of permutations. 
+    2. Create sample labels that groups them into the 2 separate clades. 
+    
+    GR1___SIM___IamLeafPURPLE
+    GR2___SIM___IamLeafGREEN
+    
+"""
+# Construct names
+
+# Constants
+sample_size = 200
+num_trees = 100
+
+# Sample labels
+samples = ['GR1___SIM___IamLeafPurple' for i in range(int(sample_size/2))]
+samples2 = ['GR2___SIM___IamLeafGreen' for i in range(int(sample_size/2))]
+samples.extend(samples2)
+
+# Construct data
+
+for tree_num in range(num_trees):
+    # loop to make multiple matices
+    data = []
+    # for r in range(sample_size):
+    #     #row = []
+    for row in range(tree_num):
+        ones = [1 for _ in range(sample_size)]
+        data.append(ones)
+    for row in range(sample_size - tree_num):
+        ones = [1 for _ in range(tree_num)]
+        zero = [0 for _ in range(sample_size - len(ones))]
+        ones.extend(zero)
+        
+        data.append(ones)
+
+    for i in range(sample_size):
+        data[i][i] = 0
+
+    data = pd.DataFrame(data, columns = [samples], index =  [samples])
+    data.to_csv('C:/Users/norab/Master/data/simulation/sim_mat{0}.csv'.format(tree_num), index = True)
+
+
+# Check mat
+
+sim_mat55 = load_cd_mat('C:/Users/norab/Master/data/simulation/sim_mat55.csv')
+
+#%% Calculate SDR for all sim mats
 
 
 
