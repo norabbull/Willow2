@@ -24,7 +24,7 @@ class TestTreeFunctions:
         test_gene1 = 'E:/Master/cophenetic_dists/ENSG00000188324___OR6C6___CopD.csv'
         test_gene2 = 'E:/Master/cophenetic_dists/ENSG00000000938___FGR___CopD.csv'
         pop_info = 'C:/Users/norab/Master/Data/real_tree_data/phydist_population_classes.tsv'
-    
+        
         tree1 = treeInfo()
         tree1.setup(test_gene1, pop_info)
         tree2 = treeInfo()
@@ -84,6 +84,7 @@ class TestTreeFunctions:
         assert info[2][1] =='EUR'
         assert info[2][2] =='GBR'
         assert list(info.items())[-1][-1][-1] == 'ESN'
+    
 
     def test_makePsuedoPops(self):
         """

@@ -78,6 +78,22 @@ class TestRunStuff(unittest.TestCase):
         run = RunStuff(config_file)
         run.main()
         
+        
+    def test_arbitrary_stuff():
+                ## REMOVE
+        test_gene = 'C:/Users/norab/Master/data/job_simulation/cd_simulation/sim_mat5.csv'
+        pop_info = 'C:/Users/norab/Master/data/job_simulation/job_input/simulation_group_classes.tsv'
+        config = 'C:/Users/norab/Master/data/job_simulation/job_input/main_config_simulation.yml'
+        tree = RunStuff(config)
+        tree.setup(test_gene, pop_info)
+        gn = tree.getGeneName()
+        cd = tree.getDistMat()
+        pop_names = tree.getPopInfo()
+        si = tree.getSampleInfo()
+        tree.getPopInfo()
+        ##
+    
+        
 
     
         

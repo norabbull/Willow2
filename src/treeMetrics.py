@@ -33,6 +33,11 @@ class treeMetrics(treeInfo):
         These are merged into one function for efficiency reasons.
     
         """
+        # POtentail edit 3.0:
+        # if self.subtype_levels == 1: 
+        #     self.calcSubtypeDists()
+        #     return
+        
         dist_mat = self.dist_mat.to_numpy()
         
         # Create distance sum placeholders
@@ -98,6 +103,49 @@ class treeMetrics(treeInfo):
             
         self.pop_dists = {'supWith': supWithSums, 'supBet': supBetSums, 
                 'subWith': subWithSums, 'subBet': subBetSums}
+        
+    
+    # NEW IN 3.0:
+    # THIS REPLACES CalcPopDists
+    def calcSubtypeDists(self):
+        """
+        Calculate inter and intra population distances
+        for both classification types (Super and sub).
+        These are merged into one function for efficiency reasons.
+    
+        """
+        dist_mat = self.dist_mat.to_numpy()
+        
+        # Create distance sum placeholders
+        # Dict with pop as key and [dist value, number of dist values added] as value
+        WithSums = {subtype : [0,0] for subtype in self.subtype_info[0]}
+        BetSums = {subtype : [0,0] for subtype in self.subtype_info[0]}
+        
+
+        # Iter upper triangular dist_mat
+        row_length = len(dist_mat)
+        row_start = 1
+        for col in range(row_length):
+            for row in range(row_start, row_length):
+                sample1 = col
+                sample2 = row
+                
+                # Get popName
+                Subtype1 = self.sample_info[sample1][1]
+                Subtype2 = self.sample_info[sample2][1]
+                
+                val = dist_mat[sample2][sample1]        # Distance value
+
+                if Subtype1 == Subtype2:        # Same super pop, same sub pop
+                    WithSums[Subtype1] = [i+j for i, j in zip(WithSums[Subtype1], [val, 1])]  
+                else:
+                    BetSums[Subtype1] = [i+j for i, j in zip(BetSums[Subtype1], [val, 1])]  
+                    BetSums[Subtype2] = [i+j for i, j in zip(BetSums[Subtype2], [val, 1])]  
+                        
+            row_start += 1
+            
+        #self.pop_dists = {'With': WithSums, 'Bet': BetSums}
+        self.subtype_dists = {'With': WithSums, 'Bet': BetSums}
 
         
     def calcMeanTypeDists(self):
@@ -105,19 +153,45 @@ class treeMetrics(treeInfo):
         Calculates mean distance between all pairwise samples within a
         classification type.
         """
-        if not self.pop_dists: self.calcPopDists()
         
-        dist_summary = {'supBet':0, 'supWith':0, 'subBet':0, 'subWith':0}
-        count_summary = {'supBet':0, 'supWith':0, 'subBet':0, 'subWith':0}
         
-        for key, val in self.pop_dists.items():
-            for pop, dist_count in val.items():
-                dist_summary[key] += dist_count[0]
-                count_summary[key] += dist_count[1]
+        if self.subtype_levels == 2:    # If old
+            if not self.pop_dists: self.calcPopDists()
         
-        self.mean_type_dists = {key: round(dist_summary[key] / count_summary[key], 8)  # Was 8 
-                                for key, val in dist_summary.items()}
-             
+            dist_summary = {'supBet':0, 'supWith':0, 'subBet':0, 'subWith':0}
+            count_summary = {'supBet':0, 'supWith':0, 'subBet':0, 'subWith':0}
+            
+            for key, val in self.pop_dists.items():
+                for pop, dist_count in val.items():
+                    dist_summary[key] += dist_count[0]
+                    count_summary[key] += dist_count[1]
+            
+            #try:
+            self.mean_type_dists = {key: round(dist_summary[key] / count_summary[key], 8)  # Was 8 
+                                    for key, val in dist_summary.items() if count_summary[key]}
+            #except ZeroDivisionError as e:
+                
+        # NEW IN 3.0:
+        elif self.subtype_levels == 1: 
+            if not self.subtype_dists: self.calcSubtypeDists()
+        
+            dist_summary = {'Bet':0, 'With':0}
+            count_summary = {'Bet':0, 'With':0}
+            
+            for key, val in self.subtype_dists.items():
+                for subtype, dist_count in val.items():
+                    dist_summary[key] += dist_count[0]
+                    count_summary[key] += dist_count[1]
+            
+            if count_summary['Bet'] == 0:
+                print('Between-value is 0, for some reason. "Error" caught in calcMeanTypeDists')
+                
+            self.mean_type_dists = {key: round(dist_summary[key] / count_summary[key], 8)  # Was 8 
+                                    for key, val in dist_summary.items() if count_summary[key]}
+            #except ZeroDivisionError as e:
+        else:
+            print("Failed in calcMeanTypeDIsts, worng number of subtype level")
+            
         
     def calcMeanPopDists(self):
         """
@@ -127,6 +201,7 @@ class treeMetrics(treeInfo):
         mean_pop_dists. 
         
         """
+        
         
         if not self.pop_dists: self.calcPopDists()
         
@@ -145,6 +220,9 @@ class treeMetrics(treeInfo):
              
         self.mean_pop_dists = mean_pop_dists
         
+    
+    
+        
         
     def calcSDR(self):
         """
@@ -158,24 +236,52 @@ class treeMetrics(treeInfo):
                 or every single group (.. = True.)
         Testing: OK.   
         """
-
-        if not self.mean_type_dists: 
-            self.calcMeanTypeDists()
-        elif (self.mean_type_dists and self.random_pops):
-            self.calcMeanTypeDists()
-        
+        if self.subtype_levels == 2: 
+                
+            if not self.mean_type_dists: 
+                self.calcMeanTypeDists()
+            elif (self.mean_type_dists and self.random_pops):
+                self.calcMeanTypeDists()
             
-        if self.mean_type_dists['supBet']:
-            self.SDRsuper = round(self.mean_type_dists['supWith'] / 
-                                  self.mean_type_dists['supBet'], 6) # was 6
-        else: 
-            self.SDRsuper = float('NaN')
+            try:     
+                if self.mean_type_dists['supBet']:
+                    self.SDRsuper = round(self.mean_type_dists['supWith'] / 
+                                          self.mean_type_dists['supBet'], 6) # was 6
+                else: 
+                    self.SDRsuper = 1
+                    
+            except KeyError: 
+                self.SDRsuper = float('NaN')
+                    # logger!
+            try: 
+                if self.mean_type_dists['subBet']:
+                    self.SDRsub = round(self.mean_type_dists['subWith'] / 
+                                        self.mean_type_dists['subBet'], 6) # was 6
+                else:
+                    self.SDRsub = 1
+                    
+            except KeyError:
+                self.SDRsub = float('NaN')
         
-        if self.mean_type_dists['subBet']:
-            self.SDRsub = round(self.mean_type_dists['subWith'] / 
-                                self.mean_type_dists['subBet'], 6) # was 6
-        else:
-            self.SDRsub = float('NaN')
+        # NEW IN 3.0
+        else: 
+                
+            if not self.mean_type_dists: 
+                self.calcMeanTypeDists()
+            elif (self.mean_type_dists and self.random_pops):
+                self.calcMeanTypeDists()
+            
+            try:     
+                if self.mean_type_dists['Bet']:
+                    self.SDR = round(self.mean_type_dists['With'] / 
+                                          self.mean_type_dists['Bet'], 6) # was 6
+                else: 
+                    self.SDR = 1
+                    
+            except KeyError: 
+                self.SDR = float('NaN')
+                    # logger!
+        
         
     
     def calcSingleSDRs(self):
@@ -365,4 +471,5 @@ class treeMetrics(treeInfo):
     def getSDRsub(self): return self.SDRsub
     def getSDVsuper(self): return self.SDVsuper
     def getSDVsub(self): return self.SDVsub
+    def getSDR(self): return self.SDR
 

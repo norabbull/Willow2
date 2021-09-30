@@ -255,7 +255,7 @@ for tree_num in range(num_trees):
 
 # Check mat
 
-sim_mat55 = load_cd_mat('C:/Users/norab/Master/data/simulation/sim_mat55.csv')
+sim_mat55 = load_cd_mat('C:/Users/norab/Master/data/job_simulation/cd_simulation/sim_mat55.csv')
 
 #%% Calculate SDR for all sim mats
 

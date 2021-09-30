@@ -1,0 +1,46 @@
+
+
+
+
+
+
+Idea:
+
+    Make it custaomizable of how many group levels one wantes to calculate for.
+    Optimize calculation for one group level only, and rather run program
+    multiple times for each group level that is to be calculated. 
+    
+    
+    Restructure calcPopDists. 
+    Make it work for one gorup only and make another function to do the process
+    the number of group levels it should be calculated for. 
+    
+    Reason to calculate both in one go is to save time - values only have to be
+    retrived once from the matrix and so the matrix only have to be
+    looped once instead of twice. 
+    
+    Idea: Time how long it takes to loop a matrix. 
+    Make a measure. 
+    Maybe you can even include this in your matrix to show the program and 
+    development idea. 
+    
+    
+Name changes: 
+    
+    "pop" and "group" is to be changed to "subtype" or "st"
+    
+    Everything refering to a gene should get a general name instead. 
+    
+Variable/ constant changes: 
+
+    Remove self.pop_info (substituted by subtype_info)
+    Remove super_pops and sub_pops, substituted by subtype_names
+    
+    
+    
+SDR of trees with zero distances in the matrix should obtain value NaN or 1.
+There is perfect clustering, however, on may want to exclude these from the 
+results. Trees with SDR = 1 is unknown if had zero- distmat vaules or if 
+S was calculated so in another manner. 
+I think they should get vaule = 1. 
+

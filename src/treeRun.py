@@ -13,43 +13,58 @@ import sys
 import os
 from os.path import isfile, join
 from src.treeMetrics import treeMetrics
-import logging
-import logging.config
+#import logging
+#import treeLogger
 
-    
+#logger = treeLogger.get_logger(__name__)
+
 class RunStuff:
     
-    def __init__(self, config_file):
+    def __init__(self, config):
         
-        self.config_file = config_file
+        """
+            confige_file: dicitonary of 
+
+        """
         
-        for key, val in self.config_file.items():
+        #self.logger = treeLogger.get_logger(__name__)
+        #self.logger.info('RunStuff initiated')
+        self.config = config
+        
+        # Make datetime stamp
+        for key, val in self.config.items():
             if 'datetime' in str(val): 
-                self.config_file[key] = val.replace('datetime', datetime.now().strftime("%d.%m.%Y_%H.%M"))
+                self.config[key] = val.replace('datetime', datetime.now().strftime("%d.%m.%Y_%H.%M"))
         
-        # Set function to run
-        self.func = self.config_file.get('func').strip()
-        self.input_folder = self.config_file.get('input_folder').strip()
-        self.output_folder = self.config_file.get('output_folder').strip()
-        self.skip_genes = self.output_folder + self.config_file.get('skip_genes').strip()
+        self.input_folder = self.config.get('input_folder').strip()
+        self.output_folder = self.config.get('output_folder').strip()
+        self.skip_genes = self.output_folder + self.config.get('skip_genes').strip()
+        self.func = self.config.get('func').strip()
+        #self.logger.info("It made it here! Hurray!")
         
-        logger.info("RUN INITIATED SUCCESSFULLY")
+        # Run! 
+        self.run_func()
+        
 
     @classmethod
     def make_filelist(self, input_files):
-
-        if isinstance(input_files, str):
-            if '.csv' in input_files: 
-                files = pd.read_csv(input_files, header = None)
-                files = files[0].values.tolist()
-            else: 
-                files = [join(input_files, f) for f in os.listdir(input_files) 
-                             if isfile(join(input_files, f))]
-                files = [f.strip() for f in files]
+        try: 
+            if isinstance(input_files, str):
+                if '.csv' in input_files: 
+                    files = pd.read_csv(input_files, header = None)
+                    files = files[0].values.tolist()
+                else: 
+                    files = [join(input_files, f) for f in os.listdir(input_files) 
+                                 if isfile(join(input_files, f))]
+                    files = [f.strip() for f in files]
+        except Exception as e:
+            #logger.error("Failed to make filelist.")
+            print("Error with make_filelist")
+            print(e)
                 
         return files
         
-    def run_calcSDR(self, random=False):
+    def run_calcSDR_old(self, random=False):
         """
         random: If groups should be random or not. Used to calculate null distribution.
         skip_genes: list of gene names to be skiped from calculation. 
@@ -58,16 +73,16 @@ class RunStuff:
         
         try:
             
-            input_cd_folder = self.config_file.get('input_cd_folder').strip()
-            group_info = self.input_folder + self.config_file.get('input_group_info').strip()
+            input_cd_folder = self.config.get('input_cd_folder').strip()
+            group_info = self.input_folder + self.config.get('input_group_info').strip()
             
-            output_super = self.output_folder + self.config_file.get('output_super').strip()
-            output_sub = self.output_folder + self.config_file.get('output_sub').strip()
-            output_unprocessed = self.output_folder + self.config_file.get('output_unprocessed').strip()
+            output_super = self.output_folder + self.config.get('output_super').strip()
+            output_sub = self.output_folder + self.config.get('output_sub').strip()
+            output_unprocessed = self.output_folder + self.config.get('output_unprocessed').strip()
             
             file_list = self.make_filelist(input_cd_folder)
-            skip_genes = self.input_folder + self.config_file.get('skip_genes').strip()
-            select_genes = self.input_folder + self.config_file.get('select_genes').strip()
+            skip_genes = self.input_folder + self.config.get('skip_genes').strip()
+            select_genes = self.input_folder + self.config.get('select_genes').strip()
             
             
             if '.csv' in select_genes:
@@ -98,7 +113,7 @@ class RunStuff:
             ind_len = len(file_list)
             
             if random: 
-                num_iter = int(self.config_file.get('num_rand_trees'))
+                num_iter = int(self.config.get('num_rand_trees'))
             else:
                 num_iter = 1
 
@@ -145,6 +160,108 @@ class RunStuff:
                 
         except Exception as e: 
             #logger.exception(e)
+            print("error with runCalc")
+            print(e)
+            
+            
+    # NEW IN 3.0:
+    def run_calcSDR(self, random=False):
+        """
+        random: If groups should be random or not. Used to calculate null distribution.
+        skip_genes: list of gene names to be skiped from calculation. 
+
+        """
+        
+        try:
+            
+            input_cd_folder = self.config.get('input_cd_folder').strip()
+            subtype_info = self.input_folder + self.config.get('input_subtype_info').strip()
+            output_SDR = self.output_folder + self.config.get('output_SDR').strip()
+            output_unprocessed = self.output_folder + self.config.get('output_unprocessed').strip()
+            
+            file_list = self.make_filelist(input_cd_folder)
+            skip_genes = self.input_folder + self.config.get('skip_genes').strip()
+            select_genes = self.input_folder + self.config.get('select_genes').strip()
+            
+            
+            if '.csv' in select_genes:
+                select_genes= pd.read_csv(select_genes, header=None)
+                select_genes.columns = ['gene']
+                select_genes= list(select_genes['gene'])
+                
+                keep_files = []
+                for file in file_list:
+                    if any(gene in file for gene in select_genes):
+                        keep_files.append(file)
+                        file_list = keep_files
+            
+            if '.csv' in skip_genes:
+                skip_genes= pd.read_csv(skip_genes, header=None)
+                skip_genes.columns = ['gene']
+                skip_genes= list(skip_genes['gene'])
+                
+                remove_files = []
+                for file in file_list:
+                    if any(gene in file for gene in skip_genes):
+                        remove_files.append(file)
+        
+                file_list = [f for f in file_list if f not in remove_files]
+            #logger.info(file_list)
+            
+            ind = 1
+            ind_len = len(file_list)
+            
+            if random: 
+                num_iter = int(self.config.get('num_rand_trees'))
+            else:
+                num_iter = 1
+
+            for i in range(num_iter):
+                for cd_file in file_list:
+                    try:         
+                        
+                        #logger.info("File processed: {0}".format(cd_file))
+                        #logger.info("File number: {0} / {1}".format(ind, ind_len))
+                        #logger.info("Iter round: {0}".format(i))
+                        ind +=1
+    
+                        tree = treeMetrics()
+                        tree.setup(cd_file.strip(), subtype_info)
+                        
+                        if random: 
+                            tree.shuffleSampleInfo()
+    
+                        tree.calcSDR()
+                        
+                        # Old: 
+                        # supSDR = tree.getSDRsuper()
+                        # subSDR = tree.getSDRsub()
+                        
+                        # supSDR = [tree.getGeneName(), supSDR]
+                        # subSDR = [tree.getGeneName(), subSDR]
+                        
+                        # New in 3.0
+                        SDR = tree.getSDR()
+                        SDR_save = [tree.getGeneName(), SDR]
+                    
+                        with open(output_SDR, 'a', newline='') as f:   # write to file    
+                            writer = csv.writer(f)
+                            writer.writerow(SDR_save)
+
+        
+                    except Exception: 
+                       
+                        #logger.exception("File disrupted:", cd_file)
+                        file = str(cd_file)
+                        
+                        with open(output_unprocessed, 'a') as f: 
+                            f.write(file)
+                            #open text file
+                        pass
+                
+        except Exception as e: 
+            #logger.exception(e)
+            print("error with runCalc")
             print(e)
        
     def run_calcSingleSDRs(self, random = False):
@@ -161,10 +278,10 @@ class RunStuff:
             
         """
 
-        input_files = self.config_file.get('input_files')
-        group_info = self.config_file.get('input_group_info')
-        SSDR_output_dir = self.config_file.get('output_SSDR')
-        output_unprocessed = self.config_file.get('output_unprocessed')
+        input_files = self.config.get('input_files')
+        group_info = self.config.get('input_group_info')
+        SSDR_output_dir = self.config.get('output_SSDR')
+        output_unprocessed = self.config.get('output_unprocessed')
                
         file_list = self.make_filelist(input_files)
 
@@ -231,11 +348,11 @@ class RunStuff:
         Output: 
             Writes SDR to file.         
         """
-        input_files = self.config_file.get('input_files').strip()
-        group_info = self.config_file.get('input_group_info').strip()
-        SDVsuper_output = self.config_file.get('output_SDRsuper').strip()
-        SDVsub_output = self.config_file.get('output_SDRsuper').strip()
-        save_unprocessed = self.config_file.get('output_unprocessed').strip()
+        input_files = self.config.get('input_files').strip()
+        group_info = self.config.get('input_group_info').strip()
+        SDVsuper_output = self.config.get('output_SDRsuper').strip()
+        SDVsub_output = self.config.get('output_SDRsuper').strip()
+        save_unprocessed = self.config.get('output_unprocessed').strip()
             
         file_list = self.make_filelist(input_files)
 
@@ -336,8 +453,7 @@ class RunStuff:
     #         #     write.writerow(file_list) 
     
 
-    def main(self):
-        
+    def run_func(self):
         if self.func == "calcSDR":
             self.run_calcSDR()
         elif self.func == "calcSDV":
@@ -349,37 +465,14 @@ class RunStuff:
         elif self.func == "calcTest":
             return self.run_calcTest()
         else:
-            logger.error("Not a valid function option. Change in main_config file." +
-                              "options are: calcSDR, calcSDV, calcSingleSDRs, calcNullSDR and calcTest")
+            print("Error with func")
+            #logger.error("Not a valid function option. Change in main_config file." +
+                              #"options are: calcSDR, calcSDV, calcSingleSDRs, calcNullSDR and calcTest")
+   
+        #logger.info('Session finished successfully: {0}'.format(datetime.now().strftime("%d.%m.%Y_%H.%M")))
 
-        logger.info('Session finished successfully: {0}'.format(datetime.now().strftime("%d.%m.%Y_%H.%M")))
+
 
 if __name__ == '__main__':
     
-    # Test on lenovo computer
-   #configFilepath = 'E:/Master/jobs/job_test/job_input/main_config_calcTest_skip_select.yml'
-    
-    # Config file argument
-    configFilepath = sys.argv[1]
-    
-    # Load config arguments
-    configFilepath = configFilepath.strip()
-    
-    with open(configFilepath, 'r') as c:
-        config_file = yaml.safe_load(c)
-        
-    log = (config_file.get('output_folder') + config_file.get('output_log')).replace('datetime', datetime.now().strftime("%d.%m.%Y_%H.%M"))
-    file_handler = logging.FileHandler(filename=log)
-    stdout_handler = logging.StreamHandler(sys.stdout)
-    handlers = [file_handler, stdout_handler]
-    
-    logging.basicConfig(
-        level=logging.DEBUG, 
-        format='[%(asctime)s] {%(name)s:%(lineno)d} %(levelname)s - %(message)s',
-        handlers=handlers
-    )
-
-    logger = logging.getLogger(__name__)
-    
-    run = RunStuff(config_file)
-    run.main()
+   pass

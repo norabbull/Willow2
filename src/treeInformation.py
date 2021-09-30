@@ -27,17 +27,27 @@ class treeInfo:
         self.sample_info = None
         self.gene_name = None
         self.pop_dists = None
-        self.mean_pop_dists = None
-        self.mean_type_dists = None    
+        self.mean_pop_dists = None     # Used for singleSDR
+        self.mean_type_dists = None    # Used for SDR
         self.random_pops = False
         self.uniqseq_map = None
         self.uniqseq_count= None
-                
-    def setup(self, dist_mat_file, pop_info_file):
+        
+        # New 3.0
+        self.subtype_names = None
+        self.subtype_info = None
+        self.subtype_levels = None
+        self.subtype_dists = None
+        self.SDR = None
+        
+    def setup(self, dist_mat_file, subtype_info_file):
         self.setDistMat(dist_mat_file)
-        self.setPopInfo(pop_info_file)
+        #self.setPopInfo(pop_info_file)
         self.setGeneName(dist_mat_file)
         self.setSampleInfo()
+        
+        # NEW IN 3.0:
+        self.setSubtypeInfo(subtype_info_file)
     
     def setDistMat(self, dist_mat_file):
         self.dist_mat = pd.read_csv(dist_mat_file, index_col = 0, dtype={'a': str})
@@ -51,6 +61,11 @@ class treeInfo:
             class variable "gene_name".
             Both Ensembl and gene name identifiers included on the form: 
                 'ENSG00000000938___FGR'
+        Plan to change for 3.0:
+            This is very custom made for my case. 
+            Make name a variable that can be generalized to whichever problem,
+            given as a configuration variable. 
+            
         """
         subName = re.sub('^.*ENS', 'ENS', dist_mat_file)
         self.gene_name = re.sub('___CopD.csv$','', subName)
@@ -71,6 +86,8 @@ class treeInfo:
         self.pop_info = [super_pops, sub_pops]   # to be replaced/deleted
         self.super_pops = super_pops
         self.sub_pops = sub_pops
+        
+    
      
     def setSampleInfo(self):
         """
@@ -93,6 +110,7 @@ class treeInfo:
             
             self.sample_info[ind] = [sample, superName, subName]
     
+
     def shuffleSampleInfo(self):
         """
         Make randomly defined population groups. 
@@ -133,7 +151,40 @@ class treeInfo:
     def getDistMat(self):return self.dist_mat
     def getUniqseqMap(self): return self.uniqseq_map
     def getUniqseqCount(self): return self.uniqseq_count
+    
+    # NEW SHIT
+    
+    def setSubtypeInfo(self, subtype_info_file):
+        """
+        file: string filepath to subtype type info-file.
+              pop types = super and sub
+        function: organize information into list of two sets 
+                of contained populations in super- and sub pops respectivly
+        """
+        subtype_info = pd.read_csv(subtype_info_file, delimiter='\t')
+        self.subtype_levels = len(subtype_info['ClassificationType'].unique())
+    
+        if self.subtype_levels == 2:     # Old version - still runable.
+            super_pops = subtype_info.loc[subtype_info['ClassificationType'] == 'SUPER']
+            super_pops = set(super_pops['ClassificationName'])
+            sub_pops = subtype_info.loc[subtype_info['ClassificationType'] == 'SUB']
+            sub_pops = set(sub_pops['ClassificationName'])
+            self.pop_info = [super_pops, sub_pops]   # to be replaced/deleted
+            self.super_pops = super_pops
+            self.sub_pops = sub_pops
+            
+        elif self.subtype_levels == 1:    # New version
+            subtypes = subtype_info.loc[subtype_info['ClassificationType'] == 'SUPER']
+            subtype_names = set(subtypes['ClassificationName'])
+            
+            self.subtype_info = [subtype_names]
+            self.subtype_names = subtype_names
+            
+        else: 
+            raise ValueError("subtype levels error. Number of levels found: ", self.subtype_levels)
 
+    def getSubtypeInfo(self): return self.subtype_info
+    
 
 if __name__ == '__main__':
   pass
