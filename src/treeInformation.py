@@ -117,6 +117,38 @@ class treeInfo:
         To be used for creating null-distribution.
             
         """
+        
+        for i in range(self.subtype_levels):
+            subtype = [val[i+1] for val in self.sample_info().values()]
+            shuffle(subtype)
+            
+            for key, val in self.sample_info.items():
+                val[i+1] = subtype.pop()
+                self.sample_info[key] = val
+                    
+        # OLD
+        # sup = [val[1] for val in self.sample_info.values()]
+        # sub = [val[2] for val in self.sample_info.values()]
+        # shuffle(sup)
+        # shuffle(sub)
+
+        # for key, val in self.sample_info.items():
+        #     val[1] = sup.pop()
+        #     val[2] = sub.pop()
+        #     self.sample_info[key] = val
+
+        self.random_pops = True
+        self.mean_pop_dists = None
+        self.mean_type_dists = None
+        self.pop_dists = None
+    
+    # NOW IN 3.0
+    def shuffleSampleInfo(self):
+        """
+        Make randomly defined population groups. 
+        To be used for creating null-distribution.
+            
+        """
           
         sup = [val[1] for val in self.sample_info.values()]
         sub = [val[2] for val in self.sample_info.values()]

@@ -130,6 +130,74 @@ def simSDR3(g, num_g, perm, dist = 0.1):
         
     return SDR
 
+#%% simSDR4 - without number of groups (unnecessary, since only two clades.)
+
+
+def simSDR4(G, perm, dist = 0.1):
+    """
+        Simulation of SDR values in a tree comprising 2 clades, C1 and C2,
+        separated by a distance (dist).
+        The leaf nodes of the tree is defined to belong to either of two 
+        groups, G1 and G2.
+          
+        G = group size of either group. G1 = G2, always.
+        C1 = number of samples in clade 1
+        C2 = number of samples in clade 2
+        
+        At start of simulation, G1 and G2 are perfectly separated
+        into the two clades; G1 samples are in C1, G2 samples are in C2. 
+        Then, G1 = G2 = C1 = C2.
+        
+        perm = number of G1 samples permuted from C1 to C2.
+        
+        When number of permutations (perm) = 0, the groups are perfectly 
+        separated into C1 and C2, but as perm increase, G1 samples are 
+        clustered together with G2 samples in C2, rather than in C2. 
+        
+        Number of permutations possible ranges from 0 to G; in which 
+        case all samples are clustered together in the same clade, and C2
+        does no longer exist.
+        
+        SDR is calculated as a function of G and perm; group size 
+        and number of permutations from G1 to G2. 
+        
+        
+        
+
+         
+
+        
+    """
+    
+    C1 = G + P      # num samples in tree clade 1
+    C2 = G - P      # num samples in tree clade 2
+    
+    
+    
+    # Within 
+    comb_within_G = ss.comb(G, 2, exact = True) * 2   # Number of combinations between samples of the same defined group
+    
+    comb_within_g_perm = C2 * perm 
+    tot_dist_within = comb_within_g_perm * dist
+    mean_within = tot_dist_within / (comb_within_g)
+
+    # Between
+    comb_between_g_nonperm = g * (g - perm) 
+    comb_between_g_g = (g * g)
+    
+    tot_dist_bewteen = comb_between_g_nonperm * dist
+    mean_between = tot_dist_bewteen / comb_between_g_g
+    
+    # SDR
+    try: 
+        SDR = mean_within / mean_between
+    except: 
+        SDR = "nan"
+        print("Division by zero. ")
+        print("G1: ", g)
+        print("P:", p)
+        
+    return SDR
 #%% Run simulation
 
 SDRresults = pd.DataFrame(columns = ['Group1', 'Group2', 'Perm', 'SDR'])
@@ -160,11 +228,83 @@ SDRresults3 = pd.DataFrame(columns = ['Group_size', 'Num_groups', 'Perm', 'SDR']
 for g in range(2,200):
     for ng in range(2,3):
         p = 0
-        while p < (g):
+        
+        while p < g:
             SDR = simSDR3(g, num_g = ng, perm = p, dist = 500)
             SDRresults3.loc[len(SDRresults3)] = [g, ng, p, SDR]
             p += 1
+
+#%% 
+
+SDRresults4 = pd.DataFrame(columns = ['Group_size', 'Num_groups', 'Perm', 'SDR'])
+#for g1 in range(2,50):
+for g in range(2,200):
+        p = 0
+        while p < g:
+            SDR = simSDR4(g, perm = p, dist = 500)
+            SDRresults4.loc[len(SDRresults4)] = [g, ng, p, SDR]
+            p += 1
+
+
+#%% Randomize
+
+
+SDRresults5 = pd.DataFrame(columns = ['Group_size', 'Num_groups', 'Perm', 'SDR'])
+#for g1 in range(2,50):
+for g in range(2,200):
+    for ng in range(2,3):
+        p = 0
+        
+        while p < g:
+            SDR = simSDR3(g, num_g = ng, perm = p, dist = 500)
+            SDRresults3.loc[len(SDRresults3)] = [g, ng, p, SDR]
+            p += 1
+
+
             
+#%% 
+
+
+# N = population size
+# G = number of samples in groups (G1 = G2)
+# n = size of C2 (sample size)
+# x = number of G1 elements in C2
+# p = number of permutations from G1 to C1
+
+# x = n because the simulation only includes situation of 
+# C2 beaing a "clean" G1 clade. 
+
+
+#____________________________
+# M = total number of objects
+# n = total number of Group 1 objects
+# N = number of samples in random draw. In my case, samples in clade 2. 
+
+# M = Total number of leaf nodes 
+# n = total number of G1 objects. G1 = G2.
+# N = number of samples in clade 2. ("outgroup")
+# x = number of G1 objects in N, drawn without replacement
+#     from the total population
+
+# N = x
+
+SDRresults4 = pd.DataFrame(columns = ['Group_size', 'Perm', 'SDR', 'p-value', 'x', 'M', 'N'])
+#for g1 in range(2,50):
+
+for G in range(2,200):
+    p = 0
+    N = G - p
+    n = G
+    M = G * 2
+    x = N
+    while p < G:
+        SDR = simSDR4(G, perm = p)
+        pval = hypergeom.cdf(x, M, n, N)  # (x, M, n, N)
+        
+        SDRresults4.loc[len(SDRresults4)] = [G, p, SDR, pval, x, M, N]
+        p += 1
+
+
 #%% Single val calc
 
 g = 10
@@ -197,6 +337,17 @@ SDR = simSDR3(g,num_g,perm = p)
 )
 
 
+(ggplot(SDRresults4, aes('Perm', 'Group_size', fill = 'SDR'))
+ + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
+# + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.65, show_legend = False)
+# + geom_boxplot(width = shift, alpha=0.7, size = 0.65, show_legend = False)
+ #+ scale_fill_manual(values=['dodgerblue', 'darkorange'])
+# + theme_classic()
+ + theme(figure_size=(8, 6))
+ + labs(title='SDR simulation')
+)
+
+
 # The simulation demonstartes how group size affects the SDR value to a large degree. 
 # So reading an SDR value by itself is not necessarily very meaningful, it must be seen in realtion
 # to the group sizes. 
@@ -218,11 +369,11 @@ SDR = simSDR3(g,num_g,perm = p)
     GR2___SIM___IamLeafGREEN
     
 """
-# Construct names
+
 
 # Constants
 sample_size = 200
-num_trees = 100
+num_trees = 200
 
 # Sample labels
 samples = ['GR1___SIM___IamLeafPurple' for i in range(int(sample_size/2))]
@@ -256,8 +407,152 @@ for tree_num in range(num_trees):
 # Check mat
 
 sim_mat55 = load_cd_mat('C:/Users/norab/Master/data/job_simulation/cd_simulation/sim_mat55.csv')
+sim_mat100 = load_cd_mat('C:/Users/norab/Master/data/job_simulation/cd_simulation/sim_mat100.csv')
 
-#%% Calculate SDR for all sim mats
+sim_mat199 = load_cd_mat('C:/Users/norab/Master/data/job_simulation/cd_simulation/sim_mat199.csv')
+
+#%% Second attempt
+
+# Constants
+sample_size = 200
+num_trees = 200
+
+# Sample labels
+samples = ['GR1___SIM___IamLeafPurple' for i in range(int(sample_size/2))]
+samples2 = ['GR2___SIM___IamLeafGreen' for i in range(int(sample_size/2))]
+samples.extend(samples2)
+
+# Construct data
+
+data = pd.DataFrame(np.zeros((sample_size, sample_size)), columns = )
+dist_mat = self.dist_mat.to_numpy()
+        
+        # Create distance sum placeholders
+        # Dict with pop as key and [dist value, number of dist values added] as value
+        WithSums = {subtype : [0,0] for subtype in self.subtype_info[0]}
+        BetSums = {subtype : [0,0] for subtype in self.subtype_info[0]}
+        
+
+        # Iter upper triangular dist_mat
+        row_length = len(dist_mat)
+        row_start = 1
+        for col in range(row_length):
+            for row in range(row_start, row_length):
+                sample1 = col
+                sample2 = row
+                
+                # Get popName
+                Subtype1 = self.sample_info[sample1][1]
+                Subtype2 = self.sample_info[sample2][1]
+                
+                val = dist_mat[sample2][sample1]        # Distance value
+
+                if Subtype1 == Subtype2:        # Same super pop, same sub pop
+                    WithSums[Subtype1] = [i+j for i, j in zip(WithSums[Subtype1], [val, 1])]  
+                else:
+                    BetSums[Subtype1] = [i+j for i, j in zip(BetSums[Subtype1], [val, 1])]  
+                    BetSums[Subtype2] = [i+j for i, j in zip(BetSums[Subtype2], [val, 1])]  
+                        
+            row_start += 1
+            
+        #self.pop_dists = {'With': WithSums, 'Bet': BetSums}
+        self.subtype_dists = {'With': WithSums, 'Bet': BetSums}
+
+
+#%% Hypergeometric probability function
+
+
+from scipy.stats import hypergeom
+import matplotlib.pyplot as plt
+
+
+
+# M = total number of objects
+# n = total number of Group 1 objects
+# N = number of samples in random draw. In my case, samples in clade 2. 
+
+# M = Total number of leaf nodes 
+# n = total number of G1 objects. G1 = G2.
+# N = number of samples in clade 2. ("outgroup")
+# x = number of G1 objects in N drawn without replacement
+#     from the total population
+
+""" 
+
+    Thought process: DIscussion!
+        Calculate the probability that the samples in 
+        one of the clades randomly appear in this clade, 
+        if there was no underlying pattern creating this 
+        group structure. 
+        Really, it is a calculation of the samples being
+        drawn from the population. 
+        Which would be the case if the underlying cause of
+        the observed variation in the sequence data were 
+        completely random. 
+        As if the mutations observed was there for no reason. 
+        ... more on drive. 
+"""
+
+# Probability mass function, pmf
+[M, n, N] = [10, 5, 5]
+rv = hypergeom(M, n, N)
+x = np.arange(0, n+1)
+pmf_g1 = rv.pmf(x)
+cdf_g1 = rv.cdf(x)
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.plot(x, pmf_g1, 'bo')
+ax.vlines(x, 0, pmf_g1, lw=2)
+ax.set_xlabel('# of g1 in c1')
+ax.set_ylabel('hypergeom PMF')
+plt.show()
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.plot(x, cdf_g1, 'bo')
+ax.vlines(x, 0, cdf_g1, lw=2)
+ax.set_xlabel('# of g1 in c1')
+ax.set_ylabel('hypergeom PMF')
+plt.show()
+
+sum(pmf_g[]
+
+# Cumulative distribution function
+
+# M = G = total number of objects
+# n = total number of Group 1 objects
+# N = number of samples in random draw. In my case, samples in clade 2. 
+
+# G = Total number of leaf nodes 
+# n = total number of G1 objects. G1 = G2.
+# N = number of samples in clade 2. ("outgroup")
+# x = number of G1 objects in N drawn without replacement
+#     from the total population
+# x represents the number of 
+
+x = 2       #(should be 50 % cahnce of drawing each)
+G = 100
+n = 50
+N = x
+
+#[x, G, n, N] = [100, 50, 100, 30]
+
+prb = hypergeom.cdf(x, M, n, N)
+#R = hypergeom.rvs(M, n, N, size = 10)
+
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.plot(x, prb, 'bo')
+ax.vlines(x, 0, prb, lw=2)
+ax.set_xlabel('# of g1 in c1')
+ax.set_ylabel('hypergeom CDF')
+plt.show()
+
+
+# Simulate p values for all simulated values. Put in matrix. 
+
 
 
 
