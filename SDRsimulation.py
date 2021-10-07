@@ -377,10 +377,16 @@ for G in range(2,200):
 
 for index, row in SDRresults6.iterrows():
     
-    header = 'Gsize:' + str(row['Group_size']) + '_Perm:' + str(row['G2Perm']) + '_SDR:' + str(row['SDR'])
-    print(header)
-    r = header
-    break
+    header = 'G:' + str(row['Group_size']) + '_P:' + str(row['G2Perm']) + '_SDR:' + str(row['SDR'])
+    print(index)
+
+    file = 'C:/Users/norab/Master/data/simulation/simNull/simNull_' + str(index) + '.csv'
+    with open(file, 'w') as f:
+        f.write(header)
+        f.write('\n')
+        for item in row['randomSDRs']:
+            f.write("%s\n" % item)
+
 
 
 #%% Visualize random! 

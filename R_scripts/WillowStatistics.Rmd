@@ -79,6 +79,7 @@ SDRnullFile <- superFiles[3]
 SDRnullFile <- "C:/Users/norab/Master/Data/SDRnull/refined_values/super/SDRnullSuper_ENSG00000178814___OPLA.csv"
 SDRnullFile <- "C:/Users/norab/Master/Data/SDRnull/refined_values/super/SDRnullSuper_ENSG00000134121___NCHL1.csv"
 SDRnullFile <- "C:/Users/norab/Master/Data/SDRnull/refined_values/super/SDRnullSuper_ENSG00000284869___SELB.csv"
+SDRnullFile <- "C:/Users/norab/Master/data/simulation/simNull/simNull_5.csv"
 
 
 pvalSaveFile <- file_super
@@ -270,5 +271,65 @@ ggplot(SDRnull, aes(x = SDRnull)) +
                     alpha = 0.5)   # Area transparency
 ```
 
+# Willow statistics simulation
 
 
+```{r}
+SDRnullFile_dummy <- "C:/Users/norab/Master/data/simulation/simNull/simNull_0.csv"
+
+
+calcAndSave_simNull_pval <- function(SDRnullFile, pvalSaveFile) {
+  
+  # Read data
+  SDRnullData <- read.csv(SDRnullFile)
+  col = colnames(SDRnullData)
+  data = unlist(strsplit(col, '_'))
+  #G = strtoi(gsub("G.", "", data[1]))
+  #P = strtoi(gsub("P.", "", data[2]))
+  SDR = as.double(gsub("SDR.", "", data[3]))
+  uniq_vals = length(unique(SDRnullData[,1]))
+  
+  
+  P = ecdf(SDRnullData[,1])    # The function giving empirical CDF of SDRnull_values
+  p_val = P(SDR)                # Returns empirical CDF at SDRtrue, ie. calculated SDR for populations
+                                   # Save p val for next step - multiple testing correcting
+  #plot(P)                         # Plot the shit (dont do for all, make an example or two...
+  # Save p val to file
+  cat(c(colnames(SDRnullData), uniq_vals, p_val), file = pvalSaveFile, sep = ",", append = TRUE)
+  cat('\n', file = pvalSaveFile, append=TRUE)
+}
+```
+
+
+# Run the shit
+```{r}
+
+# Create file to save p values:
+simNull_pvals_file<- "C:/Users/norab/Master/data/simulation/simNull_pvals.csv"
+file.create(save_file)
+# Write header to file
+cat(c("data", "unique_pvals", "pval"), file = simNull_pvals_file, append=TRUE)
+
+
+# Create filelist to process
+simNullFiles <- list.files(path="C:/Users/norab/Master/data/simulation/simNull/", full.names=TRUE, recursive=FALSE)
+
+# Action
+test <- sapply(simNullFiles, calcAndSave_simNull_pval, simNull_pvals_file)
+
+```
+
+# Multiple testing correcting
+```{r}
+
+# Read data
+p_vals <- read.csv("C:/Users/norab/Master/data/simulation/simNull_pvals.csv", sep=",", col.names = c("data", "unique_pvals", "pval"))
+
+# adjust
+p_vals$pval_adj <- p.adjust(p_vals$pval)
+
+# Save to file
+write.csv(p_vals, "C:/Users/norab/Master/data/simulation/simNull_pvals.csv", row.names = FALSE, quote = FALSE)
+
+
+```
