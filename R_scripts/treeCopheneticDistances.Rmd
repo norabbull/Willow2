@@ -11,6 +11,7 @@ output: html_document
 Imports
 ```{r}
 library(ape)
+packageVersion("ape")
 
 ```
 

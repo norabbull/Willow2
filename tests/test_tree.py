@@ -561,9 +561,27 @@ class TestTreeFunctions:
             tree.setUniqseqMap(map_NFYA)
             uniqseq_map = tree.getUniqseqMap()     
             uniqseq_count = tree.getUniqseqCount()
+
         
-        
+        def test_calcNonZeroTotdist(self):
+
+            dist_mat_MIO = load_cd_mat('C:/Users/norab/Master/data/real_tree_data/dist_mat_test/MIO_5x5.csv')
+            dist_mat_FGR = load_cd_mat('C:/Users/norab/Master/data/real_tree_data/dist_mat_test/FGR_10x10.csv')
             
+            totdist_MIO = treeMetrics.calcNonZeroTotdist(dist_mat_MIO)
+            totdist_FGR = treeMetrics.calcNonZeroTotdist(dist_mat_FGR)
+            
+            # Manual calculation
+            
+            # MIO:
+                # Full triangular matrix have distance != 0, so totdist should be = 1.0
+                assert totdist_MIO == 1.0   # Passed
+                
+            # FGR:
+                tot_nonZero = 9 + (5 * 4) + 3 + 2
+                tot_entries = 9 + 8 + 7 + 6 + 5 + 4 + 3 + 2 + 1     
+                percent = tot_nonZero / tot_entries
+                assert percent == totdist_FGR   # Passed
             
 # if __name__ == "__main__":
     

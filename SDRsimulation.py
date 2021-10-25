@@ -820,6 +820,29 @@ for G in range(2,200):
 )
 
 
+#%% Visualize p val data
 
+all_simData = load_simData()
+
+(ggplot(all_simData, aes('perm', 'group_size', fill = 'pval'))
+ + geom_point(alpha=1, size=2, stroke = 0.1, color = 'indigo')
+# + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.65, show_legend = False)
+# + geom_boxplot(width = shift, alpha=0.7, size = 0.65, show_legend = False)
+# + scale_fill_manual(values=['dodgerblue', 'darkorange'])
+# + theme_classic()
+ + theme(figure_size=(8, 6))
+ + labs(title='SDR simulation')
+)
+
+
+(ggplot(all_simData, aes('perm', 'group_size', fill = 'pval_adj'))
+ + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
+# + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.65, show_legend = False)
+# + geom_boxplot(width = shift, alpha=0.7, size = 0.65, show_legend = False)
+# + scale_fill_manual(values=['dodgerblue', 'darkorange'])
+# + theme_classic()
+ + theme(figure_size=(8, 6))
+ + labs(title='SDR simulation')
+)
 
 

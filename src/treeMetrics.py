@@ -334,10 +334,10 @@ class treeMetrics(treeInfo):
         self.SDVsuper = round(np.array(list(self.singleSuperSDRs.values())).var(ddof=1), 4)
         self.SDVsub = round(np.array(list(self.singleSubSDRs.values())).var(ddof=1), 4)
     
-    def calcNonZeroTotal(self, 
-                         percent = True):
+    
+    @classmethod
+    def calcNonZeroTotdist(self, dist_mat, percent = True):
         """
-
         Testing: to do
         Input:
             dist_mat : DataFrame with cophenetic distances for a tree
@@ -346,15 +346,16 @@ class treeMetrics(treeInfo):
             totDist: float. total amount of pairdistances being non-zero as 
             percent or count. 
             
-        Note: This does the same as what u did in R. Have all values alread. 
+        Note: This does the same as what u did in R. Have all values already. 
         """
-        nonZero_row = pd.DataFrame((self.dist_mat != 0).astype(int).sum(axis=1))
+
+        nonZero_row = pd.DataFrame((dist_mat != 0).astype(int).sum(axis=1))
         nonZeroCount = int(nonZero_row.sum(axis=0))
         
-        num_entries = (self.dist_mat.shape[0] * self.dist_mat.shape[1]) - self.dist_mat.shape[0]
-        nonZeroPercent = nonZeroCount / num_entries
+        num_entries = (dist_mat.shape[0] * dist_mat.shape[1]) - dist_mat.shape[0]
+
         if percent:    
-            return nonZeroPercent
+            return nonZeroCount / num_entries
         else: 
             return nonZeroCount
         

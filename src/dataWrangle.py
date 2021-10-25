@@ -7,6 +7,7 @@ Created on Wed Jun  2 06:45:58 2021
 
 from inspection.inspectionHelpers import *
 from src.treeInformation import treeInfo
+from src.treeMetrics import treeMetrics
 import pandas as pd
 import os
 from os.path import isfile, join
@@ -635,7 +636,7 @@ skip_genes = [file_list_stripped[i] for i in np.arange(0,200,10)]
 
 gene_name == gene
 
-#%% Final SDRnull wrangle
+#%% Final SDRnull wrangle TRUE SHIT!
 
 
 """
@@ -727,6 +728,56 @@ for key, val in subValues.items():
     df = pd.DataFrame(val)
     filename = 'C:/Users/norab/Master/data/SDRnull/refined_values/sub/SDRnullSub_' + key + '.csv'
     df.to_csv(filename, index = False, header = ['SDRnull'])
+
+#%% 
+
+# Find overlap of two lists
+
+ninja_trees = make_filelist('C:/Users/norab/Master/data/real_tree_data/ninja_trees')
+cd_files = make_filelist('E:/Master/cophenetic_dists')
+
+gene_name_test = geneName(ninja_trees[0], filetype='ninja', idtype = 'gene')
+
+nt_genes = [geneName(file, filetype='ninja', idtype='gene') for file in ninja_trees]
+cd_genes = [geneName(file, filetype='cd', idtype='gene') for file in cd_files]
+
+overlap = []
+
+
+not_processed = [value for value in nt_genes if value not in cd_genes]
+
+
+#%% Calculate total non zero values
+
+
+dist_mat_test = load_cd_mat(cd_files[0])
+
+# Started 12.27
+
+tot_dists = pd.DataFrame(columns = ['gene', 'totdist'])
+for file in cd_files: 
+    dist_mat = load_cd_mat(file)
+    totdist = treeMetrics.calcNonZeroTotdist(dist_mat)
+    geneID = geneName(file)
+    tot_dists.append({'gene': geneID, 'totdist':totdist}, ignore_index = True)
+    
+
+totdist = load_totdist()
+all_zero_distance_genes = totdist[totdist['totdist'] == 0]
+
+
+# Number of gene-trees with totdist = 0 (all samples clustered together).
+
+
+
+
+
+
+
+
+
+
+
 
 
 

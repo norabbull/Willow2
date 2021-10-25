@@ -20,6 +20,34 @@ def make_filelist(input_files):
                      if isfile(join(input_files, f))]
     return files
 
+
+def geneName(dist_mat_file, filetype = "cd", idtype = 'all'):
+    """
+    Input: 
+        file: string filepath to distance matrix-file. 
+        filetype: ninja tree or cophenetic-dist file
+    Function: 
+        Filters out name of gene the tree represents and assign to
+        class variable "gene_name".
+        Both Ensembl and gene name identifiers included on the form: 
+            'ENSG00000000938___FGR'
+    """
+    
+    if filetype == "cd":
+        subName = re.sub('^.*ENS', 'ENS', dist_mat_file)
+        gene_name = re.sub('___CopD.csv$','', subName)
+    else: 
+        subName = re.sub('^.*ENS', 'ENS', dist_mat_file)
+        gene_name = re.sub('_HUMAN.*','', subName)
+    
+    if idtype == 'ENS':
+        gene_name = re.sub('___.*', '', gene_name)
+    elif idtype == 'gene':
+        gene_name = re.sub('^.*___','', gene_name)
+    
+    return gene_name
+
+
 def load_uniqseqs(file_path = 'C:/Users/norab/Master/Data/meta_data/9381_uniqseqs.txt'):
     """
     Input: None
@@ -195,7 +223,13 @@ def load_uniqseq_map(folder_path = 'E:/Master/Data/other/uniqseq_maps/maps/', ge
 def get_gene_entry(gene, df):
 
     return df[df['gene'].str.contains(gene)]
+
+
+def load_simData(file='C:/Users/norab/Master/data/simulation/simNull_pvals.csv'):
+    return pd.read_csv(file)
     
+    
+
 if __name__ == '__main__':
     genes = ['ENSG00000166347___CYB5', 'ENSG00000185946___RNPC3', 'ENSG00000160049___DFFA', 'ENSG00000143278___F13B', 'ENSG00000185101___ANO9']
     test = load_uniqseq_map('E:/Master/Data/other/uniqseq_maps/maps/')

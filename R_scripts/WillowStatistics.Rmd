@@ -21,7 +21,7 @@ library(plyr)
 ```{r}
 prob = 0.05
 var_p = prob * (1 - prob)
-num_perm_samples = 100      # 70 = empirical p val = 0.1
+num_perm_samples = 73      # 70 = empirical p val = 0.1
 var_p_n = var_p / num_perm_samples
 sd_p_n = sqrt(var_p_n)
 
@@ -285,19 +285,23 @@ calcAndSave_simNull_pval <- function(SDRnullFile, pvalSaveFile) {
   col = colnames(SDRnullData)
   data = unlist(strsplit(col, '_'))
   #G = strtoi(gsub("G.", "", data[1]))
-  #P = strtoi(gsub("P.", "", data[2]))
+  G = gsub("G.", "", data[1])
+  perm = gsub("P.", "", data[2])
   SDR = as.double(gsub("SDR.", "", data[3]))
-  uniq_vals = length(unique(SDRnullData[,1]))
+  uniq_pvals = length(unique(SDRnullData[,1]))
   
   
   P = ecdf(SDRnullData[,1])    # The function giving empirical CDF of SDRnull_values
   p_val = P(SDR)                # Returns empirical CDF at SDRtrue, ie. calculated SDR for populations
                                    # Save p val for next step - multiple testing correcting
-  #plot(P)                         # Plot the shit (dont do for all, make an example or two...
+  # plot(P)                         # Plot the shit (dont do for all, make an example or two...
   # Save p val to file
-  cat(c(colnames(SDRnullData), uniq_vals, p_val), file = pvalSaveFile, sep = ",", append = TRUE)
+  #SDR <- as.character(SDR)
+  cat(c(G, perm, SDR, uniq_pvals, p_val), file = pvalSaveFile, sep = ",", append = TRUE)
   cat('\n', file = pvalSaveFile, append=TRUE)
 }
+
+
 ```
 
 
@@ -305,10 +309,10 @@ calcAndSave_simNull_pval <- function(SDRnullFile, pvalSaveFile) {
 ```{r}
 
 # Create file to save p values:
-simNull_pvals_file<- "C:/Users/norab/Master/data/simulation/simNull_pvals.csv"
+simNull_pvals_file <- "C:/Users/norab/Master/data/simulation/simNull_pvals.csv"
 file.create(save_file)
 # Write header to file
-cat(c("data", "unique_pvals", "pval"), file = simNull_pvals_file, append=TRUE)
+cat(c("group_size", "perm", "SDR", "n_uniq_pvals", "pval"), file = simNull_pvals_file, append=TRUE)
 
 
 # Create filelist to process
@@ -323,13 +327,28 @@ test <- sapply(simNullFiles, calcAndSave_simNull_pval, simNull_pvals_file)
 ```{r}
 
 # Read data
-p_vals <- read.csv("C:/Users/norab/Master/data/simulation/simNull_pvals.csv", sep=",", col.names = c("data", "unique_pvals", "pval"))
+p_vals <- read.csv("C:/Users/norab/Master/data/simulation/simNull_pvals.csv", sep=",")
 
 # adjust
 p_vals$pval_adj <- p.adjust(p_vals$pval)
+
 
 # Save to file
 write.csv(p_vals, "C:/Users/norab/Master/data/simulation/simNull_pvals.csv", row.names = FALSE, quote = FALSE)
 
 
+```
+
+
+```{r}
+prob = 0.05
+var_p = prob * (1 - prob)
+num_perm_samples = 700      # 70 = empirical p val = 0.1
+var_p_n = var_p / num_perm_samples
+sd_p_n = sqrt(var_p_n)
+
+# 0.0975 quantile of true empirical p-val
+high_q = prob + 1.96 * sd_p_n
+
+print(high_q)
 ```
