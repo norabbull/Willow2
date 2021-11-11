@@ -1,0 +1,13 @@
+---
+ func: 'calcTest'
+ input_folder: 'C:/Users/norab/Master/Willow1.0/jobs/testOneGene/job_input/'
+ input_group_info: 'phydist_population_classes.tsv'
+ input_dist_folder: 'C:/Users/norab/Master/Willow1.0/jobs/testOneGene/job_input/geneDists/'
+ output_folder: 'C:/Users/norab/Master/Willow1.0/jobs/testOneGene/job_output/'
+ output_log: 'testOneGene_log_datetime.log'
+ output_values: 'testOneGene_datetime.csv'
+ output_unprocessed: 'testOneGene_unprocessed_files_datetime.csv'
+ categories: 'SUPER___SUB'
+ num_random_values: 1
+ filter_skip: 'None'
+ filter_select: 'None'
