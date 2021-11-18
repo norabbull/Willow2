@@ -1,0 +1,135 @@
+---
+title: "GDRsimulationStats"
+author: "Nora Bull"
+date: "18 11 2021"
+output: html_document
+---
+
+
+# Willow statistics simulation
+
+Notes: 
+- Remove all "dummy's"
+```{r}
+# Dummy
+
+#GDRnullFile<- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG9_P5.csv"  # Dummy
+
+calcAndSave_simNull_pval <- function(GDRnullFile, pvalSaveFile) {
+  
+  # Read data
+  GDRnullData <- read.csv(GDRnullFile)
+  col = colnames(GDRnullData)
+  data = unlist(strsplit(col, '_'))
+  G = gsub("G", "", data[1])
+  perm = gsub("P", "", data[2])
+  GDR = as.double(gsub("GDR", "", data[3]))
+  uniq_pvals = length(unique(GDRnullData[,1]))
+  
+  
+  P = ecdf(GDRnullData[,1])    # The function giving empirical CDF of GDRnull_values
+  p_val = P(GDR)               # Returns empirical CDF at GDRtrue, ie. calculated GDR for populations
+                               # Save p val for next step - multiple testing correcting
+  # plot(P)                      # Plot the shit (dont do for all, make an example or two...
+  # Save p val to file
+  #GDR <- as.character(GDR)
+  cat(c(G, perm, GDR, uniq_pvals, p_val), file = pvalSaveFile, sep = ",", append = TRUE)
+  cat('\n', file = pvalSaveFile, append=TRUE)
+}
+
+
+```
+
+# Run p-value 
+```{r}
+
+# Create file to save p values:
+save_file <- "C:/Users/norab/Master/thesis_data/simulation/simNull_pvals.csv"
+file.create(save_file)
+
+# Write header to file
+cat(c("group_size", "permutations", "GDR", "n_uniq_pvals", "pval"), file = simNull_pvals_file, append=TRUE)
+
+# Create list of files to process
+simNullFiles <- list.files(path="C:/Users/norab/Master/thesis_data/simulation/simData/", full.names=TRUE, recursive=FALSE)
+
+# Apply calcAndSave_simNull_pval function to all simNullFiles
+test <- sapply(simNullFiles, calcAndSave_simNull_pval, save_file)
+
+```
+
+
+# Plot cdf for four simGDRs: 
+```{r}
+
+ecdf_pval <- function(GDRnullFile) {
+  
+  # Read data
+  GDRnullData <- read.csv(GDRnullFile)
+  col = colnames(GDRnullData)
+  data = unlist(strsplit(col, '_'))
+  G = gsub("G", "", data[1])
+  perm = gsub("P", "", data[2])
+  GDR = as.double(gsub("GDR", "", data[3]))
+  
+  P = ecdf(GDRnullData[,1])    # The function giving empirical CDF of GDRnull_values
+  p_val = P(GDR)               # Returns empirical CDF at GDRtrue, ie. calculated GDR for populations
+  
+  title = paste(c("simGDR A"))
+  plot(P, main = title, xlim=c(0,1))           # Plot 
+  abline(v=GDR, col="red")
+  print(p_val)
+  return(p_val)}
+
+```
+
+Retrieve cdf and p_val for 4 files:
+```{r}
+
+# Half of G2 permutet
+randSimG10_P5 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG10_P5.csv"
+randSimG50_P25 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG50_P25.csv"
+randSimG100_P50 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG100_P50.csv"
+randSimG150_P75 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG150_P75.csv"
+
+randSimG148_P1 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG148_P1.csv"
+
+
+randSimG150_P75 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG150_P10.csv"
+
+p<- ecdf_pval(randSimG10_P5)
+p<- ecdf_pval(randSimG50_P25)
+p<- ecdf_pval(randSimG100_P50)
+p<- ecdf_pval(randSimG150_P75)
+
+# 1/4 of G2 permuted
+randSimG10_P2 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG10_P2.csv"
+randSimG50_P12 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG50_P12.csv"
+randSimG100_P25 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG100_P25.csv"
+randSimG150_P40 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG150_P40.csv"
+
+randSimG150_P75 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG150_P10.csv"
+
+
+p<- ecdf_pval(randSimG10_P2)
+p<- ecdf_pval(randSimG50_P12)
+p<- ecdf_pval(randSimG100_P25)
+p<- ecdf_pval(randSimG150_P40)
+p <- ecdf_pval(randSimG148_P1)
+
+# Other
+
+randSimG148_P140 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG148_P140.csv"
+p <- ecdf_pval(randSimG148_P140)
+
+# Sjekk situadjon: 
+Du har total = 148 * 2. 
+Hva er ss for å trekke 8 like av disse? 
+  
+
+```
+
+```{r}
+plot(vals1[2])
+```
+

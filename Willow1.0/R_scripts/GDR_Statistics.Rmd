@@ -57,28 +57,7 @@ Cumulative distribution function
 - Create function 
 
 
-```{r}
-# Toy example:
-X = rnorm(100) # X is a sample of 100 normally distributed random variables
-P = ecdf(X)    # P is a function giving the empirical CDF of X
-P(-1)         # This returns the empirical CDF at zero (should be close to 0.5)
-[1] 0.52
-plot(P)        # Draws a plot of the empirical CDF (see below)
-
-
-# My data: 
-
-GDRnull_values = []         # Numerical vector of nullGDR values for gene
-P = ecdf(GDRnull_values)    # The function giving empirical CDF of GDRnull_values
-p_val = P(GDRtrue)          # Returns empirical CDF at GDRtrue, ie. calculated GDR for populations
-                            # Save p val for next step - multiple testing correcting
-plot(P)                     # Plot the shit (dont do for all, make an example or two...)
-
-
-```
-
-## Function to perform analysis for a file
-
+## Function to perform p-val caluclation for one file
 ```{r}
 
 # Dummy
@@ -111,7 +90,7 @@ calcAndSave_pval <- function(GDRnullFile, GDRs, pvalSaveFile) {
 ```
 
 
-# Run the shit
+## Run GDR calulcation for all trees
 ```{r}
 
 # Load calculated GDRs
@@ -129,8 +108,8 @@ superFiles <- list.files(path="C:/Users/norab/Master/data/GDRnull/refined_values
 subFiles <- list.files(path="C:/Users/norab/Master/data/GDRnull/refined_values/sub", full.names=TRUE, recursive=FALSE)
 # Action
 
-test <- sapply(superFiles, calcAndSave_pval, GDRsuper, file_super)
-test <- sapply(subFiles, calcAndSave_pval, GDRsub, file_sub)
+super <- sapply(superFiles, calcAndSave_pval, GDRsuper, file_super)
+sub <- sapply(subFiles, calcAndSave_pval, GDRsub, file_sub)
 
 ```
 
@@ -278,11 +257,11 @@ ggplot(GDRnull, aes(x = GDRnull)) +
                     alpha = 0.5)   # Area transparency
 ```
 
+
 # Willow statistics simulation
 
-
 ```{r}
-GDRnullFile<- "C:/Users/norab/Master/thesis_data/simulation/simData/simDataG-2_P-0_GDR-0.0.csv"
+GDRnullFile<- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG9_P5.csv"
 
 calcAndSave_simNull_pval <- function(GDRnullFile, pvalSaveFile) {
   
@@ -300,7 +279,7 @@ calcAndSave_simNull_pval <- function(GDRnullFile, pvalSaveFile) {
   P = ecdf(GDRnullData[,1])    # The function giving empirical CDF of GDRnull_values
   p_val = P(GDR)               # Returns empirical CDF at GDRtrue, ie. calculated GDR for populations
                                # Save p val for next step - multiple testing correcting
-  # plot(P)                    # Plot the shit (dont do for all, make an example or two...
+  plot(P)                      # Plot the shit (dont do for all, make an example or two...
   # Save p val to file
   #GDR <- as.character(GDR)
   cat(c(G, perm, GDR, uniq_pvals, p_val), file = pvalSaveFile, sep = ",", append = TRUE)
@@ -320,9 +299,8 @@ file.create(save_file)
 # Write header to file
 cat(c("group_size", "perm", "GDR", "n_uniq_pvals", "pval"), file = simNull_pvals_file, append=TRUE)
 
-
 # Create filelist to process
-simNullFiles <- list.files(path="C:/Users/norab/Master/data/simulation/simNull/", full.names=TRUE, recursive=FALSE)
+simNullFiles <- list.files(path="C:/Users/norab/Master/thesis_data/simulation/simData/", full.names=TRUE, recursive=FALSE)
 
 # Action
 test <- sapply(simNullFiles, calcAndSave_simNull_pval, simNull_pvals_file)
