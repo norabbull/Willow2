@@ -17,7 +17,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from plotnine import ggplot, aes, geom_point, geom_line, labs
 from plotnine import *  # TO DO: change
-from src.loadHelpers import *
+from loadHelpers import *
 import random
 
 
@@ -166,19 +166,27 @@ for index, row in GDRresultsRAND.iterrows():
     They are further visualized with code below.
 """
 
+pval_file = 'C:/Users/norab/Master/thesis_data/simulation/simNull_pvals.csv'
+all_simData = load_simData(pval_file)
 
-all_simData = load_simData()
+pd.read_csv(file)
 
-(ggplot(all_simData, aes('perm', 'group_size', fill = 'pval'))
+
+(ggplot(all_simData, aes('permutations', 'group_size', fill = 'pval'))
  + geom_point(alpha=1, size=2, stroke = 0.1, color = 'indigo')
 # + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.65, show_legend = False)
 # + geom_boxplot(width = shift, alpha=0.7, size = 0.65, show_legend = False)
 # + scale_fill_manual(values=['dodgerblue', 'darkorange'])
 # + theme_classic()
  + theme(figure_size=(8, 6))
- + labs(title='GDR simulation')
+ + labs(title='SDR simulation')
 )
 
+(ggplot(all_simData, aes('permutations', 'group_size', fill = 'pval'))
+ + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
+ + theme(figure_size=(8, 6))
+ + labs(title='GDR simulation p-values')
+)
 
 (ggplot(all_simData, aes('perm', 'group_size', fill = 'pval_adj'))
  + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
@@ -187,7 +195,7 @@ all_simData = load_simData()
 # + scale_fill_manual(values=['dodgerblue', 'darkorange'])
 # + theme_classic()
  + theme(figure_size=(8, 6))
- + labs(title='GDR simulation')
+ + labs(title='SDR simulation')
 )
 
 
