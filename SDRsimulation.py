@@ -822,7 +822,7 @@ for G in range(2,200):
 
 #%% Visualize p val data
 
-all_simData = load_simData()
+all_simData = load_sim(file = 'C:/Users/norab/Master/thesis_data/simulation/simNull_pvals.csv')
 
 (ggplot(all_simData, aes('perm', 'group_size', fill = 'pval'))
  + geom_point(alpha=1, size=2, stroke = 0.1, color = 'indigo')

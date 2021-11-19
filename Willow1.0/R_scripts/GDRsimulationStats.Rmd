@@ -26,11 +26,9 @@ calcAndSave_simNull_pval <- function(GDRnullFile, pvalSaveFile) {
   GDR = as.double(gsub("GDR", "", data[3]))
   uniq_pvals = length(unique(GDRnullData[,1]))
   
-  
-  P = ecdf(GDRnullData[,1])    # The function giving empirical CDF of GDRnull_values
-  p_val = P(GDR)               # Returns empirical CDF at GDRtrue, ie. calculated GDR for populations
-                               # Save p val for next step - multiple testing correcting
-  # plot(P)                      # Plot the shit (dont do for all, make an example or two...
+  P = ecdf(GDRnullData[,1])    # Returns function of empirical CDF
+  p_val = P(GDR)               # Returns p val GDR
+
   # Save p val to file
   #GDR <- as.character(GDR)
   cat(c(G, perm, GDR, uniq_pvals, p_val), file = pvalSaveFile, sep = ",", append = TRUE)
@@ -48,13 +46,13 @@ save_file <- "C:/Users/norab/Master/thesis_data/simulation/simNull_pvals.csv"
 file.create(save_file)
 
 # Write header to file
-cat(c("group_size", "permutations", "GDR", "n_uniq_pvals", "pval"), file = simNull_pvals_file, append=TRUE)
+cat(c("group_size", "permutations", "GDR", "n_uniq_pvals", "pval"), file = save_file, append=TRUE)
 
 # Create list of files to process
 simNullFiles <- list.files(path="C:/Users/norab/Master/thesis_data/simulation/simData/", full.names=TRUE, recursive=FALSE)
 
 # Apply calcAndSave_simNull_pval function to all simNullFiles
-test <- sapply(simNullFiles, calcAndSave_simNull_pval, save_file)
+ test <- sapply(simNullFiles, calcAndSave_simNull_pval, save_file) 
 
 ```
 
