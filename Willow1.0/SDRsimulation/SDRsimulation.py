@@ -23,21 +23,6 @@ import random
 
 
 
-#%% Visualize  non random
-
-(ggplot(GDRresults5, aes('G2Perm', 'Group_size', fill = 'GDR'))
- + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
-# + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.65, show_legend = False)
-# + geom_boxplot(width = shift, alpha=0.7, size = 0.65, show_legend = False)
-# + scale_fill_manual(values=['dodgerblue', 'darkorange'])
-# + theme_classic()
- + theme(figure_size=(8, 6))
- + labs(title='GDR simulation')
-)
-
-
-
-
 
 #%% SAVED VERSION TO PRODUCE SIMULATION PLOT: 
     
@@ -93,7 +78,7 @@ def simGDR(G, G2perm, Random = False, dist = 0.1):
     G2C1 = G - G2C2       # G2C1 = num group 2 samples in clade 1      
     
     # Total number of pairwise distances between samples of same group
-    comb_within_G = ss.comb(G, 2, exact = True) * 2
+    comb_within_G = ss.comb(G, 2, exact = True) * 2  # 2 groups of equal sizes
     
     # Distance between samples from same group with dist != 0:
     dist_within_G1C1_G1C2 = (G1C1 * G1C2) * dist
@@ -131,7 +116,7 @@ for G in range(2,200):
         p += 1
 
 
-#%% Visualize simGDR (not random)
+#%% Visualize simGDR
 
 (ggplot(GDRresults, aes('Permutations', 'Group_size', fill = 'GDR'))
  + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
@@ -140,9 +125,9 @@ for G in range(2,200):
 )
 
 
-#%% Randomize
+#%% Calculate random GDRs
 
-GDRresultsRAND = pd.DataFrame(columns = ['Group_size', 'Permutations', 'GDR', 'randomGDR'])
+GDRresults = pd.DataFrame(columns = ['Group_size', 'Permutations', 'GDR', 'randomGDR'])
 
 for G in range(2,200):
     p = 0
@@ -153,26 +138,19 @@ for G in range(2,200):
             rGDR = simGDR(G, G2perm = p, Random = True)
             randomGDRs.append(rGDR)
             
-        GDRresultsRAND.loc[len(GDRresultsRAND)] = [G, p, GDR, randomGDRs]
+        GDRresults.loc[len(GDRresults)] = [G, p, GDR, randomGDRs]
         p += 1
 
-#%% Visualize simGDR (not random)
 
-(ggplot(GDRresultsRAND, aes('Permutations', 'Group_size', fill = 'randomGDR'))
- + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
- + theme(figure_size=(8, 6))
- + labs(title='GDR simulation')
- + theme(text=element_text(size=15))
-)
-
-#%% Save values to files
+#%% Save random values to files
 
 for index, row in GDRresultsRAND.iterrows():
     
-    header = 'G:' + str(row['Group_size']) + '_P:' + str(row['Permutations']) + '_GDR:' + str(row['GDR'])
+    title = 'G' + str(row['Group_size']) + '_P' + str(row['Permutations']) 
+    header = title + '_GDR' + str(row['GDR'])
     print(index)
 
-    file = 'C:/Users/norab/Master/thesis_data/simulation/' + str(header) + '.csv'
+    file = 'C:/Users/norab/Master/thesis_data/simulation/simData/randSim' + title + '.csv'
     with open(file, 'w') as f:
         f.write(header)
         f.write('\n')
@@ -182,6 +160,13 @@ for index, row in GDRresultsRAND.iterrows():
 
 
 #%% Visualize random
+
+"""
+    p-values for all random GDRs are calculated in R, see script "GDRsimulationStats".
+    They are further visualized with code below.
+"""
+
+
 
 
 all_simData = load_simData()

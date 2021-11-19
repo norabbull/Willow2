@@ -59,10 +59,27 @@ test <- sapply(simNullFiles, calcAndSave_simNull_pval, save_file)
 ```
 
 
-# Plot cdf for four simGDRs: 
+# Plot CDF for four simumlated instances
+
+Retrieve cdf and p_val for 4 files:
+
+The 4 scenarios of simulated GDR value distributions are plotted: 
+
+G = number of group samples
+P = number of permuted samples
+
+  1. Low G, low P
+  2. Low G, high P
+  3. High G, low P
+  4. High G, low P
+
+Low = 20 % permuted samples
+High = 80 % permuted samples
+
+### Function to plot 
 ```{r}
 
-ecdf_pval <- function(GDRnullFile) {
+ecdf_pval <- function(GDRnullFile, title) {
   
   # Read data
   GDRnullData <- read.csv(GDRnullFile)
@@ -72,60 +89,37 @@ ecdf_pval <- function(GDRnullFile) {
   perm = gsub("P", "", data[2])
   GDR = as.double(gsub("GDR", "", data[3]))
   
-  P = ecdf(GDRnullData[,1])    # The function giving empirical CDF of GDRnull_values
-  p_val = P(GDR)               # Returns empirical CDF at GDRtrue, ie. calculated GDR for populations
+  P = ecdf(GDRnullData[,1])    # The function giving empirical CDF of simGDR
+  p_val = P(GDR)               # Returns empirical CDF for simGDR
   
-  title = paste(c("simGDR A"))
-  plot(P, main = title, xlim=c(0,1))           # Plot 
-  abline(v=GDR, col="red")
+  # Plot
+  title = paste0("simGDR: ", title)
+  plot(P, main = title, xlim=c(0,1), ylab="Probability", xlab="GDR")          
+  
+  abline(v=GDR, col="red", lwd = 2, lty = 2)
+  abline(h=p_val, col="purple", lwd = 2, lty = 2)
+  GDRlab = paste("GDR = ",round(GDR, 2))
+  p_valLab = paste("p-val = ", p_val)
+  legend(x=0, y=1,c(GDRlab, p_valLab), col=c("red", "purple"), lty=2, cex=0.8)
+  
   print(p_val)
-  return(p_val)}
+  return(GDR)}
 
 ```
 
-Retrieve cdf and p_val for 4 files:
+### Plot
 ```{r}
+# Files to plot
+randSimG20_P4 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG20_P4.csv"
+randSimG20_P16 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG20_P16.csv"
+randSimG190_P38 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG190_P38.csv"
+randSimG190_P152 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG190_P152.csv"
 
-# Half of G2 permutet
-randSimG10_P5 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG10_P5.csv"
-randSimG50_P25 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG50_P25.csv"
-randSimG100_P50 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG100_P50.csv"
-randSimG150_P75 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG150_P75.csv"
-
-randSimG148_P1 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG148_P1.csv"
-
-
-randSimG150_P75 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG150_P10.csv"
-
-p<- ecdf_pval(randSimG10_P5)
-p<- ecdf_pval(randSimG50_P25)
-p<- ecdf_pval(randSimG100_P50)
-p<- ecdf_pval(randSimG150_P75)
-
-# 1/4 of G2 permuted
-randSimG10_P2 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG10_P2.csv"
-randSimG50_P12 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG50_P12.csv"
-randSimG100_P25 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG100_P25.csv"
-randSimG150_P40 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG150_P40.csv"
-
-randSimG150_P75 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG150_P10.csv"
-
-
-p<- ecdf_pval(randSimG10_P2)
-p<- ecdf_pval(randSimG50_P12)
-p<- ecdf_pval(randSimG100_P25)
-p<- ecdf_pval(randSimG150_P40)
-p <- ecdf_pval(randSimG148_P1)
-
-# Other
-
-randSimG148_P140 <- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG148_P140.csv"
-p <- ecdf_pval(randSimG148_P140)
-
-# Sjekk situadjon: 
-Du har total = 148 * 2. 
-Hva er ss for å trekke 8 like av disse? 
-  
+# Plot
+ecdf_pval(randSimG20_P4, title = "G20 / P4")
+ecdf_pval(randSimG20_P16, title = "G20 / P16")
+ecdf_pval(randSimG190_P38, title = "G190 / P38")
+ecdf_pval(randSimG190_P152, title = "G190 / P152")
 
 ```
 
