@@ -9,15 +9,15 @@ Created on Thu Sep 16 13:47:30 2021
 
 
 
-import numpy as np
-import math
+# import numpy as np
+# import math
 import scipy.special as ss
-import itertools
+# import itertools
 import pandas as pd
-import matplotlib.pyplot as plt
-from plotnine import ggplot, aes, geom_point, geom_line, labs
-from plotnine import *  # TO DO: change
-from loadHelpers import *
+# import matplotlib.pyplot as plt
+from plotnine import ggplot, aes, theme, geom_point, labs
+# from plotnine import *  # TO DO: change
+# from loadHelpers import *
 import random
 
 
@@ -26,8 +26,11 @@ import random
 
 #%% SAVED VERSION TO PRODUCE SIMULATION PLOT: 
     
+"""
+Function to calculate simulated GDR values 
+"""
     
-def simGDR(G, G2perm, Random = False, dist = 0.1):
+def simGDR(G, p, Random = False, dist = 0.1):
     """
     Simulation procedure: 
         Simulation of GDR values in a tree comprising 2 clades, C1 and C2,
@@ -38,13 +41,13 @@ def simGDR(G, G2perm, Random = False, dist = 0.1):
         G = group sizes, G = G1 = G2
         C1 = number of samples in clade 1
         C2 = number of samples in clade 2
-        G2perm = number of G2 samples permuted from C2 to C1
+        p = number of G2 samples permuted from C2 to C1
         
-        When number of G2perm = 0, G1 = G2 = C1 = C2.
+        When number of p = 0, G1 = G2 = C1 = C2.
         G1 and G2 are perfectly separated into the two clades; 
         all G1 samples are in C1, all G2 samples are in C2. 
         
-        As G2perm increase, G2 samples are "moved" from C2 to C1.
+        As p increase, G2 samples are "moved" from C2 to C1.
         
         Number of possible permutations ranges from 0 to G; in which 
         case all samples are clustered together in the same clade, and C2
@@ -65,8 +68,8 @@ def simGDR(G, G2perm, Random = False, dist = 0.1):
         
     """
     # Clade and group sizes    
-    C1 = G + G2perm       # num samples in clade 1
-    C2 = G - G2perm       # num samples in clade 2
+    # C1 = G + p       # num samples in clade 1
+    C2 = G - p       # num samples in clade 2
    
     if Random: 
         G1C2 = random.randint(0,C2)   # G1C2 = num group 1 samples in clade 2
@@ -104,19 +107,54 @@ def simGDR(G, G2perm, Random = False, dist = 0.1):
 
 
 
-#%% Randomize
+#%% Old
 
-GDRresults = pd.DataFrame(columns = ['Group_size', 'Permutations', 'GDR'])
+# GDRresults = pd.DataFrame(columns = ['Group_size', 'Permutations', 'GDR'])
 
-for G in range(2,200):
-    p = 0
-    while p < G:
-        GDR = simGDR(G, G2perm = p, Random = False)
-        GDRresults.loc[len(GDRresults)] = [G, p, GDR]
+# for G in range(2,200):
+#     p = 0
+#     while p < G:
+#         GDR = simGDR(G, p = p, Random = False)
+#         GDRresults.loc[len(GDRresults)] = [G, p, GDR]
+#         p += 1
+
+
+
+
+#%% Calculate GDRs + random GDRs
+
+"""
+GDR simulation: 
+    - Calculates simulated GDR values in with simGDR function for
+    group size, G, in range 2-200 and all permutations, p, where p < G.
+
+    - Calculates 100 random GDR values for each constellation.
+
+"""
+
+# Table to save results
+GDRresults = pd.DataFrame(columns = ['Group_size', 'Permutations', 'GDR', 'randomGDR'])
+
+for G in range(2,200):              # group size in range 2 - 200
+    p = 0                           # p = number of permutations
+    while p < G:                
+        GDR = simGDR(G, p = p, Random = False)      # simGDR calculation
+        randomGDRs = []
+        for _ in range(100):
+            rGDR = simGDR(G, p = p, Random = True)  # randomGDR calculation 
+            randomGDRs.append(rGDR)
+            
+        GDRresults.loc[len(GDRresults)] = [G, p, GDR, randomGDRs]
         p += 1
 
 
 #%% Visualize simGDR
+
+"""
+Plot: 
+    Simulated GDR values 
+    
+"""
 
 (ggplot(GDRresults, aes('Permutations', 'Group_size', fill = 'GDR'))
  + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
@@ -124,26 +162,12 @@ for G in range(2,200):
  + labs(title='GDR simulation')
 )
 
-
-#%% Calculate random GDRs
-
-GDRresults = pd.DataFrame(columns = ['Group_size', 'Permutations', 'GDR', 'randomGDR'])
-
-for G in range(2,200):
-    p = 0
-    while p < G:
-        GDR = simGDR(G, G2perm = p, Random = False)
-        randomGDRs = []
-        for _ in range(100):
-            rGDR = simGDR(G, G2perm = p, Random = True)
-            randomGDRs.append(rGDR)
-            
-        GDRresults.loc[len(GDRresults)] = [G, p, GDR, randomGDRs]
-        p += 1
-
-
 #%% Save random values to files
 
+"""
+Save values to file
+
+"""
 for index, row in GDRresultsRAND.iterrows():
     
     title = 'G' + str(row['Group_size']) + '_P' + str(row['Permutations']) 
@@ -162,40 +186,24 @@ for index, row in GDRresultsRAND.iterrows():
 #%% Visualize random
 
 """
-    p-values for all random GDRs are calculated in R, see script "GDRsimulationStats".
-    They are further visualized with code below.
+p-value calculation:
+    p-values for all random GDRs are calculated in R, see script 
+    "GDRsimulationStats".
+    p-values are read and visualized with code below.
+    
 """
 
+# Read data
 pval_file = 'C:/Users/norab/Master/thesis_data/simulation/simNull_pvals.csv'
-all_simData = load_simData(pval_file)
+all_simData = pd.read_csv(pval_file)
 
-pd.read_csv(file)
-
-
-(ggplot(all_simData, aes('permutations', 'group_size', fill = 'pval'))
- + geom_point(alpha=1, size=2, stroke = 0.1, color = 'indigo')
-# + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.65, show_legend = False)
-# + geom_boxplot(width = shift, alpha=0.7, size = 0.65, show_legend = False)
-# + scale_fill_manual(values=['dodgerblue', 'darkorange'])
-# + theme_classic()
- + theme(figure_size=(8, 6))
- + labs(title='SDR simulation')
-)
-
+# plot p-values
 (ggplot(all_simData, aes('permutations', 'group_size', fill = 'pval'))
  + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
  + theme(figure_size=(8, 6))
  + labs(title='GDR simulation p-values')
 )
 
-(ggplot(all_simData, aes('perm', 'group_size', fill = 'pval_adj'))
- + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
-# + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.65, show_legend = False)
-# + geom_boxplot(width = shift, alpha=0.7, size = 0.65, show_legend = False)
-# + scale_fill_manual(values=['dodgerblue', 'darkorange'])
-# + theme_classic()
- + theme(figure_size=(8, 6))
- + labs(title='SDR simulation')
-)
+
 
 
