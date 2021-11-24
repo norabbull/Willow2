@@ -9,24 +9,13 @@ import pandas as pd
 import re
 from random import shuffle
 
-"""
-Notes:
-    
-    - Remove super_pops and sub_pops self variables. Replace
-    by looping through group_info variable.
-    - Before program was planned and developed, samples were given on the form 
-    SUP___SUB___SOME-INFO, and the first program made to run SDR calculation
-    was hardcoded to take these group levels into account. 
-    Since all input data of the thesis is structured this way, the parts
-    of the program considering these must remain in this version. 
-    However, the plan for future development is to restructure these parts
-    of the code for a more flexible group level option.
-    - In group info file, give a sample that says the category name instead
-    of the group of the instance. 
-"""
 
 class treeInfo:
     
+    """
+    treeInfo class handles all input information and stores to class variables.
+    
+    """
 
     def __init__(self):
         
@@ -44,11 +33,16 @@ class treeInfo:
     def setup(self, dist_mat_file, group_info_file, categories):
         """
         Input: 
-            dist_mat_file = matrix containing pairwise sample distances (string)
-            group_info_file = contain info on group levels and groups in 
-                each group level (string)
-            categories = info on group categories
-                format: 'category1___category2___category3___...____' (string)        
+            dist_mat_file: 
+                filepath to distance matrix (CSV)
+                type: string
+            
+            group_info_file: 
+                filepath group category information (CSV)
+                type: string
+                
+        Function:
+            call other treeInfo-functions to format and store input information
         """
         
         self.setDistMat(dist_mat_file)
@@ -60,24 +54,23 @@ class treeInfo:
     def setDistMat(self, dist_mat_file):
         """
         Input:
-            dist_mat_file: filepath to distance matrix
-                type: string
-                fileformat: CSV
+            dist_mat_file: filepath to distance matrix (CSV)
+                type: str
         
         Function: 
-            read distance matrix, assign to class variable
+            read distance matrix values, assign information to class variable
         """
-        self.dist_mat = pd.read_csv(dist_mat_file, index_col = 0, dtype={'a': str})
+        self.dist_mat = pd.read_csv(dist_mat_file, index_col = 0, 
+                                    dtype={'a': str})
     
     def setName(self, dist_mat_file):
         """
         Input: 
-            dist_mat_file: filepath to distance matrix
-                type: string
-                fileformat: CSV
+            dist_mat_file: filepath to distance matrix (CSV)
+                type: str
         
         Function: 
-            read name of distance matrix, assign to class variable
+            read name of distance matrix file, assign to class variable
             
         Note: 
             hard-coded for customized format used in master project.            
@@ -89,35 +82,34 @@ class treeInfo:
         subName = re.sub('^.*ENS', 'ENS', dist_mat_file)
         self.name = re.sub('___CopD.csv$','', subName)
     
-    def setCategories(self, categories):
+    def setCategories(self, categories, sep = '___'):
         """
         Input: 
-            group category informaiton on same format as sample names are 
-            formatted in distance matrix 
-            type: string
-            format: 'category1___category2___category3___...____'
-            example: 'SUPER___SUB'
+            categories: group category information
+            type: str
+                format: 'category1___category2___category3___...____'
+                example: 'SUPER___SUB'
+            
+            sep: separator of category names in string, default: ___
             
         Function: 
             assign categories class variable
-            
-        Develop:
-            make separator optional
+
         """
-        self.categories = categories.split('___')
+        self.categories = categories.split(sep)
         
     
     def setSampleInfo(self):
         """ 
         Function:
-            assign sample information to class variable
-            samples are stored in nested dictionary
-            keys to nested dictionary are the same integer indexes as 
-            samples are referred to in rows and columns of distance matrix
+            - assign sample information to class variable
+            - samples are stored in nested dictionary
+            - keys to nested dictionary indices are equal to numeric order of
+            samples in rows and columns of distance matrix
                      
-            example: 
-                0: {'sample': 'HG02545', 'SUPER': 'AFR', 'SUB': 'ACB'}
-                1: {'sample': 'HG00334', 'SUPER': 'EUR', 'SUB': 'FIN'}      
+            dict format example: 
+                {0: {'sample': 'HG02545', 'SUPER': 'AFR', 'SUB': 'ACB'}
+                1: {'sample': 'HG00334', 'SUPER': 'EUR', 'SUB': 'FIN'}}
         
         """
         self.sample_info = {}
@@ -137,9 +129,9 @@ class treeInfo:
     def shuffleSampleInfo(self):
         """
         Function: 
-            shuffle sample information in each category.
-            Rows and column indices of distance matrix will no longer
-            correspond correctly to their sample informaiton. 
+            shuffle sample information in each category. rows and column 
+            indices of distance matrix will no longer correspond to original 
+            sample informaiton
 
         """
 
@@ -158,13 +150,11 @@ class treeInfo:
     def setUniqseqMap(self, uniqseq_map_file):
         """
         Input: 
-            uniqseq_map_file: filepath containing unique sequences. 
-            There is one unique sequence per row in the file, and all samples
-            having that sequence is listed in the same row. 
+            uniqseq_map_file: filepath containing unique sequences
+            type: str
             
         Function: 
-            set info on number of samples having each of the unique 
-            sequences
+            retrieve unique sequence informaiton
         
         """
         # Read file
@@ -178,12 +168,14 @@ class treeInfo:
     def setGroupInfo(self, group_info_file):
         """
         Input: 
-            group_info_file: string filepath to group info-file
-        function: 
-            organize information into a list, containig a set of defined 
-            groups for each group level. 
-            E.g: 
-                two group levels - "super" and "sub"
+            group_info_file: filepath to file with group info (CSV)
+            type: str
+            
+        Function: 
+            organize information into a list containig a set of defined 
+            groups for each group category 
+            example: 
+                two categories: "super" and "sub"
                 list = [{AFR, EUR, EAS}, {FIN, YRI, GBR}]
         """
         group_info = pd.read_csv(group_info_file, delimiter='\t')

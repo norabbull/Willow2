@@ -7,17 +7,9 @@ Created on Thu Sep 16 13:47:30 2021
 
 
 
-
-
-# import numpy as np
-# import math
 import scipy.special as ss
-# import itertools
 import pandas as pd
-# import matplotlib.pyplot as plt
 from plotnine import ggplot, aes, theme, geom_point, labs
-# from plotnine import *  # TO DO: change
-# from loadHelpers import *
 import random
 
 
@@ -194,14 +186,21 @@ p-value calculation:
 """
 
 # Read data
-pval_file = 'C:/Users/norab/Master/thesis_data/simulation/simNull_pvals.csv'
+pval_file = 'C:/Users/norab/Master/thesis_data/simulation/simNull_alldata_24.11.21.csv'
 all_simData = pd.read_csv(pval_file)
 
-# plot p-values
+# plot p-values, uncorrected
 (ggplot(all_simData, aes('permutations', 'group_size', fill = 'pval'))
- + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
+ + geom_point(alpha=1, size=3.2, stroke = 0.1, color = 'indigo')
  + theme(figure_size=(8, 6))
  + labs(title='GDR simulation p-values')
+)
+
+# plot p-values, corrected
+(ggplot(all_simData, aes('permutations', 'group_size', fill = 'pval_adj_holm'))
+ + geom_point(alpha=1, size=3.2, stroke = 0.1, color = 'indigo')
+ + theme(figure_size=(8, 6))
+ + labs(title='GDR simulation, adjusted p-values')
 )
 
 

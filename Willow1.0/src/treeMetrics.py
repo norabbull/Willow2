@@ -11,36 +11,39 @@ import pandas as pd
 from src.treeInformation import treeInfo
 
 class treeMetrics(treeInfo):
+    """
+    inherits treeInfo class. 
+    class to perform calculations utilizing informaiton stored with treeInfo. 
+    """
     
     def __init__(self):
         """
-        Inherits treeInformaiton. 
-        All calculation procedures performed on tree information 
-        are defined in treeMetrics subclass.
-
+        Function: 
+            - initiate class variables
+            - inherit treeInfo
         """
         
         self.category_dists = None
         self.mean_cat_dists = None
-        self.SDRs = None
+        self.GDRs = None
                 
         treeInfo.__init__(self)
         
     def calcGroupDists(self):
         """
         Function: 
-            calculate inter and intra group distances for two group levels.
-            calculation merged into one function for efficiency reasons.
-    
+            calculate inter- and intra group distances for all categories
         """
 
         dist_mat = self.dist_mat.to_numpy()
 
         catWithSums = dict()
         catBetSums = dict()
+        
         for category, groups in self.group_info.items():
             groupWithSums = dict()
             groupBetSums = dict()
+            
             for group in groups: 
                 groupWithSums[group] = [0,0]
                 groupBetSums[group] = [0,0]
@@ -50,7 +53,9 @@ class treeMetrics(treeInfo):
         
         row_length = len(dist_mat)
         row_start = 1
+        
         for sample1 in range(row_length):
+            
             for sample2 in range(row_start, row_length):
                 dist_val = dist_mat[sample2][sample1]        # Distance value
                 
@@ -72,8 +77,8 @@ class treeMetrics(treeInfo):
     def calcMeanGroupDists(self):
         """
         Function: 
-            Calculates mean distance between all pairwise samples within a
-            category
+            calculates mean distance between all pairwise samples within- and
+            between groups respectivly, for each category
         """
         
         if not self.category_dists: self.calcGroupDists()
@@ -106,44 +111,35 @@ class treeMetrics(treeInfo):
         
     def calcGDR(self):
         """
-        Input: 
-            group_dists: Numpy arrayList of dataframes containing info of total group distances and
-            number of comparisons.
-            calc_SDRgroupwise: If SDR for all single groups should be calculated. This is 
-                required to calculate SDVs. 
         Function: 
-            Calculates group mean for either full group (calc_SDRgroupwise = False)
-                or every single group (.. = True.)
-        Testing: OK.   
+            calculate GDR
         """
         
-        self.SDRs = {}
+        self.GDRs = {}
         for cat, val in self.mean_cat_dists.items():
             
             if val['bet']:
-                SDR = round(val['with'] / val['bet'], 4)
+                GDR = round(val['with'] / val['bet'], 4)
             else: 
-                SDR = 1     # Maybe should be NAN - think
+                GDR = 1     # Maybe should be NAN - think
             
-            self.SDRs[cat] = SDR
+            self.GDRs[cat] = GDR
             
-    @classmethod
-    def calcNonZeroTotdist(self, dist_mat, percent = True):
+            
+    def calcNonZeroDists(self, percent = True):
         """
         Input:
-            dist_mat : DataFrame withdistances for a tree
+            percent: give nonero variable as percentage
     
-        Returns:
-            totDist: float. total amount of pairdistances being non-zero as 
-            percent or count. 
-            
-        Note: This does the same as what u did in R. Have all values already. 
+        Function:
+            calculate proportion of distance matrix that has non-zero values, 
+            assign to class variable
         """
 
-        nonZero_row = pd.DataFrame((dist_mat != 0).astype(int).sum(axis=1))
+        nonZero_row = pd.DataFrame((self.dist_mat != 0).astype(int).sum(axis=1))
         nonZeroCount = int(nonZero_row.sum(axis=0))
         
-        num_entries = (dist_mat.shape[0] * dist_mat.shape[1]) - dist_mat.shape[0]
+        num_entries = (self.dist_mat.shape[0] * self.dist_mat.shape[1]) - self.dist_mat.shape[0]
 
         if percent:    
             return nonZeroCount / num_entries
@@ -159,9 +155,9 @@ class treeMetrics(treeInfo):
         if not self.mean_category_dists: self.calcMeanCategoryDists()
         return self.mean_category_dists
         
-    def getSDRs(self): 
-        if not self.SDRs: self.calcSDR()
-        return self.SDRs
+    def getGDRs(self): 
+        if not self.GDRs: self.calcGDR()
+        return self.GDRs
     
 
 
@@ -190,6 +186,6 @@ if __name__ == '__main__':
     cat_dists = test_tree.getCategoryDists()
     
     test_tree.calcMeanCategoryDists()
-    test_tree.calcSDR()    
+    test_tree.calcGDR()    
     
     
