@@ -195,7 +195,7 @@ class treeInfo:
     def getUniqseqCount(self): return self.uniqseq_count
     def getCategories(self): return self.categories
     
-
+#%%
 if __name__ == '__main__':
   
     # Test with simple case

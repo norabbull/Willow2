@@ -7,7 +7,6 @@ Created on Thu May  6 11:33:03 2021
 """
 
 import pandas as pd
-#import numpy as np
 from treeInformation import treeInfo
 
 class treeMetrics(treeInfo):
@@ -24,7 +23,7 @@ class treeMetrics(treeInfo):
         """
         
         self.group_dists = None
-        self.mean_cat_dists = None
+        self.mean_group_dists = None
         self.GDRs = None
                 
         treeInfo.__init__(self)
@@ -86,7 +85,7 @@ class treeMetrics(treeInfo):
         catWithSums = self.group_dists['catWithSums']
         catBetSums = self.group_dists['catBetSums']
         
-        self.mean_cat_dists = {}
+        self.mean_group_dists = {}
         for cat in self.categories:
             
             withSums = catWithSums[cat]
@@ -115,6 +114,8 @@ class treeMetrics(treeInfo):
             calculate GDR
         """
         
+        if not self.mean_group_dists: self.calcMeanGroupDists()
+            
         self.GDRs = {}
         for cat, val in self.mean_group_dists.items():
             
@@ -149,7 +150,7 @@ class treeMetrics(treeInfo):
         
     def getGroupDists(self): 
         if not self.group_dists: self.calcGroupDists()
-        return self.category_dists
+        return self.group_dists
     
     def getMeanGroupDists(self):
         if not self.mean_group_dists: self.calcMeanGroupDists()
@@ -167,10 +168,12 @@ import timeit
 
 if __name__ == '__main__':
     # Test with simple case
-   
+    
+    # Test files
     dist_mat_file = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/testOneGene/job_input/geneDists/ENSG00000000938___FGR___CopD.csv'
     group_info_file = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/testOneGene/job_input/phydist_population_classes.tsv'
     categories = 'SUPER___SUB'
+    
     
     test_tree = treeMetrics()
     test_tree.setup(dist_mat_file, group_info_file, categories)
@@ -179,13 +182,13 @@ if __name__ == '__main__':
     group_info = test_tree.getGroupInfo()
     categories = test_tree.getCategories()
     
-    # Calcl group dists
+    # Calc group dists
     starttime = timeit.default_timer()
     timeGroupDists = test_tree.calcGroupDists()
     endtime = timeit.default_timer()
-    cat_dists = test_tree.getGroupDists()
     
     test_tree.calcMeanGroupDists()
     test_tree.calcGDR()    
     
+    GDRss = test_tree.getGDRs()
     

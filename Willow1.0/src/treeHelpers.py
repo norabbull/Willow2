@@ -10,7 +10,7 @@ import pandas as pd
 import os
 from os.path import isfile, join
 
-def make_filelist(self, input_files):
+def make_filelist(input_files):
     """
     Input: 
         input_files: path to folder

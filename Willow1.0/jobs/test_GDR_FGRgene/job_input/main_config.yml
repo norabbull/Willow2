@@ -1,0 +1,10 @@
+---
+ func: 'calcGDR'
+ input_group_info: 'E:/Master/all_thesis_stuff/jobs/test_GDR_FGRgene/job_input/phydist_population_classes.tsv'
+ input_phydist_folder: 'E:/Master/all_thesis_stuff/jobs/test_GDR_FGRgene/job_input/phydist_matrix'
+ output_folder: 'E:/Master/all_thesis_stuff/jobs/test_GDR_FGRgene/job_output/'
+ output_unprocessed: 'test_GDR_FGRgene_unprocessed_files_datetime.csv'
+ categories: 'SUPER___SUB'
+ num_random_values: 0
+ filter_skip: 'None'
+ filter_select: 'None'

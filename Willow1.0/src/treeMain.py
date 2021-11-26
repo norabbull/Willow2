@@ -7,17 +7,18 @@ Created on Wed Sep 29 15:39:57 2021
 
 import sys
 import yaml
-from src.treeRun import treeRun
+from treeRun import treeRun
  
-def main():
+def main(configFilepath):
     """
     Function: 
         - call function to run program
         - all information given through 1st argument (path to configuration file)
     """
     
-    # Read input configfile
+    # Read configfile argument
     configFilepath = sys.argv[1]
+    
     configFilepath = configFilepath.strip()
     
     with open(configFilepath, 'r') as c:
@@ -26,7 +27,12 @@ def main():
     # Run
     treeRun(configFile)
     
+    
 if __name__ == '__main__':
-    testpath = 'C:/Users/norab/Master/data/job_simulation/job_input/main_config_simulation.yml'
-    sys.argv.append(testpath)
+    
+    #configFilepath = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/test_GDR_10genes/job_input/main_config.yml'
+    print("Job initiated")
     main()
+    
+    
+    

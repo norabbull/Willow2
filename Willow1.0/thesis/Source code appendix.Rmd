@@ -1,0 +1,821 @@
+---
+title: 'Appendix: source code'
+author: "Nora Bull"
+date: "26 11 2021"
+output: word_document
+---
+
+```{r}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+# Source code appendix
+
+
+## Overview: 
+
+
+1. Calculate distance matrix for all newick-format trees in a folder
+
+2. Simulation source code
+  2.1 treeSimulation.py
+  
+3. Willow1.0 
+  3.1 treeInformation.py
+  3.2 treeMetrics.py
+  3.3 treeRun.py
+  3.4 treeMain.py
+  3.5 treeHelpers.py
+
+4. Data wrangle and plotting
+  4.1 Plot ...
+  ...
+
+# 1. Calculate distance matrixes for all newick-format trees in a folder
+
+Additional packages: 
+- `ape`, version 5.5
+
+```{r}
+library(ape)
+
+# Create function to calculate and save matrix
+calcAndSave <- function(treefile) {
+  
+  tree<-read.tree(treefile, savedir)
+  
+  if(is.null(tree)) {
+        return(NULL)
+  } else {
+  pairDist <- cophenetic(tree)
+  name <-  gsub("^.*ninja_trees/", "", treefile)
+  name <- gsub("_HUMAN__full_aln.tre$", "", name)
+  out_filename <- paste0(savedir, name)
+  out_filename <- paste0(out_filename, "___CopD.csv")
+  print("File: ", out_filename)
+  write.csv(pairDist, file=out_filename, row.names=TRUE, col.names=TRUE, sep = ",", quote = F)
+  }
+}
+
+# Make list of newick tree files to process
+files <- list.files(path="C:/Users/norab/Master/WillowShare/data/ninja_trees", full.names=TRUE, recursive=FALSE)
+savedir <- "C:/Users/norab/Master/WillowShare/data/cophenetic_distances/"
+
+# Apply function to all files
+treeDistVals <- sapply(files, savedir, calcAndSave)
+```
+
+# 2 Simulation source code
+
+## Packages: 
+- `pandas` version 
+
+## 2.1 GDRsimulation.py
+
+```{python python.reticulate=FALSE}
+
+import scipy.special as ss
+import pandas as pd
+from plotnine import ggplot, aes, theme, geom_point, labs
+import random
+
+
+
+# Function to calculate simulated GDR values:
+    
+def simGDR(G, p, Random = False, dist = 0.1):
+    """
+    Simulation procedure: 
+        Simulation of GDR values in a tree comprising 2 clades, C1 and C2,
+        separated by a distance (dist).
+        The leaf nodes of the tree is defined to belong to either of two 
+        groups, G1 and G2.
+          
+        G = group sizes, G = G1 = G2
+        C1 = number of samples in clade 1
+        C2 = number of samples in clade 2
+        p = number of G2 samples permuted from C2 to C1
+        
+        When number of p = 0, G1 = G2 = C1 = C2.
+        G1 and G2 are perfectly separated into the two clades; 
+        all G1 samples are in C1, all G2 samples are in C2. 
+        
+        As p increase, G2 samples are "moved" from C2 to C1.
+        
+        Number of possible permutations ranges from 0 to G; in which 
+        case all samples are clustered together in the same clade, and C2
+        no longer exist.
+        
+        GDR is calculated as a function of group size and number 
+        of permutations from G2 to G1. 
+        
+    Random simulation: 
+        Obtain GDR value when partition of G1 and G2 samples into 
+        C1 and C2 is random. Sizes of C1 and C2 are determined by the 
+        same criteria as above (number of permutations).
+        This will simulate the same situation as if leaf nodes are 
+        randomly assigned to G1 and G2.
+        
+        Result: X number of GDR values, each obtained from a random 
+        tree clustering
+        
+    """
+    # Clade and group sizes    
+    C2 = G - p       # num samples in clade 2
+   
+    if Random: 
+        G1C2 = random.randint(0,C2)   # G1C2 = num group 1 samples in clade 2
+    else:
+        G1C2 = 0      
+
+    G2C2 = C2 - G1C2      # G2C2 = num group 2 samples in clade 2
+    G1C1 = G - G1C2       # G1C1 = num group 1 samples in clade 1
+    G2C1 = G - G2C2       # G2C1 = num group 2 samples in clade 1      
+    
+    # Total number of pairwise distances between samples of same group
+    comb_within_G = ss.comb(G, 2, exact = True) * 2  # 2 groups of equal sizes
+    
+    # Distance between samples from same group with dist != 0:
+    dist_within_G1C1_G1C2 = (G1C1 * G1C2) * dist
+    dist_within_G2C1_G2C2 = (G2C1 * G2C2) * dist
+
+    tot_dist_within = dist_within_G1C1_G1C2 + dist_within_G2C1_G2C2
+    mean_within = tot_dist_within / comb_within_G
+
+    # Total number of pairwise distances between G1 and G2 samples
+    comb_between_G1_G2 = G * G
+    
+    # Distance between samples from different gorups with dist != 0
+    dist_between_G1C1_G2C2 = (G1C1 * G2C2) * dist
+    dist_between_G1C2_G2C1 = (G1C2 * G2C1) * dist
+    
+    tot_dist_between = dist_between_G1C1_G2C2 + dist_between_G1C2_G2C1
+    mean_between = tot_dist_between / comb_between_G1_G2
+    
+    # GDR 
+    GDR = mean_within / mean_between
+
+    return GDR
+
+
+# Calculate GDRs + random GDRs
+
+"""
+GDR simulation: 
+    - Calculates simulated GDR values in with simGDR function for
+    group size, G, in range 2-200 and all permutations, p, where p < G.
+
+    - Calculates 100 random GDR values for each constellation.
+
+"""
+
+# Table to save results
+GDRresults = pd.DataFrame(columns = ['Group_size', 'Permutations', 'GDR', 'randomGDR'])
+
+for G in range(2,200):              # group size in range 2 - 200
+    p = 0                           # p = number of permutations
+    while p < G:                
+        GDR = simGDR(G, p = p, Random = False)      # simGDR calculation
+        randomGDRs = []
+        for _ in range(100):
+            rGDR = simGDR(G, p = p, Random = True)  # randomGDR calculation 
+            randomGDRs.append(rGDR)
+            
+        GDRresults.loc[len(GDRresults)] = [G, p, GDR, randomGDRs]
+        p += 1
+
+
+# Visualize simGDR
+
+# Plot: Simulated GDR values 
+(ggplot(GDRresults, aes('Permutations', 'Group_size', fill = 'GDR'))
+ + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
+ + theme(figure_size=(8, 6))
+ + labs(title='GDR simulation')
+)
+
+
+# Save values to file
+
+for index, row in GDRresultsRAND.iterrows():
+    
+    title = 'G' + str(row['Group_size']) + '_P' + str(row['Permutations']) 
+    header = title + '_GDR' + str(row['GDR'])
+    print(index)
+
+    file = 'C:/Users/norab/Master/thesis_data/simulation/simData/randSim' + title + '.csv'
+    with open(file, 'w') as f:
+        f.write(header)
+        f.write('\n')
+        for item in row['randomGDR']:
+            f.write("%s\n" % item)
+
+# Visualize randomGDRs
+
+"""
+p-value calculation:
+    p-values for all random GDRs are calculated in R, see script 
+    "GDRsimulationStats".
+    p-values are read and visualized with code below.
+    
+"""
+
+# Read data
+pval_file = 'C:/Users/norab/Master/thesis_data/simulation/simNull_alldata_24.11.21.csv'
+all_simData = pd.read_csv(pval_file)
+
+# plot p-values, uncorrected
+(ggplot(all_simData, aes('permutations', 'group_size', fill = 'pval'))
+ + geom_point(alpha=1, size=3.2, stroke = 0.1, color = 'indigo')
+ + theme(figure_size=(8, 6))
+ + labs(title='GDR simulation p-values')
+)
+
+# plot p-values, corrected
+(ggplot(all_simData, aes('permutations', 'group_size', fill = 'pval_adj_holm'))
+ + geom_point(alpha=1, size=3.2, stroke = 0.1, color = 'indigo')
+ + theme(figure_size=(8, 6))
+ + labs(title='GDR simulation, adjusted p-values')
+)
+
+    
+```
+
+
+
+# 3. Willow1.0
+
+## 3.1 treeInformation.py
+
+
+
+```{python python.reticulate=FALSE}
+class treeInfo:
+    
+    """
+    treeInfo class handles all input information and stores to class variables.
+    
+    """
+
+    def __init__(self):
+        
+        """
+        Function: 
+            initiate class variables
+        """
+        self.name = None
+        self.dist_mat = None
+        self.categories = None 
+        self.group_info = None
+        self.sample_info = None
+        self.random_groups = False
+        
+    def setup(self, dist_mat_file, group_info_file, categories):
+        """
+        Input: 
+            dist_mat_file: 
+                filepath to distance matrix (CSV)
+                type: string
+            
+            group_info_file: 
+                filepath group category information (CSV)
+                type: string
+                
+        Function:
+            call other treeInfo-functions to format and store input information
+        """
+        
+        self.setDistMat(dist_mat_file)
+        self.setName(dist_mat_file)
+        self.setCategories(categories)
+        self.setGroupInfo(group_info_file)
+        self.setSampleInfo()
+        
+    def setDistMat(self, dist_mat_file):
+        """
+        Input:
+            dist_mat_file: filepath to distance matrix (CSV)
+                type: str
+        
+        Function: 
+            read distance matrix values, assign information to class variable
+        """
+        self.dist_mat = pd.read_csv(dist_mat_file, index_col = 0, 
+                                    dtype={'a': str})
+    
+    def setName(self, dist_mat_file):
+        """
+        Input: 
+            dist_mat_file: filepath to distance matrix (CSV)
+                type: str
+        
+        Function: 
+            read name of distance matrix file, assign to class variable
+            
+        Note: 
+            hard-coded for customized format used in master project.            
+            both ENSEBL and gene name identifiers included on the form
+            'ENSEBL___GENENAME'
+            example: 'ENSG00000000938___FGR'
+            
+        """
+        subName = re.sub('^.*ENS', 'ENS', dist_mat_file)
+        self.name = re.sub('___CopD.csv$','', subName)
+    
+    def setCategories(self, categories, sep = '___'):
+        """
+        Input: 
+            categories: group category information
+            type: str
+                format: 'category1___category2___category3___...____'
+                example: 'SUPER___SUB'
+            
+            sep: separator of category names in string, default: ___
+            
+        Function: 
+            assign categories class variable
+
+        """
+        self.categories = categories.split(sep)
+        
+    
+    def setSampleInfo(self):
+        """ 
+        Function:
+            - assign sample information to class variable
+            - samples are stored in nested dictionary
+            - keys to nested dictionary indices are equal to numeric order of
+            samples in rows and columns of distance matrix
+                     
+            dict format example: 
+                {0: {'sample': 'HG02545', 'SUPER': 'AFR', 'SUB': 'ACB'}
+                1: {'sample': 'HG00334', 'SUPER': 'EUR', 'SUB': 'FIN'}}
+        
+        """
+        self.sample_info = {}
+        
+        for ind, sample_in in enumerate(self.dist_mat.columns):
+            sample_in = sample_in.split('___')
+            # Add sample info
+            sample_trans = {'sample':sample_in[-1]}
+            
+            # Add all categories
+            for cat_ind, cat in enumerate(self.categories):
+                sample_trans[cat] = sample_in[cat_ind]
+    
+            # Store sample info
+            self.sample_info[ind] = sample_trans
+
+    def shuffleSampleInfo(self):
+        """
+        Function: 
+            shuffle sample information in each category. rows and column 
+            indices of distance matrix will no longer correspond to original 
+            sample informaiton
+
+        """
+
+        for cat in self.categories:
+            samples = [sample[cat] for sample in self.sample_info.values()]
+            shuffle(samples)
+            
+            for ind in self.sample_info:
+                new = self.sample_info[ind]
+                new[cat] = samples.pop()
+                self.sample_info[ind] = new
+
+        self.random_groups = True
+
+        
+    def setUniqseqMap(self, uniqseq_map_file):
+        """
+        Input: 
+            uniqseq_map_file: filepath containing unique sequences
+            type: str
+            
+        Function: 
+            retrieve unique sequence informaiton
+        
+        """
+        # Read file
+        file = pd.read_csv(uniqseq_map_file, header = None)
+        
+        # Counts
+        self.uniqseq_count = len(file[0])   # What is this for
+        self.uniqseq_map = sorted(file.count(axis=1), reverse=True)
+
+
+    def setGroupInfo(self, group_info_file):
+        """
+        Input: 
+            group_info_file: filepath to file with group info (CSV)
+            type: str
+            
+        Function: 
+            organize information into a list containig a set of defined 
+            groups for each group category 
+            example: 
+                two categories: "super" and "sub"
+                list = [{AFR, EUR, EAS}, {FIN, YRI, GBR}]
+        """
+        group_info = pd.read_csv(group_info_file, delimiter='\t')
+        
+        self.group_info = dict()
+        for cat in self.categories:
+            groups = group_info[group_info['GroupCategory'] == cat]
+            groups = set(groups['GroupName'])
+            self.group_info[cat] = groups
+
+
+    def getGroupInfo(self): return self.group_info
+    def getSampleInfo(self): return self.sample_info
+    def getName(self): return self.name
+    def getDistMat(self):return self.dist_mat
+    def getUniqseqMap(self): return self.uniqseq_map
+    def getUniqseqCount(self): return self.uniqseq_count
+    def getCategories(self): return self.categories
+```
+
+## 3.2 treeMetrics.py
+
+
+```{python python.reticulate=FALSE}
+
+
+import pandas as pd
+from treeInformation import treeInfo
+
+class treeMetrics(treeInfo):
+    """
+    inherits treeInfo class. 
+    class to perform calculations utilizing informaiton stored with treeInfo. 
+    """
+    
+    def __init__(self):
+        """
+        Function: 
+            - initiate class variables
+            - inherit treeInfo
+        """
+        
+        self.group_dists = None
+        self.mean_group_dists = None
+        self.GDRs = None
+                
+        treeInfo.__init__(self)
+        
+    def calcGroupDists(self):
+        """
+        Function: 
+            calculate inter- and intra group distances for all categories
+        """
+
+        dist_mat = self.dist_mat.to_numpy()
+
+        catWithSums = dict()
+        catBetSums = dict()
+        
+        for category, groups in self.group_info.items():
+            groupWithSums = dict()
+            groupBetSums = dict()
+            
+            for group in groups: 
+                groupWithSums[group] = [0,0]
+                groupBetSums[group] = [0,0]
+                
+            catWithSums[category] = groupWithSums
+            catBetSums[category] = groupBetSums
+        
+        row_length = len(dist_mat)
+        row_start = 1
+        
+        for sample1 in range(row_length):
+            
+            for sample2 in range(row_start, row_length):
+                dist_val = dist_mat[sample2][sample1]        # Distance value
+                
+                for cat in self.categories: 
+                    g1 = self.sample_info[sample1][cat]
+                    g2 = self.sample_info[sample2][cat]
+                    
+                    if g1 == g2:
+                        catWithSums[cat][g1] = [old+new for old, new in zip(catWithSums[cat][g1], [dist_val,1])]
+                    else: 
+                        catBetSums[cat][g1] = [old+new for old, new in zip(catBetSums[cat][g1], [dist_val,1])]
+                        catBetSums[cat][g2] = [old+new for old, new in zip(catBetSums[cat][g2], [dist_val,1])]
+            
+            row_start += 1  
+                
+        self.group_dists = {'catWithSums': catWithSums, 'catBetSums': catBetSums}
+                                  
+
+    def calcMeanGroupDists(self):
+        """
+        Function: 
+            calculates mean distance between all pairwise samples within- and
+            between groups respectivly, for each category
+        """
+        
+        if not self.group_dists: self.calcGroupDists()
+        
+        catWithSums = self.group_dists['catWithSums']
+        catBetSums = self.group_dists['catBetSums']
+        
+        self.mean_group_dists = {}
+        for cat in self.categories:
+            
+            withSums = catWithSums[cat]
+            betSums = catBetSums[cat]
+            
+            dist_summary = {'with':0, 'bet':0}
+            count_summary = {'with':0, 'bet':0}
+            
+            for group, val in withSums.items(): 
+                dist_summary['with'] += val[0]
+                count_summary['with'] += val[1]
+            
+            for group, val in betSums.items(): 
+                dist_summary['bet'] += val[0]
+                count_summary['bet'] += val[1]
+            
+            mean_dists = {key: round(dist_summary[key] / count_summary[key], 6)  # Was 8 
+                          for key, val in dist_summary.items() if count_summary[key]}
+          
+            self.mean_group_dists[cat] = mean_dists
+         
+        
+    def calcGDR(self):
+        """
+        Function: 
+            calculate GDR
+        """
+        
+        if not self.mean_group_dists: self.calcMeanGroupDists()
+            
+        self.GDRs = {}
+        for cat, val in self.mean_group_dists.items():
+            
+            if val['bet']:
+                GDR = round(val['with'] / val['bet'], 4)
+            else: 
+                GDR = 1     # Maybe should be NAN - think
+            
+            self.GDRs[cat] = GDR
+            
+            
+    def calcNonZeroDists(self, percent = True):
+        """
+        Input:
+            percent: give nonero variable as percentage
+    
+        Function:
+            calculate proportion of distance matrix that has non-zero values, 
+            assign to class variable
+        """
+
+        nonZero_row = pd.DataFrame((self.dist_mat != 0).astype(int).sum(axis=1))
+        nonZeroCount = int(nonZero_row.sum(axis=0))
+        
+        num_entries = (self.dist_mat.shape[0] * self.dist_mat.shape[1]) - self.dist_mat.shape[0]
+
+        if percent:    
+            return nonZeroCount / num_entries
+        else: 
+            return nonZeroCount
+        
+        
+    def getGroupDists(self): 
+        if not self.group_dists: self.calcGroupDists()
+        return self.group_dists
+    
+    def getMeanGroupDists(self):
+        if not self.mean_group_dists: self.calcMeanGroupDists()
+        return self.mean_group_dists
+        
+    def getGDRs(self): 
+        if not self.GDRs: self.calcGDR()
+        return self.GDRs
+    
+
+
+```
+
+## 3.3 treeRun.py
+
+```{python python.reticulate=FALSE}
+
+import csv
+from datetime import datetime
+import pandas as pd
+from treeMetrics import treeMetrics
+from treeHelpers import make_filelist
+
+
+class treeRun:
+    """
+        class to organize tree instance calculations for files
+    """
+    
+    def __init__(self, config):
+        
+        """
+        Function: 
+            initiate class variables
+        """
+        
+        self.config = config
+        self.config_setup()
+        self.file_list = make_filelist(input_files=self.input_phydist_folder)
+        
+        # Run! 
+        self.run_func()
+
+    
+    def config_setup(self):
+        
+        """
+        Input: 
+            config: configuration filepath  (yaml)
+            type: str
+                       
+        Function: 
+            configure variables from file
+        
+        """
+        
+        # Make datetime stamp
+        for key, val in self.config.items():
+            if 'datetime' in str(val): 
+                self.config[key] = val.replace('datetime', datetime.now().strftime("%d.%m.%Y_%H.%M"))
+        
+        # Folder/file paths
+        #self.input_folder = config.get('input_folder').strip()
+        self.input_phydist_folder = self.config.get('input_phydist_folder').strip()
+        self.output_folder = self.config.get('output_folder').strip()
+        self.output_unprocessed = self.output_folder + self.config.get('output_unprocessed').strip()
+               
+        # Input information
+        self.func = self.config.get('func').strip()
+        self.group_info = self.config.get('input_group_info').strip()
+        self.filter_select = self.config.get('filter_select').strip()
+        self.filter_skip = self.config.get('filter_skip').strip()
+        self.group_categories = self.config.get('group_categories').strip()
+        self.num_random_values = int(self.config.get('num_random_values'))
+        self.random = self.config.get('random')
+            
+                    
+    def run_calcGDR(self):
+        """
+        Funcition: 
+            - calculate GDR value for all given input distance matrix files
+            - save values to file
+            - if error with file, filepath is saved to separate file and
+            calculation proceeds with next file
+        """
+        
+        try:        
+            if '.csv' in self.filter_select:
+                filter_select = pd.read_csv(self.filter_select, header=None)
+                filter_select.columns = ['name']
+                filter_select= list(filter_select['name'])
+                
+                keep_files = []
+                for file in self.file_list:
+                    if any(gene in file for gene in filter_select):
+                        keep_files.append(file)
+                        self.file_list = keep_files
+            
+            if '.csv' in self.filter_skip:
+                filter_skip= pd.read_csv(self.filter_skip, header=None)
+                filter_skip.columns = ['name']
+                filter_skip= list(filter_skip['name'])
+                
+                remove_files = []
+                for file in self.file_list:
+                    if any(gene in file for gene in filter_skip):
+                        remove_files.append(file)
+        
+                self.file_list = [f for f in self.file_list if f not in remove_files]
+            
+            ind = 0
+            ind_len = len(self.file_list)
+            
+            if self.random: 
+                num_iter = int(self.num_random_values)
+            else:
+                num_iter = 1
+
+            for i in range(num_iter):
+                
+                for dist_file in self.file_list:
+                    
+                    
+                    try:         
+                        ind +=1
+                        print(f"Processing file {ind} / {ind_len} ")
+    
+    
+                        tree = treeMetrics()
+                        tree.setup(dist_file.strip(), self.group_info, self.group_categories)
+                        
+                        if self.random: 
+                            tree.shuffleSampleInfo()
+    
+                        tree.calcGDR()
+                        GDRs = tree.getGDRs()
+                        
+                        for cat in GDRs:
+                            
+                            GDR_save = [tree.getName(), GDRs[cat]]
+                            if self.random: 
+                                save_to = self.output_folder + 'GDR_random_' + cat + '_' + str(datetime.now().strftime("%d.%m.%Y")) + '.csv'
+                            else:
+                                save_to = self.output_folder + 'GDR_' + cat + '_' + str(datetime.now().strftime("%d.%m.%Y")) + '.csv'
+                        
+                        
+                            with open(save_to, 'a', newline='') as f:   # write to file    
+                                writer = csv.writer(f)
+                                writer.writerow(GDR_save)
+
+        
+                    except Exception as e: 
+                        print("Error to prosess dist file:", dist_file)
+                        print("Error: ", e)
+                        # Save filepath to unprocessed file
+                        file = str(dist_file)
+                        with open(self.output_unprocessed, 'a') as f: 
+                            f.write(file)
+
+                        
+                        # continue with next
+                        pass
+                
+        except Exception as e: 
+            print("error with runCalc:\n")
+            print(e)
+
+
+       
+    def run_calcTest(self):
+        """
+        Test function to check functionality of program.
+        """
+        return 
+
+
+    def run_func(self):
+        if self.func == "calcGDR":
+            self.run_calcGDR()
+        elif self.func == "calcGDRrandom":
+            self.random = True
+            self.run_calcGDR()
+        elif self.func == "calcTest":
+            return self.run_calcTest()
+        else:
+            print("No valid function called ", self.func)
+```
+
+## 3.4 treeMain.py
+
+```{python python.reticulate=FALSE}
+
+import sys
+import yaml
+from treeRun import treeRun
+ 
+def main(configFilepath):
+    """
+    Function: 
+        - call function to run program
+        - all information given through 1st argument (path to configuration file)
+    """
+    
+    # Read configfile argument
+    configFilepath = sys.argv[1]
+    
+    configFilepath = configFilepath.strip()
+    
+    with open(configFilepath, 'r') as c:
+        configFile = yaml.safe_load(c)
+
+    # Run
+    treeRun(configFile)
+    
+    
+if __name__ == '__main__':
+    
+    #configFilepath = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/test_GDR_10genes/job_input/main_config.yml'
+    print("Job initiated")
+    main()
+    
+    
+```
+
+## 3.5 treeHelpers.py
+
+```{python python.reticulate=FALSE}
+
+FILL
+    
+```
+

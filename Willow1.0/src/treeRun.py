@@ -10,7 +10,8 @@ from datetime import datetime
 import pandas as pd
 # import yaml
 # import sys
-from src.treeMetrics import treeMetrics
+from treeMetrics import treeMetrics
+from treeHelpers import make_filelist
 
 
 class treeRun:
@@ -18,21 +19,22 @@ class treeRun:
         class to organize tree instance calculations for files
     """
     
-    def __init__(self):
+    def __init__(self, config):
         
         """
         Function: 
             initiate class variables
         """
         
-        self.config()
-        self.file_list = self.make_filelist(self.input_dist_folder)
+        self.config = config
+        self.config_setup()
+        self.file_list = make_filelist(input_files=self.input_phydist_folder)
         
         # Run! 
         self.run_func()
 
     
-    def config(self, config):
+    def config_setup(self):
         
         """
         Input: 
@@ -43,7 +45,6 @@ class treeRun:
             configure variables from file
         
         """
-        self.config = config
         
         # Make datetime stamp
         for key, val in self.config.items():
@@ -52,18 +53,18 @@ class treeRun:
         
         # Folder/file paths
         #self.input_folder = config.get('input_folder').strip()
-        self.input_dist_folder = config.get('input_cd_folder').strip()
-        self.output_folder = config.get('output_folder').strip()
-        self.output_values_file = self.output_folder + config.get('output_values').strip()
-        self.output_unprocessed = self.output_folder + config.get('output_unprocessed').strip()
+        self.input_phydist_folder = self.config.get('input_phydist_folder').strip()
+        self.output_folder = self.config.get('output_folder').strip()
+        self.output_unprocessed = self.output_folder + self.config.get('output_unprocessed').strip()
                
         # Input information
-        self.func = config.get('func').strip()
-        self.group_info = config.get('input_group_info').strip()
-        self.filter_select = config.get('filter_select').strip()
-        self.filter_skip = config.get('filter_skip').strip()
-        self.categories = config.get('categories').strip()
-        self.num_random_values = config.get('num_random_values').strip()
+        self.func = self.config.get('func').strip()
+        self.group_info = self.config.get('input_group_info').strip()
+        self.filter_select = self.config.get('filter_select').strip()
+        self.filter_skip = self.config.get('filter_skip').strip()
+        self.group_categories = self.config.get('group_categories').strip()
+        self.num_random_values = int(self.config.get('num_random_values'))
+        self.random = self.config.get('random')
             
                     
     def run_calcGDR(self):
@@ -99,8 +100,8 @@ class treeRun:
         
                 self.file_list = [f for f in self.file_list if f not in remove_files]
             
-            ind = 1
-            #ind_len = len(self.file_list)
+            ind = 0
+            ind_len = len(self.file_list)
             
             if self.random: 
                 num_iter = int(self.num_random_values)
@@ -108,34 +109,46 @@ class treeRun:
                 num_iter = 1
 
             for i in range(num_iter):
+                
                 for dist_file in self.file_list:
+                    
+                    
                     try:         
                         ind +=1
+                        print(f"Processing file {ind} / {ind_len} ")
+    
     
                         tree = treeMetrics()
-                        tree.setup(dist_file.strip(), self.group_info, categories)
+                        tree.setup(dist_file.strip(), self.group_info, self.group_categories)
                         
                         if self.random: 
                             tree.shuffleSampleInfo()
     
                         tree.calcGDR()
-                        for cat in tree.getCategories():
-                            
-                            GDR = tree.getGDR()[]
-                            GDR_save = [tree.getGeneName(), tree.getGDR()]
+                        GDRs = tree.getGDRs()
                         
-                            with open(self.output_GDR, 'a', newline='') as f:   # write to file    
+                        for cat in GDRs:
+                            
+                            GDR_save = [tree.getName(), GDRs[cat]]
+                            if self.random: 
+                                save_to = self.output_folder + 'GDR_random_' + cat + '_' + str(datetime.now().strftime("%d.%m.%Y")) + '.csv'
+                            else:
+                                save_to = self.output_folder + 'GDR_' + cat + '_' + str(datetime.now().strftime("%d.%m.%Y")) + '.csv'
+                        
+                        
+                            with open(save_to, 'a', newline='') as f:   # write to file    
                                 writer = csv.writer(f)
                                 writer.writerow(GDR_save)
 
         
-                    except Exception: 
-                        
-                        # Ssve filepath to unprocessed file
+                    except Exception as e: 
+                        print("Error to prosess dist file:", dist_file)
+                        print("Error: ", e)
+                        # Save filepath to unprocessed file
                         file = str(dist_file)
                         with open(self.output_unprocessed, 'a') as f: 
-                            writer = csv.writer(f)
-                            writer.writerow(file)
+                            f.write(file)
+
                         
                         # continue with next
                         pass
@@ -156,7 +169,7 @@ class treeRun:
     def run_func(self):
         if self.func == "calcGDR":
             self.run_calcGDR()
-        elif self.func == "calcGDRnull":
+        elif self.func == "calcGDRrandom":
             self.random = True
             self.run_calcGDR()
         elif self.func == "calcTest":
@@ -171,26 +184,6 @@ class treeRun:
 import timeit
 
 if __name__ == '__main__':
-    # Test with simple case
-   
-    dist_mat_file = 'C:/Users/norab/Master/data/real_tree_data/dist_mat_subset/ENSG00000001626___CFTR___CopD.csv'
-    #dist_mat_file = 'C:/Users/norab/Master/Willow1.0/jobs/testOneGene/job_input/geneDists/ENSG00000000938___FGR___CopD.csv'
-    group_info_file = 'C:/Users/norab/Master/Willow1.0/jobs/testOneGene/job_input/phydist_population_classes.tsv'
-    
-    test_tree = treeMetrics()
-    test_tree.setup(dist_mat_file, group_info_file, categories)
-    
-    sample_info = test_tree.getSampleInfo()
-    group_info = test_tree.getGroupInfo()
-    categories = test_tree.getCategories()
-    
-    # Calcl group dists
-    starttime = timeit.default_timer()
-    timeGroupDists = test_tree.calcGroupDists()
-    endtime = timeit.default_timer()
-    cat_dists = test_tree.getGroupDists()
-    
-    test_tree.calcMeanGroupDists()
-    test_tree.calcGDR()    
-    
+    pass
+
     
