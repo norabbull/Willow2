@@ -8,7 +8,7 @@ Created on Thu May  6 11:33:03 2021
 
 import pandas as pd
 #import numpy as np
-from src.treeInformation import treeInfo
+from treeInformation import treeInfo
 
 class treeMetrics(treeInfo):
     """
@@ -23,7 +23,7 @@ class treeMetrics(treeInfo):
             - inherit treeInfo
         """
         
-        self.category_dists = None
+        self.group_dists = None
         self.mean_cat_dists = None
         self.GDRs = None
                 
@@ -71,7 +71,7 @@ class treeMetrics(treeInfo):
             
             row_start += 1  
                 
-        self.category_dists = {'catWithSums': catWithSums, 'catBetSums': catBetSums}
+        self.group_dists = {'catWithSums': catWithSums, 'catBetSums': catBetSums}
                                   
 
     def calcMeanGroupDists(self):
@@ -81,10 +81,10 @@ class treeMetrics(treeInfo):
             between groups respectivly, for each category
         """
         
-        if not self.category_dists: self.calcGroupDists()
+        if not self.group_dists: self.calcGroupDists()
         
-        catWithSums = self.category_dists['catWithSums']
-        catBetSums = self.category_dists['catBetSums']
+        catWithSums = self.group_dists['catWithSums']
+        catBetSums = self.group_dists['catBetSums']
         
         self.mean_cat_dists = {}
         for cat in self.categories:
@@ -106,7 +106,7 @@ class treeMetrics(treeInfo):
             mean_dists = {key: round(dist_summary[key] / count_summary[key], 6)  # Was 8 
                           for key, val in dist_summary.items() if count_summary[key]}
           
-            self.mean_cat_dists[cat] = mean_dists
+            self.mean_group_dists[cat] = mean_dists
          
         
     def calcGDR(self):
@@ -116,7 +116,7 @@ class treeMetrics(treeInfo):
         """
         
         self.GDRs = {}
-        for cat, val in self.mean_cat_dists.items():
+        for cat, val in self.mean_group_dists.items():
             
             if val['bet']:
                 GDR = round(val['with'] / val['bet'], 4)
@@ -147,13 +147,13 @@ class treeMetrics(treeInfo):
             return nonZeroCount
         
         
-    def getCategoryDists(self): 
-        if not self.category_dists: self.calcGroupDists()
+    def getGroupDists(self): 
+        if not self.group_dists: self.calcGroupDists()
         return self.category_dists
     
-    def getMeanCategoryDists(self):
-        if not self.mean_category_dists: self.calcMeanCategoryDists()
-        return self.mean_category_dists
+    def getMeanGroupDists(self):
+        if not self.mean_group_dists: self.calcMeanGroupDists()
+        return self.mean_group_dists
         
     def getGDRs(self): 
         if not self.GDRs: self.calcGDR()
@@ -168,10 +168,10 @@ import timeit
 if __name__ == '__main__':
     # Test with simple case
    
-    dist_mat_file = 'C:/Users/norab/Master/data/real_tree_data/dist_mat_subset/ENSG00000001626___CFTR___CopD.csv'
-    #dist_mat_file = 'C:/Users/norab/Master/Willow1.0/jobs/testOneGene/job_input/geneDists/ENSG00000000938___FGR___CopD.csv'
-    group_info_file = 'C:/Users/norab/Master/Willow1.0/jobs/testOneGene/job_input/phydist_population_classes.tsv'
+    dist_mat_file = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/testOneGene/job_input/geneDists/ENSG00000000938___FGR___CopD.csv'
+    group_info_file = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/testOneGene/job_input/phydist_population_classes.tsv'
     categories = 'SUPER___SUB'
+    
     test_tree = treeMetrics()
     test_tree.setup(dist_mat_file, group_info_file, categories)
     
@@ -183,9 +183,9 @@ if __name__ == '__main__':
     starttime = timeit.default_timer()
     timeGroupDists = test_tree.calcGroupDists()
     endtime = timeit.default_timer()
-    cat_dists = test_tree.getCategoryDists()
+    cat_dists = test_tree.getGroupDists()
     
-    test_tree.calcMeanCategoryDists()
+    test_tree.calcMeanGroupDists()
     test_tree.calcGDR()    
     
     

@@ -1,0 +1,110 @@
+---
+title: "Method_software_description"
+author: "Nora Bull"
+date: "26 11 2021"
+output: word_document
+---
+
+
+
+# Method
+
+## Overview
+
+Willow version 1.0 software, implemented in Python 3.7, was run to calculate GDR values and GDR null distributions is described in details. 
+
+Full code scripts are attached in the bottom of this section.
+
+R was used for a few procedures. 
+
+This section includes: 
+
+- Listed program and package versions
+
+- Input file descriptions
+  1. Configuration file
+  2. Group information file
+  3. Distance matrix files
+  
+- How to run Willow1.0
+  1. GDR calculation 
+  2. Random GDR value calculation
+
+- Willow1.0 source code:
+  - treeInformation.py
+  - treeMetrics.py
+  - treeRun.py
+  - TreeMain.py
+
+
+
+
+
+# Program versions: 
+
+[Fill in]
+
+# Input files description
+
+
+## 1. Configuration file
+
+The configuration file (`main_config.yml`) is structured in yaml-format and contains all optional input parameters to Willow. The configuration file is the only input-argument given to run a Willow job. 
+
+`main_config.yaml` template with comments:
+
+```
+---
+ func: *specify function*
+ input_group_info: *path to group information file*
+ input_dist_folder: *path to folder containing distance matrix files*
+ output_folder: *output folder path where all output files are sent*
+ output_values: *filename to store output values (CSV format)*
+ output_unprocessed: *file to store unprocessed file information (CSV format)*
+ categories: *group categories*
+ num_random_values: *number of random values*
+ filter_skip: *path to file containing list of genes to skip*
+ filter_select:  *path to file containing list of genes to skip*
+ 
+```
+#### Additional parameter details: 
+
+- Valid options for `func`: 
+ 1. `calcGDR`:calculate GDR value*
+ 2. `calcGDRnull`: calculate random GDR value*
+ 
+- `input_group_info` contain information to specify groups. An arbitrarily number of categories/group levels can be specified, but all samples must belong to a group for each category. 
+
+- `input_dist_folder`: all distance matrix files to process are contained in this folder in CSV format. See details below.
+
+- `group categories` must be written on format: `category1___category2__..."`, i.e. using three underscores as delimiter. Category names must be equally specified in the distance matrices row- and column names.
+
+
+- `filter_skip` and `filter_select` only works for lists of gene names.
+These parameters can be used to provide a list of genes that should not be processed or selected for, respectivly, to make a selection of files from the folder with input files specified by `input_dist_folder`.
+
+## 2. Input distance matrix
+
+The distance matrix(ces) to calculate GDR for are stored in a common folder, where all files in folder are processed in one job-run. 
+
+An example of a 3x3 distance matrix file: 
+```
+,AFR___LWK___NA19308,AFR___LWK___NA19317,EUR___GBR___HG00096
+AFR___LWK___NA19308,0.0,0.00236,0.00236
+AFR___LWK___NA1931,0.00236,0.00236,0.00118
+EUR___GBR___HG00096,0.00236,0.00118,0.00354
+
+```
+
+All row- and column names refer to a sample/leaf node stemming from the phylogenetic tree and must be formatted as a string that includes group information for all specified group categories. The group names, given by a 3-letter acronym, are separated by three underscores, "___". The order of specified groups in the string determines which group category the gorup is specified for. This information corresponds to how group information is given in the `ìnput_group_info`-file.    
+
+
+
+# Calculation of GDRs with Willow 1.0
+
+[General description]
+Willow version 1.0 was used to calculate GDR values for an arbitrarily number of distance matrices representing phylogenetic trees. The distance matrices can be generated as described under 
+
+
+
+# Calculate cophenetic distances for all trees in a folder

@@ -47,7 +47,7 @@ class treeInfo:
         self.setSampleInfo()
         
         # NEW IN 3.0:
-        self.setSubtypeInfo(subtype_info_file)
+        #self.setSubtypeInfo(subtype_info_file)
     
     def setDistMat(self, dist_mat_file):
         self.dist_mat = pd.read_csv(dist_mat_file, index_col = 0, dtype={'a': str})

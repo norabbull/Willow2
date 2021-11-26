@@ -199,8 +199,8 @@ class treeInfo:
 if __name__ == '__main__':
   
     # Test with simple case
-    dist_mat_file = 'C:/Users/norab/Master/Willow1.0/jobs/testOneGene/job_input/geneDists/ENSG00000000938___FGR___CopD.csv'
-    group_info_file = 'C:/Users/norab/Master/Willow1.0/jobs/testOneGene/job_input/phydist_population_classes.tsv'
+    dist_mat_file = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/testOneGene/job_input/geneDists/ENSG00000000938___FGR___CopD.csv'
+    group_info_file = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/testOneGene/job_input/phydist_population_classes.tsv'
     categories = 'SUPER___SUB'
     test_tree = treeInfo()
     test_tree.setup(dist_mat_file, group_info_file, categories)

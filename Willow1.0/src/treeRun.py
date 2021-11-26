@@ -51,7 +51,7 @@ class treeRun:
                 self.config[key] = val.replace('datetime', datetime.now().strftime("%d.%m.%Y_%H.%M"))
         
         # Folder/file paths
-        self.input_folder = config.get('input_folder').strip()
+        #self.input_folder = config.get('input_folder').strip()
         self.input_dist_folder = config.get('input_cd_folder').strip()
         self.output_folder = config.get('output_folder').strip()
         self.output_values_file = self.output_folder + config.get('output_values').strip()
@@ -59,9 +59,9 @@ class treeRun:
                
         # Input information
         self.func = config.get('func').strip()
-        self.group_info = self.input_folder + config.get('input_group_info').strip()
-        self.filter_select = self.input_folder + config.get('filter_select').strip()
-        self.filter_skip = self.output_folder + config.get('filter_skip').strip()
+        self.group_info = config.get('input_group_info').strip()
+        self.filter_select = config.get('filter_select').strip()
+        self.filter_skip = config.get('filter_skip').strip()
         self.categories = config.get('categories').strip()
         self.num_random_values = config.get('num_random_values').strip()
             
@@ -119,11 +119,14 @@ class treeRun:
                             tree.shuffleSampleInfo()
     
                         tree.calcGDR()
-                        GDR_save = [tree.getGeneName(), tree.getGDR()]
-                    
-                        with open(self.output_GDR, 'a', newline='') as f:   # write to file    
-                            writer = csv.writer(f)
-                            writer.writerow(GDR_save)
+                        for cat in tree.getCategories():
+                            
+                            GDR = tree.getGDR()[]
+                            GDR_save = [tree.getGeneName(), tree.getGDR()]
+                        
+                            with open(self.output_GDR, 'a', newline='') as f:   # write to file    
+                                writer = csv.writer(f)
+                                writer.writerow(GDR_save)
 
         
                     except Exception: 
@@ -185,9 +188,9 @@ if __name__ == '__main__':
     starttime = timeit.default_timer()
     timeGroupDists = test_tree.calcGroupDists()
     endtime = timeit.default_timer()
-    cat_dists = test_tree.getCategoryDists()
+    cat_dists = test_tree.getGroupDists()
     
-    test_tree.calcMeanCategoryDists()
+    test_tree.calcMeanGroupDists()
     test_tree.calcGDR()    
     
     
