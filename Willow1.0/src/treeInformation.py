@@ -10,6 +10,7 @@ import re
 from random import shuffle
 
 
+#%%
 class treeInfo:
     
     """
@@ -24,16 +25,16 @@ class treeInfo:
             initiate class variables
         """
         self.name = None
-        self.dist_mat = None
+        self.phydists = None
         self.categories = None 
         self.group_info = None
         self.sample_info = None
         self.random_groups = False
         
-    def setup(self, dist_mat_file, group_info_file, categories):
+    def setup(self, phydists_file, group_info_file, categories):
         """
         Input: 
-            dist_mat_file: 
+            phydists_file: 
                 filepath to distance matrix (CSV)
                 type: string
             
@@ -45,28 +46,28 @@ class treeInfo:
             call other treeInfo-functions to format and store input information
         """
         
-        self.setDistMat(dist_mat_file)
-        self.setName(dist_mat_file)
+        self.setDistMat(phydists_file)
+        self.setName(phydists_file)
         self.setCategories(categories)
         self.setGroupInfo(group_info_file)
         self.setSampleInfo()
         
-    def setDistMat(self, dist_mat_file):
+    def setDistMat(self, phydists_file):
         """
         Input:
-            dist_mat_file: filepath to distance matrix (CSV)
+            phydists_file: filepath to distance matrix (CSV)
                 type: str
         
         Function: 
             read distance matrix values, assign information to class variable
         """
-        self.dist_mat = pd.read_csv(dist_mat_file, index_col = 0, 
+        self.phydists = pd.read_csv(phydists_file, index_col = 0, 
                                     dtype={'a': str})
     
-    def setName(self, dist_mat_file):
+    def setName(self, phydists_file):
         """
         Input: 
-            dist_mat_file: filepath to distance matrix (CSV)
+            phydists_file: filepath to distance matrix (CSV)
                 type: str
         
         Function: 
@@ -79,7 +80,7 @@ class treeInfo:
             example: 'ENSG00000000938___FGR'
             
         """
-        subName = re.sub('^.*ENS', 'ENS', dist_mat_file)
+        subName = re.sub('^.*ENS', 'ENS', phydists_file)
         self.name = re.sub('___CopD.csv$','', subName)
     
     def setCategories(self, categories, sep = '___'):
@@ -114,7 +115,7 @@ class treeInfo:
         """
         self.sample_info = {}
         
-        for ind, sample_in in enumerate(self.dist_mat.columns):
+        for ind, sample_in in enumerate(self.phydists.columns):
             sample_in = sample_in.split('___')
             # Add sample info
             sample_trans = {'sample':sample_in[-1]}
@@ -190,7 +191,7 @@ class treeInfo:
     def getGroupInfo(self): return self.group_info
     def getSampleInfo(self): return self.sample_info
     def getName(self): return self.name
-    def getDistMat(self):return self.dist_mat
+    def getDistMat(self):return self.phydists
     def getUniqseqMap(self): return self.uniqseq_map
     def getUniqseqCount(self): return self.uniqseq_count
     def getCategories(self): return self.categories
@@ -199,11 +200,11 @@ class treeInfo:
 if __name__ == '__main__':
   
     # Test with simple case
-    dist_mat_file = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/testOneGene/job_input/geneDists/ENSG00000000938___FGR___CopD.csv'
+    phydists_file = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/testOneGene/job_input/geneDists/ENSG00000000938___FGR___CopD.csv'
     group_info_file = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/testOneGene/job_input/phydist_population_classes.tsv'
     categories = 'SUPER___SUB'
     test_tree = treeInfo()
-    test_tree.setup(dist_mat_file, group_info_file, categories)
+    test_tree.setup(phydists_file, group_info_file, categories)
     
     sample_info = test_tree.getSampleInfo()
     group_info = test_tree.getGroupInfo()

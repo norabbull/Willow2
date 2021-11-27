@@ -34,7 +34,7 @@ class treeMetrics(treeInfo):
             calculate inter- and intra group distances for all categories
         """
 
-        dist_mat = self.dist_mat.to_numpy()
+        phydists = self.phydists.to_numpy()
 
         catWithSums = dict()
         catBetSums = dict()
@@ -50,13 +50,13 @@ class treeMetrics(treeInfo):
             catWithSums[category] = groupWithSums
             catBetSums[category] = groupBetSums
         
-        row_length = len(dist_mat)
+        row_length = len(phydists)
         row_start = 1
         
         for sample1 in range(row_length):
             
             for sample2 in range(row_start, row_length):
-                dist_val = dist_mat[sample2][sample1]        # Distance value
+                dist_val = phydists[sample2][sample1]        # Distance value
                 
                 for cat in self.categories: 
                     g1 = self.sample_info[sample1][cat]
@@ -126,8 +126,8 @@ class treeMetrics(treeInfo):
             
             self.GDRs[cat] = GDR
             
-            
-    def calcNonZeroDists(self, percent = True):
+    @classmethod
+    def calcNonZeroPhydists(self, phydists, percent = True):
         """
         Input:
             percent: give nonero variable as percentage
@@ -137,10 +137,10 @@ class treeMetrics(treeInfo):
             assign to class variable
         """
 
-        nonZero_row = pd.DataFrame((self.dist_mat != 0).astype(int).sum(axis=1))
+        nonZero_row = pd.DataFrame((phydists != 0).astype(int).sum(axis=1))
         nonZeroCount = int(nonZero_row.sum(axis=0))
         
-        num_entries = (self.dist_mat.shape[0] * self.dist_mat.shape[1]) - self.dist_mat.shape[0]
+        num_entries = (phydists.shape[0] * phydists.shape[1]) - phydists.shape[0]
 
         if percent:    
             return nonZeroCount / num_entries
@@ -170,13 +170,13 @@ if __name__ == '__main__':
     # Test with simple case
     
     # Test files
-    dist_mat_file = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/testOneGene/job_input/geneDists/ENSG00000000938___FGR___CopD.csv'
+    phydists_file = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/testOneGene/job_input/geneDists/ENSG00000000938___FGR___CopD.csv'
     group_info_file = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/testOneGene/job_input/phydist_population_classes.tsv'
     categories = 'SUPER___SUB'
     
     
     test_tree = treeMetrics()
-    test_tree.setup(dist_mat_file, group_info_file, categories)
+    test_tree.setup(phydists_file, group_info_file, categories)
     
     sample_info = test_tree.getSampleInfo()
     group_info = test_tree.getGroupInfo()

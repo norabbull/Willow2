@@ -8,8 +8,6 @@ Created on Wed Jun  2 05:48:23 2021
 import csv
 from datetime import datetime
 import pandas as pd
-# import yaml
-# import sys
 from treeMetrics import treeMetrics
 from treeHelpers import make_filelist
 

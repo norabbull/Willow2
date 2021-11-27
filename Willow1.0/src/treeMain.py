@@ -8,16 +8,17 @@ Created on Wed Sep 29 15:39:57 2021
 import sys
 import yaml
 from treeRun import treeRun
- 
-def main(configFilepath):
+import timeit
+
+def main(configFilepath=None):
     """
     Function: 
         - call function to run program
         - all information given through 1st argument (path to configuration file)
     """
-    
+    print("Job initiated")
     # Read configfile argument
-    configFilepath = sys.argv[1]
+    # configFilepath = sys.argv[1]   # uncomment this to run from terminal
     
     configFilepath = configFilepath.strip()
     
@@ -30,9 +31,13 @@ def main(configFilepath):
     
 if __name__ == '__main__':
     
-    #configFilepath = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/test_GDR_10genes/job_input/main_config.yml'
-    print("Job initiated")
-    main()
+    configFilepath = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/test_GDR_10genes/job_input/main_config.yml'
+    
+    starttime = timeit.default_timer()
+    main(configFilepath)
+    endtime = timeit.default_timer()
+    
+
     
     
     

@@ -10,10 +10,8 @@ output: html_document
 ### Willow statistics
 
 
-
 # Imports
-```{r}
-install.packages("plyr")
+```{r, eval=FALSE}
 library(dplyr)
 library(plyr)
 ```
