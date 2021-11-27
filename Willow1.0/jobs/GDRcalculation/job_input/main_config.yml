@@ -2,7 +2,7 @@
  func: 'calcGDR'
  input_group_info: 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/GDRcalculation/job_input/phydist_population_classes.tsv'
  input_phydist_folder: 'E:/Master/all_phydists/'
- output_folder: 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/GDRcalculation/job_output'
+ output_folder: 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/GDRcalculation/job_output/'
  output_unprocessed: 'GDRcalculation_unprocessed_files_datetime.csv'
  group_categories: 'SUPER___SUB'
  num_random_values: 0

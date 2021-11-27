@@ -21,7 +21,6 @@ from treeMetrics import treeMetrics
 
 #%% Create non-zero distance values file 
 
-
 """
     Non-zero phydist values    
     Create file containing total amount of non-zero values in each matrix
@@ -57,13 +56,58 @@ GDRall = pd.concat([GDRsub, GDRsuper])
 
 # Save
 GDRall.to_csv('C:/Users/norab/Master/thesis_data/test_result_data/GDR_10genes_all.csv', index = False, header = True)
-#SDRsuper.to_csv('C:/Users/norab/Master/data/SDR/SDRsuper.csv', index = False, header = True)
-#SDRsub.to_csv('C:/Users/norab/Master/data/SDR/SDRsub.csv', index = False, header = True)
+#GDRsuper.to_csv('C:/Users/norab/Master/data/GDR/GDRsuper.csv', index = False, header = True)
+#GDRsub.to_csv('C:/Users/norab/Master/data/GDR/GDRsub.csv', index = False, header = True)
+
+#%% Create concatenated file of super- and sub GDRnull distribution data
+
+"""
+    Separate random GDR values fro each gene into separate files for 
+    super- and sub population categories respectivly.
+    Ie. ranodm values for each gene is stored in separate file. 
+"""
+
+# Files produced from GDRnullCalculation, containing all calculated GDRnull values
+GDRnullSuper = pd.read_csv('C:/Users/norab/Master/thesis_data/test_result_data/GDR_random_SUPER_27.11.2021.csv', names = ['gene', 'GDRnull'])
+GDRnullSub = pd.read_csv('C:/Users/norab/Master/thesis_data/test_result_data/GDR_random_SUB_27.11.2021.csv', names = ['gene', 'GDRnull'])
+
+GDRsuper.dropna(inplace=True)
+GDRsub.dropna(inplace=True)
+
+GDRnullSuper.index = GDRnullSuper['gene']
+GDRnullSub.index = GDRnullSub['gene']
 
 
+# Check and create list of uniq genes with random values
+unique = list(set(GDRnullSuper.index)) # Correct. there are 1055 genes in the df.
 
+# Fill gene selection dict with values.
+# Extract genes, save GDR null values as values to each gene key
+superValues = dict()
+for gene in unique:
+    values = list(GDRnullSuper[GDRnullSuper.index == gene]['GDRnull'])
+    superValues[gene] = values
+    
+subValues = dict()
+for gene in unique:
+    values = list(GDRnullSub[GDRnullSub.index == gene]['GDRnull'])
+    subValues[gene] = values
 
-#%% Data Wranglew functions
+# Save GDR null values for each gene to spearate file    
+for key, val in superValues.items():
+    df = pd.DataFrame(val)
+    filename = 'C:/Users/norab/Master/thesis_data/test_result_data/super/GDRnullSuper_' + key + '.csv'
+    df.to_csv(filename, index = False, header = ['GDRnull'])
+
+for key, val in subValues.items():
+    df = pd.DataFrame(val)
+    filename = 'C:/Users/norab/Master/data/GDRnull/refined_values/sub/GDRnullSub_' + key + '.csv'
+    df.to_csv(filename, index = False, header = ['GDRnull'])
+
+# Results: two folders (super and sub) with 1055 files in each, containing 
+# GDRnull values for each gene respectivly. 
+
+#%% Data Wrangle functions
 
 def calc_nonZero_phydists(folder):
     """

@@ -62,9 +62,8 @@ class treeRun:
         self.filter_skip = self.config.get('filter_skip').strip()
         self.group_categories = self.config.get('group_categories').strip()
         self.num_random_values = int(self.config.get('num_random_values'))
-        self.random = self.config.get('random')
-            
-                    
+        self.random = bool(self.num_random_values)
+        
     def run_calcGDR(self):
         """
         Funcition: 

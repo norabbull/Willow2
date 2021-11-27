@@ -140,3 +140,21 @@ def load_totdist_pops(file = 'C:/Users/norab/Master/data/other_measures/totdist_
     """
 
     return pd.read_csv(file)
+
+def load_GDRnull(file_path = 'C:/Users/norab/Master/Data/SDRnull/all/SDRnull_allGenes_22.07.21.csv',
+                 group_category = "All"):
+    """ 
+    Input: Filepath
+    Return: pd DataFrame containing SDR values for super and sub popultions for each tree/gene
+    
+    """ 
+    
+    GDRs = pd.read_csv(file_path, header=0, index_col=False)
+    
+    if 'super' in level:
+        return GDRs[GDRs['level'] == 'nullSuper']
+    elif 'sub' in level:
+        return SDRs[SDRs['level'] == 'nullSub']
+    else:
+        return SDRs 
+        

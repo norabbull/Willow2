@@ -31,13 +31,15 @@ def main(configFilepath=None):
     
 if __name__ == '__main__':
     
+    # Test job: 
     configFilepath = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/test_GDR_10genes/job_input/main_config.yml'
     
-    starttime = timeit.default_timer()
+    # GDR calculation job:
+    #configFilepath = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/GDRcalculation/job_input/main_config.yml'
+    
+    #starttime = timeit.default_timer()
     main(configFilepath)
-    endtime = timeit.default_timer()
-    
+    #endtime = timeit.default_timer()
 
-    
-    
-    
+    # GDR random job: 
+        
