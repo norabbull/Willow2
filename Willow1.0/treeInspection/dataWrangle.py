@@ -38,8 +38,27 @@ test = calc_nonZero_phydists(phydist_files)    # function defined above
 saveto = 'C:/Users/norab/Master/thesis_data/meta_data/test_nonzero_phydists.csv'
 test.to_csv(saveto, index = False, header = True)
 
-#%% Load unique sequence count file
+#%% Create concatenated file with all GDR values for super- and sub populations
 
+# load calculated GDR values
+
+GDRsuper = pd.read_csv('C:/Users/norab/Master/thesis_data/test_result_data/GDR_SUPER_27.11.2021.csv', names = ['gene', 'GDR'])
+GDRsub = pd.read_csv('C:/Users/norab/Master/thesis_data/test_result_data/GDR_SUB_27.11.2021.csv', names = ['gene', 'GDR'])
+
+GDRsuper.dropna(inplace=True)
+GDRsub.dropna(inplace=True)
+
+# Add level column
+GDRsuper.insert(0, 'level', 'super')
+GDRsub.insert(0, 'level', 'sub')
+
+# Concatenate
+GDRall = pd.concat([GDRsub, GDRsuper])
+
+# Save
+GDRall.to_csv('C:/Users/norab/Master/thesis_data/test_result_data/GDR_10genes_all.csv', index = False, header = True)
+#SDRsuper.to_csv('C:/Users/norab/Master/data/SDR/SDRsuper.csv', index = False, header = True)
+#SDRsub.to_csv('C:/Users/norab/Master/data/SDR/SDRsub.csv', index = False, header = True)
 
 
 

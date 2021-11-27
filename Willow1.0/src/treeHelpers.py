@@ -95,9 +95,9 @@ def load_uniqseqs(file= 'C:/Users/norab/Master/thesis_data/meta_data/9381_uniqse
 
 def load_nz_phydists(file= 'C:/Users/norab/Master/thesis_data/meta_data/test_nonzero_phydists.csv'):
     """
-    Input: None
-    Funtion: Load data. Path is specified in function for functoinality.
-    Retun: Pd dataframe with values and gene names as indices.
+    Input: file: str path to file with calculated non-zero phydists
+    Funtion: Load data
+    Return: Pd dataframe with values and gene names as indices.
     """
     
     totdist = pd.read_csv(file, "r", delimiter = ",", index_col = 0)
@@ -110,25 +110,33 @@ def load_nz_phydists(file= 'C:/Users/norab/Master/thesis_data/meta_data/test_non
     
     return totdist
 
-def load_totdist_pops(path = 'C:/Users/norab/Master/data/other_measures/totdist_pops_all.csv', get_info = False):
-    desc = """Informtion on total distance within each defined population
-                for all genes.  """
-    if get_info: 
-        print(desc)
+
     
-    return pd.read_csv(path)
-    
-def load_SDRs(file_path = 'C:/Users/norab/Master/Data/SDR/SDR_all.csv', level='All'):
+def load_GDRs(file = 'C:/Users/norab/Master/thesis_data/test_result_data/GDR_10genes_all.csv', group_category = 'all'):
     """ 
-    Input: path
-    Return: pd DataFrame containing SDR values for super and sub popultions for each tree/gene
+    Input: file: file with calculated GDR values
+          group_category: option: 'super' and 'sub' 
+    Return: pd DataFrame containing GDR values for super and/or 
+    sub popultions for each gene
     
     """
-    SDRs = pd.read_csv(file_path, header=0, index_col=False)
+    GDRs = pd.read_csv(file, header=0, index_col=False)
     
-    if level == 'super':
-        return SDRs[SDRs['level'] == 'super']
-    elif level == 'sub':
-        return SDRs[SDRs['level'] == 'sub']
+    if group_category == 'super':
+        return GDRs[GDRs['level'] == 'super']
+    elif group_category == 'sub':
+        return GDRs[GDRs['level'] == 'sub']
     else:
-        return SDRs 
+        return GDRs 
+    
+    
+    
+def load_totdist_pops(file = 'C:/Users/norab/Master/data/other_measures/totdist_pops_all.csv'):
+    """
+    Input: file: file with total distance within each defined population
+                for all genes.  
+    Function: load data
+    Return: pd dataframe with input data values 
+    """
+
+    return pd.read_csv(file)

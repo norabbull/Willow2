@@ -19,15 +19,18 @@ import copy
 # Load data 
 
 # Folder all files are stored in : 
-folder = 'C:/Users/norab/Master/thesis_data/meta_data/'
+folder = 'C:/Users/norab/Master/thesis_data/'
 
-nz_phydists = load_totdist(file=folder + 'test_nonzero_phydists.csv')  # works
-uniqseqs = load_uniqseqs(file=folder + '9381_uniqseqs.txt') #works
-GDRs = load_GDRs()
+nz_phydists = load_totdist(file=folder + 'meta_data/test_nonzero_phydists.csv')  # works
+uniqseqs = load_uniqseqs(file=folder + 'meta_data/9381_uniqseqs.txt') #works
+GDRs = load_GDRs(file = folder + 'test_result_data/GDR_10genes_all.csv') # works
 
-data_all = totdist.merge(SDRs, on = 'gene')
-data_all = data_all.merge(SDVs, on = ['gene', 'level'])
-data_all = data_all.merge(uniqseqs, on = ['gene'])
+# Maybe leave out
+GDRsuper = load_GDRs(group_category = 'super')
+GDRsub = load_GDRs(group_category = 'sub')
+
+data_all = nz_phydists.merge(uniqseqs, on = 'gene')
+data_all = data_all.merge(GDRs, on = 'gene')
 data_all.drop_duplicates(inplace=True)
 
 #%%
