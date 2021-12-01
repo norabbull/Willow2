@@ -25,6 +25,7 @@ class treeMetrics(treeInfo):
         self.group_dists = None
         self.mean_group_dists = None
         self.GDRs = None
+        self.nz_phydists = None
                 
         treeInfo.__init__(self)
         
@@ -126,8 +127,7 @@ class treeMetrics(treeInfo):
             
             self.GDRs[cat] = GDR
             
-    @classmethod
-    def calcNonZeroPhydists(self, phydists, percent = True):
+    def calcNonZeroPhydists(self):
         """
         Input:
             percent: give nonero variable as percentage
@@ -137,15 +137,12 @@ class treeMetrics(treeInfo):
             assign to class variable
         """
 
-        nonZero_row = pd.DataFrame((phydists != 0).astype(int).sum(axis=1))
+        nonZero_row = pd.DataFrame((self.phydists != 0).astype(int).sum(axis=1))
         nonZeroCount = int(nonZero_row.sum(axis=0))
         
-        num_entries = (phydists.shape[0] * phydists.shape[1]) - phydists.shape[0]
-
-        if percent:    
-            return nonZeroCount / num_entries
-        else: 
-            return nonZeroCount
+        num_entries = (self.phydists.shape[0] * self.phydists.shape[1]) - self.phydists.shape[0]
+        
+        self.nz_phydists = nonZeroCount / num_entries
         
         
     def getGroupDists(self): 
@@ -160,6 +157,9 @@ class treeMetrics(treeInfo):
         if not self.GDRs: self.calcGDR()
         return self.GDRs
     
+    def getNZphydists(self):
+        if not self.nz_phydists: self.calcNonZeroPhydists()
+        return self.nz_phydists
 
 
 #%% TEST

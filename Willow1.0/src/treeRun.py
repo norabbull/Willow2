@@ -62,8 +62,9 @@ class treeRun:
         self.filter_skip = self.config.get('filter_skip').strip()
         self.group_categories = self.config.get('group_categories').strip()
         self.num_random_values = int(self.config.get('num_random_values'))
-        self.random = bool(self.num_random_values)
-        
+        self.random = self.num_random_values
+
+
     def run_calcGDR(self):
         """
         Funcition: 
@@ -154,7 +155,39 @@ class treeRun:
             print("error with runCalc:\n")
             print(e)
 
-
+    
+    def run_calcNZphydists(self):
+        """
+        Input:    folder with phylgenetic distance files
+        Function: calculate total amount of non-zero values for each file in folder
+        Return:   pandas dataframe with values for all genes
+        
+        """
+        
+        # initiate df 
+        all_nz_phydists = pd.DataFrame(columns = ['gene', 'nz_phydists'])
+        
+        for phydist_file in self.file_list:
+            ind = 0
+            ind_len = len(self.file_list)
+            
+            try:         
+                ind +=1
+                print(f"Processing file {ind} / {ind_len} ")
+                
+                tree = treeMetrics()
+                tree.setup(phydist_file.strip(), self.group_info, self.group_categories)
+                nz_phydists = tree.getNZphydists()
+                geneID = tree.getName()
+                
+                all_nz_phydists = all_nz_phydists.append({'gene': geneID, 'nz_phydists':nz_phydists}, ignore_index = True)
+                
+                ind += 1
+                
+            except Exception as e: 
+                print("Error to calc NZ phydist for file:" , phydist_file)
+                print(e)
+                
        
     def run_calcTest(self):
         """
@@ -169,6 +202,8 @@ class treeRun:
         elif self.func == "calcGDRrandom":
             self.random = True
             self.run_calcGDR()
+        elif self.func == "calcNZphydists"
+            self.run_calcNZphydists()
         elif self.func == "calcTest":
             return self.run_calcTest()
         else:

@@ -30,11 +30,12 @@ def make_filelist(input_files):
                 files = [join(input_files, f) for f in os.listdir(input_files) 
                              if isfile(join(input_files, f))]
                 files = [f.strip() for f in files]
+            return files
     except Exception as e:
         print("Error with make_filelist:")
         print(e)
             
-    return files
+    
 
 def geneName(phydists_file, filetype = "phydist", idtype = 'all'):
     """
@@ -141,20 +142,21 @@ def load_totdist_pops(file = 'C:/Users/norab/Master/data/other_measures/totdist_
 
     return pd.read_csv(file)
 
-def load_GDRnull(file_path = 'C:/Users/norab/Master/Data/SDRnull/all/SDRnull_allGenes_22.07.21.csv',
+def load_GDRnull(file_path = 'C:/Users/norab/Master/thesis_data/test_result_data/GDRnull_all_27.11.21.csv',
                  group_category = "All"):
     """ 
     Input: Filepath
-    Return: pd DataFrame containing SDR values for super and sub popultions for each tree/gene
+    Return: pd DataFrame containing GDR values for super and sub popultions for each tree/gene
     
     """ 
     
     GDRs = pd.read_csv(file_path, header=0, index_col=False)
     
-    if 'super' in level:
+    if 'super' in group_category:
         return GDRs[GDRs['level'] == 'nullSuper']
-    elif 'sub' in level:
-        return SDRs[SDRs['level'] == 'nullSub']
+    elif 'sub' in group_category:
+        return GDRs[GDRs['level'] == 'nullSub']
     else:
-        return SDRs 
+        return GDRs 
         
+    # YOU STOPPED HERE: WRANGLE so you can load this properly. All 

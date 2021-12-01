@@ -100,14 +100,14 @@ def simGDR(G, p, Random = False, dist = 0.1):
 
 #%% Old
 
-# GDRresults = pd.DataFrame(columns = ['Group_size', 'Permutations', 'GDR'])
+GDRresults = pd.DataFrame(columns = ['Group_size', 'Permutations', 'GDR'])
 
-# for G in range(2,200):
-#     p = 0
-#     while p < G:
-#         GDR = simGDR(G, p = p, Random = False)
-#         GDRresults.loc[len(GDRresults)] = [G, p, GDR]
-#         p += 1
+for G in range(2,200):
+    p = 0
+    while p < G:
+        GDR = simGDR(G, p = p, Random = False)
+        GDRresults.loc[len(GDRresults)] = [G, p, GDR]
+        p += 1
 
 
 

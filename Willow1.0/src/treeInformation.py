@@ -31,7 +31,7 @@ class treeInfo:
         self.sample_info = None
         self.random_groups = False
         
-    def setup(self, phydists_file, group_info_file, categories):
+    def setup(self, phydists_file=None, group_info_file=None, categories=None):
         """
         Input: 
             phydists_file: 
@@ -46,13 +46,20 @@ class treeInfo:
             call other treeInfo-functions to format and store input information
         """
         
-        self.setDistMat(phydists_file)
-        self.setName(phydists_file)
-        self.setCategories(categories)
-        self.setGroupInfo(group_info_file)
-        self.setSampleInfo()
+        if phydists_file:
+            self.setPhydists(phydists_file)
+            self.setName(phydists_file)
         
-    def setDistMat(self, phydists_file):
+        if group_info_file != 'None':
+            self.setGroupInfo(group_info_file)
+        
+        if categories != 'None': 
+            self.setCategories(categories)
+        
+        if (phydists_file != 'None') and (categories != 'None'):
+            self.setSampleInfo()
+        
+    def setPhydists(self, phydists_file):
         """
         Input:
             phydists_file: filepath to distance matrix (CSV)
@@ -191,7 +198,7 @@ class treeInfo:
     def getGroupInfo(self): return self.group_info
     def getSampleInfo(self): return self.sample_info
     def getName(self): return self.name
-    def getDistMat(self):return self.phydists
+    def getPhydists(self):return self.phydists
     def getUniqseqMap(self): return self.uniqseq_map
     def getUniqseqCount(self): return self.uniqseq_count
     def getCategories(self): return self.categories

@@ -37,9 +37,35 @@ if __name__ == '__main__':
     # GDR calculation job:
     #configFilepath = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/GDRcalculation/job_input/main_config.yml'
     
+    # nullGDR calculation job:
+    #configFilepath = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/GDRcalculation/job_input/main_config.yml'
+        
+    # non-zero phydists job: 
+    #configFilepath = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/GDRcalculation/job_input/main_config.yml'
+    
+    
     #starttime = timeit.default_timer()
     main(configFilepath)
     #endtime = timeit.default_timer()
 
-    # GDR random job: 
         
+    
+    
+    #%% Create non-zero distance values file 
+
+"""
+    Non-zero phydist values    
+    Create file containing total amount of non-zero values in each matrix
+
+"""
+
+
+# folder with all phydist files 
+phydist_files = 'C:/Users/norab/Master/thesis_data/test_data/phydists_10samples'
+
+# calculate percentage of non-zero values in phydist matrices that is non-zero
+test = calc_nonZero_phydists(phydist_files)    # function defined above
+
+# save to file 
+saveto = 'C:/Users/norab/Master/thesis_data/meta_data/test_nonzero_phydists.csv'
+test.to_csv(saveto, index = False, header = True)

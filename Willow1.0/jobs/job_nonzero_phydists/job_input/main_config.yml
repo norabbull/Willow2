@@ -1,0 +1,10 @@
+---
+ func: 'calcNZphydists'
+ input_group_info: 'None'
+ input_phydist_folder: 'E:/Master/all_phydists/'
+ output_folder: 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/job_nonzero_phydists/job_output/'
+ output_unprocessed: 'NZ_phydist_unprocessed_files_datetime.csv'
+ group_categories: 'None'
+ num_random_values: 0
+ filter_skip: 'None'
+ filter_select: 'None'
