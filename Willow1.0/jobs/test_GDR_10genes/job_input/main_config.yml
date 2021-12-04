@@ -5,6 +5,6 @@
  output_folder: 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/test_GDR_10genes/job_output/'
  output_unprocessed: 'test_GDR_10genes_unprocessed_files_datetime.csv'
  group_categories: 'SUPER___SUB'
- num_random_values: 10
+ num_random_values: 0
  filter_skip: 'None'
  filter_select: 'None'

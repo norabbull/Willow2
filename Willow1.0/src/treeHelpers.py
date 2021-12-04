@@ -94,7 +94,7 @@ def load_uniqseqs(file= 'C:/Users/norab/Master/thesis_data/meta_data/9381_uniqse
     return uniqseq
 
 
-def load_nz_phydists(file= 'C:/Users/norab/Master/thesis_data/meta_data/test_nonzero_phydists.csv'):
+def load_nz_phydists(file= 'C:/Users/norab/Master/thesis_data/meta_data/nonzero_phydists.csv'):
     """
     Input: file: str path to file with calculated non-zero phydists
     Funtion: Load data
@@ -113,7 +113,7 @@ def load_nz_phydists(file= 'C:/Users/norab/Master/thesis_data/meta_data/test_non
 
 
     
-def load_GDRs(file = 'C:/Users/norab/Master/thesis_data/test_result_data/GDR_10genes_all.csv', group_category = 'all'):
+def load_GDRs(file = 'C:/Users/norab/Master/thesis_data/result_data/GDR/GDR_all.csv', group_category = 'all'):
     """ 
     Input: file: file with calculated GDR values
           group_category: option: 'super' and 'sub' 

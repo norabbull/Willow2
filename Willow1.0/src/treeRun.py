@@ -202,7 +202,7 @@ class treeRun:
         elif self.func == "calcGDRrandom":
             self.random = True
             self.run_calcGDR()
-        elif self.func == "calcNZphydists"
+        elif self.func == "calcNZphydists":
             self.run_calcNZphydists()
         elif self.func == "calcTest":
             return self.run_calcTest()

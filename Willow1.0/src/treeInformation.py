@@ -49,12 +49,13 @@ class treeInfo:
         if phydists_file:
             self.setPhydists(phydists_file)
             self.setName(phydists_file)
+            
+        if categories != 'None': 
+            self.setCategories(categories)
         
         if group_info_file != 'None':
             self.setGroupInfo(group_info_file)
         
-        if categories != 'None': 
-            self.setCategories(categories)
         
         if (phydists_file != 'None') and (categories != 'None'):
             self.setSampleInfo()

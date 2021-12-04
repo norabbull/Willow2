@@ -6,6 +6,7 @@ output: html_document
 ---
 
 
+
 ## Calculate cophenetic distances for all trees in a folder
 
 Imports
@@ -48,4 +49,25 @@ files <- list.files(path="C:/Users/norab/Master/WillowShare/data/ninja_trees", f
 Apply function to all trees, save output on the go
 ```{r}
 treeDistVals <- sapply(files, calcAndSave)
+```
+
+
+
+# PLAY! DELETE!
+
+```{r}
+library(ape)
+tree<-read.tree('C:/Users/norab/Master/data/real_tree_data/ninja_trees/ENSG00000092841___CASPA_HUMAN__full_aln.tre')
+tree<-read.tree('C:/Users/norab/Master/data/real_tree_data/ninja_trees/ENSG00000003400___CASPA_HUMAN__full_aln.tre')
+
+
+pairDist <- cophenetic(tree)
+path <- "C:/Users/norab/Master/thesis_data/inspect_single_trees/ENSG00000003400___CASPA_HUMAN_phydist.csv"   # SAVE FILES TO THIS DIRECTORY
+  name <-  gsub("^.*ninja_trees/", "", file)
+  name <- gsub("_HUMAN__full_aln.tre$", "", name)
+  filename <- paste0(path, name)
+  filename <- paste0(filename, "___CopD.csv")
+  print("File: ", filename)
+  write.csv(pairDist, file=path, row.names=TRUE, col.names=TRUE, sep = ",", quote = F)
+
 ```
