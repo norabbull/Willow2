@@ -26,7 +26,7 @@ Procedure to find number of samples needed for 90% significance level:
 ```{r}
 prob = 0.05
 var_p = prob * (1 - prob)
-num_perm_samples = 1000      # 70 = empirical p val = 0.1
+num_perm_samples = 70    # 70 = empirical p val = 0.1
 var_p_n = var_p / num_perm_samples
 sd_p_n = sqrt(var_p_n)
 

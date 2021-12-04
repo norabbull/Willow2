@@ -114,7 +114,33 @@ m2 = aes(x=stage('level', after_scale='x-shift*alt_sign(x)'), group='gene')  # s
      + labs(title='GDR for all genes'))
 
 
+#%% Combined plot of all null distributions
 
+
+# =============================================================================
+# GDR for significant genes
+# =============================================================================
+
+# Inspect GDRnull distribution values 
+
+import glob
+
+l = [pd.read_csv(filename) for filename in glob.glob("C:/Users/norab/Master/thesis_data/result_data/GDRnull/super/*.csv")]
+all_GDRnull = pd.concat(l, axis=0)
+all_GDRnull.describe()
+
+half_GDRnull = all_GDRnull.iloc[0:30000]
+
+(ggplot(half_GDRnull, aes(x='SDRnull', fill = 'SDRnull')) 
+     + geom_density(adjust = 1/2, alpha=0.5) 
+     + scale_fill_manual(values=['green'])
+     + labs(title='30.000 random GDR values'))
+
+
+#%% Other plots
+
+
+# Unique sequences
 
 
 

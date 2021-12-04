@@ -104,30 +104,26 @@ GDRall.to_csv('C:/Users/norab/Master/thesis_data/test_result_data/GDR_10genes_al
 """
 
 # Load GDRs
-GDRnull = load_GDRnull()   # works
+GDRs = load_GDRs()   # works
 nz_phydists = load_nz_phydists()  # works
-data_all = nz_phydists.merge(GDRnull, on = 'gene')
+data_all = nz_phydists.merge(GDRs, on = 'gene')
 
-selection1 = data_all[data_all['totdist'] > 0.0157]    # Genes with less than 20 samples with values filtered out
-selection1.sort_values(by=['SDR'], inplace=True, ignore_index=True)
+# Filter genes with less than 20 samples
+selection1 = data_all[data_all['totdist'] > 0.016]
 
+# Sort by GDR
+selection1.sort_values(by=['GDR'], inplace=True, ignore_index=True)
 
-
+# Select 1600 genes
 selection2 = selection1[selection1.index < 1600]
+
+# Drop genes appearing twice in list (included for both super and sub population)
 gene_selection = list(set(list(selection2['gene'])))
 gene_selection = pd.DataFrame(gene_selection, columns = ['gene'])
 gene_selection = gene_selection.drop_duplicates()
-# Save to computer and to disk
-gene_selection.to_csv('E:/Master/data/SDRnull/other/SDRnull_genes_selection.csv', index = False)
-gene_selection.to_csv('C:/Users/norab/Master/data/SDRnull/other/SDRnull_gene_selection.csv', index = False)
 
-# Filter out genes with already enough values: 
-read_genes = pd.read_csv('E:/Master/external_runs/data_software_SDRnull_allGenes_x1000/data/job_input/skip_genes.csv')
-skip_genes = list(read_genes['gene'])
-genes_to_run_list = [g for g in genes if not g in skip_genes]
-genes_to_run = pd.DataFrame(genes_to_run)
-genes_to_run.to_csv('E:/Master/data/SDRnull/other/SDRnull_genes_toRun.csv', index = False)
-
+# Save list of selected genes
+# gene_selection.to_csv('C:/Users/norab/Master/thesis_data/result_data/GDRnull/GDRnull_1055genes_selection.csv', index = False)
 
 
 #%% Concatenate super and sub null values
@@ -209,6 +205,12 @@ for key, val in subValues.items():
 
 #%% CAN DELETE THIS
 
+# Fjerne feil i sub
+p_val_super = pd.read_csv('C:/Users/norab/Master/thesis_data/result_data/GDRnull/GDRnull_pval_super.csv',header=0, names = ['gene','pval'])
+p_val_sub = pd.read_csv('C:/Users/norab/Master/thesis_data/result_data/GDRnull/GDRnull_pval_sub.csv',header=0, names = ['gene','pval'])
+super_list = list(p_val_super['gene'])
+
+p_val_sub2 = p_val_sub[~p_val_sub['gen'].isin(super_list)]
 
 if __name__ == '__main__':
     pass

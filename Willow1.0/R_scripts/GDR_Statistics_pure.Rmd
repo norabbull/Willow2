@@ -40,20 +40,6 @@ print(low_q)
 print(high_q)
 ```
 
-**Interpretation:** 
-True empirical p-value for 100 samples is between 0.009 and 0.091. 
-
-For 1000 samples, it is only dropped to 0.036 - 0.0635, so around 3% more 
-confidence. It is not worth the computational time here. 
-
-
-
-
-Cumulative distribution function
-
-- Calculate p-value for each distribution.
-- Create function 
-
 
 ## Function to perform p-val caluclation for one file
 ```{r}
@@ -88,24 +74,24 @@ calcAndSave_pval <- function(GDRnullFile, GDRs, pvalSaveFile) {
 ```
 
 
-## Run GDR calulcation for all trees
+## Run p-val calulcation for 1055 trees
 ```{r}
 
 # Load calculated GDRs
-GDRsuper <- read.csv("C:/Users/norab/Master/data/GDR/GDRsuper_all.csv", header = TRUE)
-GDRsub <- read.csv("C:/Users/norab/Master/data/GDR/GDRsub_all.csv", header = TRUE)
+GDRsuper <- read.csv("C:/Users/norab/Master/thesis_data/result_data/GDR/GDRsuper_all.csv", header = TRUE)
+GDRsub <- read.csv("C:/Users/norab/Master/thesis_data/result_data/GDR/GDRsub_all.csv", header = TRUE)
 
 # Create file to save p values:
-file_super <- "C:/Users/norab/Master/data/GDRnull/refined_values/GDRnull_pval_super.csv"
+file_super <- "C:/Users/norab/Master/thesis_data/result_data/GDR/GDRnull_pval_super.csv"
 file.create(file_super)
-file_sub <- "C:/Users/norab/Master/data/GDRnull/refined_values/GDRnull_pval_sub.csv"
+file_sub <- "C:/Users/norab/Master/thesis_data/result_data/GDR/GDRnull_pval_sub.csv"
 file.create(file_sub)
 
 # Create filelist to process
-superFiles <- list.files(path="C:/Users/norab/Master/data/GDRnull/refined_values/super", full.names=TRUE, recursive=FALSE)
-subFiles <- list.files(path="C:/Users/norab/Master/data/GDRnull/refined_values/sub", full.names=TRUE, recursive=FALSE)
-# Action
+superFiles <- list.files(path="C:/Users/norab/Master/thesis_data/result_data/GDRnull/super", full.names=TRUE, recursive=FALSE)
+subFiles <- list.files(path="C:/Users/norab/Master/thesis_data/result_data/GDRnull/sub", full.names=TRUE, recursive=FALSE)
 
+# Action
 super <- sapply(superFiles, calcAndSave_pval, GDRsuper, file_super)
 sub <- sapply(subFiles, calcAndSave_pval, GDRsub, file_sub)
 
@@ -115,8 +101,8 @@ sub <- sapply(subFiles, calcAndSave_pval, GDRsub, file_sub)
 ```{r}
 
 # Read data
-p_vals_super <- read.csv("C:/Users/norab/Master/data/GDRnull/refined_values/GDRnull_pval_super.csv", sep=",", col.names = c("gene", "pval"))
-p_vals_sub <- read.csv("C:/Users/norab/Master/data/GDRnull/refined_values/GDRnull_pval_sub.csv", sep=",", col.names = c("gene", "pval"))
+p_vals_super <- read.csv("C:/Users/norab/Master/thesis_data/result_data/GDRnull/GDRnull_pval_super.csv", sep=",", col.names = c("gene", "pval"))
+p_vals_sub <- read.csv("C:/Users/norab/Master/thesis_data/result_data/GDRnull/GDRnull_pval_sub.csv", sep=",", col.names = c("gene", "pval"))
 
 # adjust
 p_vals_super$pval_adj <- p.adjust(p_vals_super$pval)
@@ -126,11 +112,6 @@ p_vals_sub$pval_adj <- p.adjust(p_vals_sub$pval)
 SUPERdata <- inner_join(p_vals_super, GDRsuper, by = "gene")
 SUBdata <- inner_join(p_vals_sub, GDRsub, by = "gene")
 
-throw_genes_super <- p_vals_super$gene[p_vals_super$pval_adj > 0.001 ] 
-keep_genes_super <- SUPERdata[SUPERdata$pval_adj < 0.001,]
-keep_genes_sub <- SUBdata[SUBdata$pval_adj < 0.001,]
-
-keep_genes_super_GDR_50 <- SUPERdata[SUPERdata$GDR < 0.62,]
 ```
 
 # Save gene list
@@ -142,30 +123,24 @@ genes3 <-  sapply(genes, function (x) gsub("___.*$", "", x))
 genes50lowest <- sapply(genes50, function (x) gsub("___.*$", "", x))
 
 # Save
-lapply(genes2, write, "C:/Users/norab/Master/data/GDR/GDR1005_significantGenes_GDRlimit0.8.csv", append=TRUE)
 lapply(genes, write, "C:/Users/norab/Master/data/GDR/GDR1005_significantGenesFullname.csv", append=TRUE)
-lapply(genes3, write, "C:/Users/norab/Master/data/GDR/GDR1005_significantGenesFullname_ENS.csv", append=TRUE)
-lapply(genes50lowest, write, "C:/Users/norab/Master/data/GDR/50LowestSignificantGenes_ENS.csv", append=TRUE)
-
-
 lapply(SUPERdata, write, "C:/Users/norab/Master/data/GDR/GDR1005_significantGenesSUPER.csv", append=TRUE)
 write.table(SUBdata, file = "C:/Users/norab/Master/data/GDR/GDR1005_significantGenesSUB.csv", quote = FALSE, sep = ",", row.names = FALSE)
 
-
-
 ```
 
-#Plot null dist to check
+#Plot null disttribution for 4 selected genes
+
 ```{r}
-GDRnullFile <- "C:/Users/norab/Master/Data/GDRnull/refined_values/super/GDRnullSuper_ENSG00000134121___NCHL1.csv"
-GDRsuper <- read.csv("C:/Users/norab/Master/data/GDR/GDRsuper_all.csv", header = TRUE)
+GDRnullFile <- "C:/Users/norab/Master/thesis_data/result_data/GDRnull/super/SDRnull_ENSG00000134121___NCHL1.csv"
+GDRsuper <- read.csv("C:/Users/norab/Master/thesis_data/result_data/GDR/GDRsuper_all.csv", header = TRUE)
 
 
 GDRnullData <- read.csv(GDRnullFile) # Swap to file
 gene.name <- gsub("^.*_EN", "EN", GDRnullFile)
 gene.name <- gsub(".csv$", "", gene.name)
 GDRval <- GDRsuper$GDR[GDRsuper$gene == gene.name]
-P = ecdf(GDRnullData$GDRnull)    # The function giving empirical CDF of GDRnull_values
+P = ecdf(GDRnullData$SDRnull)    # The function giving empirical CDF of GDRnull_values
 p_val = P(GDRval)                # Returns empirical CDF at GDRtrue, ie. calculated GDR for populations
                                    # Save p val for next step - multiple testing correcting
 plot(P, main = "GDRnull: NCHL1         GDR = 0.9757", xlab = "GDR", ylab = "cumulative %")  
@@ -189,148 +164,16 @@ plot(P, main = "GDRnull: NDUS5         GDR = 0.953", xlab = "GDR", ylab = "cumul
 
 ```
 
-### Extract relevant GDRnull values
-```{r}
-
-# Read all GDRnull data
-GDRnull_all_super <- read.csv("C:/Users/norab/Master/data/GDRnull/all/GDRnullTotalSuper_22.07.21.csv")
-GDRnull_all_sub <- read.csv("C:/Users/norab/Master/data/GDRnull/all/GDRnullTotalSub_22.07.21.csv")
-
-# Read list of relevant genes
-GDRnull_genes <- read.csv("C:/Users/norab/Master/data/GDRnull/other/GDRnull_gene_selection.csv")
-colnames(GDRnull_genes) <- c("gene")
-
-# Extract GDRnull data for selected genes
-
-# Info
-gene_nr <- table(GDRnull_all_super['gene'])
-max(gene_nr)
-
-# Get generated GDRnull for selected genes only
-GDRnull_selection_super <- dplyr::filter(GDRnull_all_super, GDRnull_all_super$gene %in% GDRnull_genes$gene)
-GDRnull_selection_sub <- dplyr::filter(GDRnull_all_sub, GDRnull_all_sub$gene %in% GDRnull_genes$gene)
-
-# Next: filter genes with more than 
-CFAH_example <- filter(GDRnull_selection_super, gene == "ENSG00000000971___CFAH")
-
-# Load GDRs for population groups
-GDRsuper <- read.csv("C:/Users/norab/Master/data/GDR/GDRsuper_all.csv", header = TRUE)
-GDRsub <- read.csv("C:/Users/norab/Master/data/GDR/GDRsub_all.csv", header = TRUE)
 
 
-
-GDR_CFAH <- filter(GDRsuper, gene == "ENSG00000000971___CFAH")
-GDR_RBL1 <- sum(filter(keep_genes_super, gene == "ENSG00000080839___RBL1"))
-
-
-
-```
-
-
-
-```{r}
-
-
-any(SUPERdata$gene == "ENSG00000110700___RS13")
-SUPERdata[SUPERdata$gene ==  "ENSG00000110700___RS13",] 
-SUPERdata[SUPERdata$gene ==  "ENSG00000080839___RBL1",]
-SUBdata[SUBdata$gene ==  "ENSG00000080839___RBL1",]
-GDRsuper[GDRsuper$gene ==  "ENSG00000080839___RBL1",]
-p_vals_super[p_vals_super$gene ==  "ENSG00000080839___RBL1",]
-
-
-```
-
-
-
-# Plot null distribution
+# Plot one null distribution
 
 ```{r}
 install.packages("ggplot")
 library(ggplot2)
 # Filled Density Plot
-ggplot(GDRnull, aes(x = GDRnull)) + 
+ggplot(GDRnullData, aes(x = SDRnull)) + 
        geom_histogram(color = "red", # Curve color
                     fill = "purple",  # Area color
                     alpha = 0.5)   # Area transparency
-```
-
-
-# Willow statistics simulation
-
-```{r}
-GDRnullFile<- "C:/Users/norab/Master/thesis_data/simulation/simData/randSimG9_P5.csv"
-
-calcAndSave_simNull_pval <- function(GDRnullFile, pvalSaveFile) {
-  
-  # Read data
-  GDRnullData <- read.csv(GDRnullFile)
-  col = colnames(GDRnullData)
-  data = unlist(strsplit(col, '_'))
-  #G = strtoi(gsub("G.", "", data[1]))
-  G = gsub("G.", "", data[1])
-  perm = gsub("P.", "", data[2])
-  GDR = as.double(gsub("GDR.", "", data[3]))
-  uniq_pvals = length(unique(GDRnullData[,1]))
-  
-  
-  P = ecdf(GDRnullData[,1])    # The function giving empirical CDF of GDRnull_values
-  p_val = P(GDR)               # Returns empirical CDF at GDRtrue, ie. calculated GDR for populations
-                               # Save p val for next step - multiple testing correcting
-  plot(P)                      # Plot the shit (dont do for all, make an example or two...
-  # Save p val to file
-  #GDR <- as.character(GDR)
-  cat(c(G, perm, GDR, uniq_pvals, p_val), file = pvalSaveFile, sep = ",", append = TRUE)
-  cat('\n', file = pvalSaveFile, append=TRUE)
-}
-
-
-```
-
-
-# Run the shit
-```{r}
-
-# Create file to save p values:
-simNull_pvals_file <- "C:/Users/norab/Master/data/simulation/simNull_pvals.csv"
-file.create(save_file)
-# Write header to file
-cat(c("group_size", "perm", "GDR", "n_uniq_pvals", "pval"), file = simNull_pvals_file, append=TRUE)
-
-# Create filelist to process
-simNullFiles <- list.files(path="C:/Users/norab/Master/thesis_data/simulation/simData/", full.names=TRUE, recursive=FALSE)
-
-# Action
-test <- sapply(simNullFiles, calcAndSave_simNull_pval, simNull_pvals_file)
-
-```
-
-# Multiple testing correcting
-```{r}
-
-# Read data
-p_vals <- read.csv("C:/Users/norab/Master/data/simulation/simNull_pvals.csv", sep=",")
-
-# adjust
-p_vals$pval_adj <- p.adjust(p_vals$pval)
-
-
-# Save to file
-write.csv(p_vals, "C:/Users/norab/Master/data/simulation/simNull_pvals.csv", row.names = FALSE, quote = FALSE)
-
-
-```
-
-
-```{r}
-prob = 0.05
-var_p = prob * (1 - prob)
-num_perm_samples = 700      # 70 = empirical p val = 0.1
-var_p_n = var_p / num_perm_samples
-sd_p_n = sqrt(var_p_n)
-
-# 0.0975 quantile of true empirical p-val
-high_q = prob + 1.96 * sd_p_n
-
-print(high_q)
 ```
