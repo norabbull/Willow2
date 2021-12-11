@@ -160,3 +160,8 @@ def load_GDRnull(file_path = 'C:/Users/norab/Master/thesis_data/test_result_data
         return GDRs 
         
     # YOU STOPPED HERE: WRANGLE so you can load this properly. All 
+    
+    
+def get_gene_entry(gene, df):
+
+    return df[df['gene'].str.contains(gene)]

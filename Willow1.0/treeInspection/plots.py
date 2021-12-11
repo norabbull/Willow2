@@ -36,6 +36,11 @@ data_all = nz_phydists.merge(uniqseqs, on = 'gene')
 data_all = data_all.merge(GDRs, on = 'gene')
 data_all.drop_duplicates(inplace=True)
 
+#%% Signifiacnt genes
+
+data_all_sig_SUB = pd.read_csv('C:/Users/norab/Master/thesis_data/result_data/GDRsignificant/SDR1005_significantGenesSUB.csv')
+data_all_sig_SUPER = pd.read_csv('C:/Users/norab/Master/thesis_data/result_data/GDRsignificant/SDR1005_significantGenesSUPER.csv')
+
 #%%
 # all_data, super
 
@@ -57,7 +62,7 @@ GDRs.describe()
 GDRsuper.describe()
 GDRsub.describe()
 
-below_095 = GDRsuper[GDRsuper['GDR'] < 0.]
+below_09 = GDRsuper[GDRsuper['GDR'] < 0.9]
 # Inspect which genes that did not obtain GDR value
 # 1. Get list of all GDR gene labels
 # 2. Get list of all input tree labels
@@ -93,26 +98,112 @@ m2 = aes(x=stage('level', after_scale='x-shift*alt_sign(x)'), group='gene')  # s
 (ggplot(GDRs, aes('level', 'GDR', fill = 'level'))
  + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.8, show_legend = False)
  + geom_point(m2, color='none', alpha=0.6, size=1.5, show_legend=False)
- + geom_line(m2, color='gray', size=0.65, alpha=0.6)
+ + geom_line(m2, color='saddlebrown', size=0.4, alpha=0.3)
  + scale_fill_manual(values=['indigo', 'darkorange'])
  + theme_classic()  # change color
  + theme(figure_size=(8, 6))
- + labs(title='GDR')
+ + labs(title='GDR distributions')
+ + xlab("Group level")
+ + ylab("GDR")
+ + theme_classic()
+ + theme(
+     axis_text_x=element_text(rotation=30, hjust=1),
+         plot_title=element_text(color = "black",
+                             size = 35,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+          axis_title=element_text(color='black',
+                             size=25,
+                             family='sans-serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+          axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=25,
+     legend_key_height=15,
+     legend_key_size=25,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+     )
 )
+
+#%% MAL
+
+(ggplot(all_simData, aes('permutations', 'group_size', fill = 'adj p-val'))
+ + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
+ + theme(figure_size=(13, 13))
+ + labs(title='GDR simulation: adjusted p - values')
+ + scale_x_continuous(name="Number of permuted G2-samples from C2 to C1")
+ + scale_y_continuous(name="Group size  (Number of samples in G)")
+ + scale_color_cmap(cmap_name="inferno")
+ + theme_classic()
+  + theme(
+     plot_title=element_text(color = "black",
+                             size = 25,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+     axis_title=element_text(color='indigo',
+                             size=15,
+                             family='serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+     
+     axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=30,
+     legend_key_height=15,
+     legend_key_size=30,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+     #legend_title_align='center',
+     
+     )
+)
+
+
 
 
 # =============================================================================
 # Plot density + boxplot
 # =============================================================================
 
+
 (ggplot(GDRs, aes('level', 'GDR', fill = 'level'))
- + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.65, show_legend = False)
- + geom_boxplot(width = shift, alpha=0.7, size = 0.65, show_legend = False)
+ + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.9, show_legend = False)
+ + geom_boxplot(width = shift, alpha=0.4, size = 0.9, show_legend = False)
  + scale_fill_manual(values=['indigo', 'darkorange'])
- + theme_classic()  
+ + theme_classic()  # change color
  + theme(figure_size=(8, 6))
- + labs(title='GDR for all genes')
+ + labs(title='GDR distributions')
+ + xlab("Group level")
+ + ylab("GDR")
+ + theme(
+     axis_text_x=element_text(rotation=30, hjust=1),
+         plot_title=element_text(color = "black",
+                             size = 35,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+          axis_title=element_text(color='black',
+                             size=25,
+                             family='sans-serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+          axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=25,
+     legend_key_height=15,
+     legend_key_size=25,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+     )
 )
+
 
 
 # =============================================================================
@@ -120,10 +211,38 @@ m2 = aes(x=stage('level', after_scale='x-shift*alt_sign(x)'), group='gene')  # s
 # =============================================================================
 
 
-(ggplot(GDRs, aes(x='GDR', fill='level')) 
-     + geom_density(adjust = 1/2, alpha=0.5) 
-     + scale_fill_manual(values=['indigo', 'darkorange'])
-     + labs(title='GDR for all genes'))
+(ggplot(GDRs, aes(x='GDR', fill='level'))
+ + geom_density(adjust = 1/2, alpha=0.5) 
+ + scale_fill_manual(values=['indigo', 'darkorange'])
+ + theme_classic()  # change color
+ + theme(figure_size=(8, 6))
+ + labs(title='GDR distributions')
+ + xlab("GDR")
+ + ylab("Density")
+ + theme(
+     axis_text_x=element_text(rotation=30, hjust=1),
+         plot_title=element_text(color = "black",
+                             size = 35,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+          axis_title=element_text(color='black',
+                             size=25,
+                             family='sans-serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+          axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=30,
+     legend_key_height=20,
+     legend_key_size=40,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold', size=12),
+
+     )
+)
+
 
 
 #%% Combined plot of all null distributions
@@ -227,5 +346,38 @@ ggplot(half_GDRnull, aes(x='GDRnull', y=after_stat('density')))
  + xlim(0,30)
 )
 
+#%% MAL
 
+
+(ggplot(all_simData, aes('permutations', 'group_size', fill = 'adj p-val'))
+ + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
+ + theme(figure_size=(13, 13))
+ + labs(title='GDR simulation: adjusted p - values')
+ + scale_x_continuous(name="Number of permuted G2-samples from C2 to C1")
+ + scale_y_continuous(name="Group size  (Number of samples in G)")
+ + scale_color_cmap(cmap_name="inferno")
+  + theme(
+     plot_title=element_text(color = "black",
+                             size = 25,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+     axis_title=element_text(color='indigo',
+                             size=15,
+                             family='serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+     
+     axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=30,
+     legend_key_height=15,
+     legend_key_size=30,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+     #legend_title_align='center',
+     
+     )
+)
 

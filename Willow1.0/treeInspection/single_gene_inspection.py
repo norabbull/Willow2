@@ -27,11 +27,17 @@ import math
 uniqseqs = load_uniqseqs()
 totdist = load_totdist()
 SDRs = load_SDRs()
-SDVs = load_SDVs()
 data_all = totdist.merge(SDRs, on = 'gene')
 data_all = data_all.merge(SDVs, on = ['gene', 'level'])
 data_all = data_all.merge(uniqseqs, on = ['gene'])
 data_all.drop_duplicates(inplace=True)
+
+
+#%% Inspect significant genes
+
+data_all_sig_SUB = pd.read_csv('C:/Users/norab/Master/thesis_data/result_data/GDRsignificant/SDR1005_significantGenesSUB.csv')
+data_all_sig_SUPER = pd.read_csv('C:/Users/norab/Master/thesis_data/result_data/GDRsignificant/SDR1005_significantGenesSUPER.csv')
+
 
 #%% SDR plot
 
@@ -67,68 +73,160 @@ def find_uniqseq_groups(gene):
     
 #%% seqdata genes
 
-seqdata_OPLA = find_uniqseq_groups(gene = 'ENSG00000178814___OPLA')
-seqdata_SELB = find_uniqseq_groups('ENSG00000284869___SELB')
+
 seqdata_KRA22 = find_uniqseq_groups('ENSG00000214518___KRA22')
-seqdata_PTK6 = find_uniqseq_groups('ENSG00000101213___PTK6')
-seqdata_TAGL2 = find_uniqseq_groups('ENSG00000158710___TAGL2')
-seqdata_CADM3 = find_uniqseq_groups('ENSG00000162706___CADM3')
-seqdata_RN135 = find_uniqseq_groups('ENSG00000181481___RN135')
 seqdata_NDUS5 = find_uniqseq_groups('ENSG00000168653___NDUS5')
-seqdata_AMPH = find_uniqseq_groups('ENSG00000078053___AMPH')
-seqdata_NDKB = find_uniqseq_groups('ENSG00000243678___NDKB')
+seqdata_HAUS4 = find_uniqseq_groups('ENSG00000092036___HAUS4')
 
 
+#%% ggplots throw
 
-#%% ggplots
-
-
-ggplot(seqdata_OPLA) + geom_bar(aes(x='seq', fill='super')) 
-ggplot(seqdata_SELB) + geom_bar(aes(x='seq', fill='super')) 
+ 
 ggplot(seqdata_KRA22) + geom_bar(aes(x='seq', fill='super')) + labs(title = "KRA22, SUPER") + theme(axis_text_x=element_text(rotation=90, hjust=1))
 ggplot(seqdata_KRA22) + geom_bar(aes(x='seq', fill='sub')) + labs(title = "KRA22, SUB") + theme(axis_text_x=element_text(rotation=90, hjust=1))
-ggplot(seqdata_PTK6) + geom_bar(aes(x='seq', fill='sub')) 
-ggplot(seqdata_TAGL2) + geom_bar(aes(x='seq', fill='super')) 
-ggplot(seqdata_CADM3) + geom_bar(aes(x='seq', fill='super')) 
-ggplot(seqdata_CADM3) + geom_bar(aes(x='seq', fill='sub'))
-ggplot(seqdata_RN135) + geom_bar(aes(x='seq', fill='super')) 
-ggplot(seqdata_RN135) + geom_bar(aes(x='seq', fill='sub')) 
-ggplot(seqdata_NDUS5) + geom_bar(aes(x='seq', fill='super')) 
-ggplot(seqdata_NDUS5) + geom_bar(aes(x='seq', fill='sub')) 
-ggplot(seqdata_AMPH) + geom_bar(aes(x='seq', fill='super'))
-ggplot(seqdata_NDKB) + geom_bar(aes(x='seq', fill='super')) 
+ggplot(seqdata_NDUS5) + geom_bar(aes(x='seq', fill='super')) # High SDR sub
+ggplot(seqdata_HAUS4) + geom_bar(aes(x='seq', fill='super')) # Many african
 
-
-#%% get gene entries
-
-get_gene_entry("RN135", data_all)
-NDUS5 = get_gene_entry("NDUS5", data_all)
-
-get_gene_entry("RT35", data_all)
-
-# DPOA2 inspection
-DPOA2data = get_gene_entry("DPOA2", data_all)
-seqdata_DPOA2 = find_uniqseq_groups('ENSG00000014138___DPOA2')
-ggplot(seqdata_DPOA2) + geom_bar(aes(x='seq', fill='super'))
-
-
-# APOE
-APOEdata = get_gene_entry("APOE", data_all)
-seqdata_APOE = find_uniqseq_groups('ENSG00000130203___APOE')
-ggplot(seqdata_APOE) + geom_bar(aes(x='seq', fill='super'))
-
-# GAPD1
-GAPD1data = get_gene_entry("GAPD1", data_all)
-seqdata_GAPD1 = find_uniqseq_groups('ENSG00000165219___GAPD1')
-ggplot(seqdata_GAPD1) + geom_bar(aes(x='seq', fill='super'))
-
-# GAPD1
-GAPD1data = get_gene_entry("GAPD1", data_all)
-seqdata_GAPD1 = find_uniqseq_groups('ENSG00000165219___GAPD1')
-ggplot(seqdata_GAPD1) + geom_bar(aes(x='seq', fill='super'))
 
 
 #%% 
+
+# Get GDR info of genes
+data_all_sig_SUPER[data_all_sig_SUPER['gene'].str.contains('HAUS4')]
+data_all_sig_SUB[data_all_sig_SUB['gene'].str.contains('HAUS4')]
+
+data_all_sig_SUPER[data_all_sig_SUPER['gene'].str.contains('NDUS')]
+data_all_sig_SUB[data_all_sig_SUB['gene'].str.contains('NDUS')]
+
+
+#%% Plot KRA22 gene
+(ggplot(seqdata_KRA22) 
+ + geom_bar(aes(x='seq', fill='super')) 
+ + labs(title = "KRA22, SUPER     GDR = 0.394") 
+ #+ scale_x_discrete(name="unique samples")
+ #+ scale_y_discrete(name="count")
+ + xlab("unique 3'UTR variants")
+ + theme(figure_size=(13, 13))
+ + theme(axis_text_x=element_text(rotation=30, hjust=1),
+         plot_title=element_text(color = "black",
+                             size = 35,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+          axis_title=element_text(color='black',
+                             size=25,
+                             family='sans-serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+          axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=25,
+     legend_key_height=15,
+     legend_key_size=25,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+         )
+)
+
+(ggplot(seqdata_KRA22) 
+ + geom_bar(aes(x='seq', fill='sub')) 
+ + labs(title = "KRA22, SUB     GDR = 0.371") 
+ #+ scale_x_discrete(name="unique samples")
+ #+ scale_y_discrete(name="count")
+ + xlab("unique 3'UTR variants")
+ + theme(figure_size=(13, 13))
+ + theme(axis_text_x=element_text(rotation=30, hjust=1),
+         plot_title=element_text(color = "black",
+                             size = 35,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+          axis_title=element_text(color='black',
+                             size=25,
+                             family='sans-serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+          axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=25,
+     legend_key_height=15,
+     legend_key_size=25,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+         )
+)
+
+
+#%% Plot NDUS5 gene
+
+
+(ggplot(seqdata_NDUS5) 
+ + geom_bar(aes(x='seq', fill='super')) 
+ + labs(title = "NDUS5, SUPER     GDR = 0.804") 
+ #+ scale_x_discrete(name="unique samples")
+ #+ scale_y_discrete(name="count")
+ + xlab("unique 3'UTR variants")
+ + theme(figure_size=(13, 13))
+ + theme(axis_text_x=element_text(rotation=30, hjust=1),
+         plot_title=element_text(color = "black",
+                             size = 35,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+          axis_title=element_text(color='black',
+                             size=25,
+                             family='sans-serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+          axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=25,
+     legend_key_height=15,
+     legend_key_size=25,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+         )
+)
+
+
+#%% Plot HAUS4 gene
+
+
+(ggplot(seqdata_HAUS4) 
+ + geom_bar(aes(x='seq', fill='super')) 
+ + labs(title = "HAUS4, SUPER     GDR = 0.971") 
+ #+ scale_x_discrete(name="unique samples")
+ #+ scale_y_discrete(name="count")
+ + xlab("unique samples")
+ + theme(figure_size=(13, 13))
+ + theme(axis_text_x=element_text(rotation=30, hjust=1),
+         plot_title=element_text(color = "black",
+                             size = 35,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+          axis_title=element_text(color='black',
+                             size=25,
+                             family='sans-serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+          axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=25,
+     legend_key_height=15,
+     legend_key_size=25,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+         )
+)
+
+
+
+#%% IF TIME: 
 
 """
     Count populations samples in uniqseqs with low sample count.
@@ -161,7 +259,6 @@ for gene in gene_list:
 seqdata_counts_sub.to_csv('C:/Users/norab/Master/data/SDR/seqdata_counts_sub.csv', index = False)
 
 
-#%%
 
 
 
@@ -182,4 +279,5 @@ ggplot(seqdata_count_sup) + geom_point(aes(x='super', y = 'entries'))
        mapping=aes(x="column_in_dataset", fill='another_column_color')) 
  + geom_density(alpha=0.5)
  + labs(title="title"))
+
 
