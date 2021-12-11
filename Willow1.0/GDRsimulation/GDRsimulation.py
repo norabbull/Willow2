@@ -10,6 +10,7 @@ Created on Thu Sep 16 13:47:30 2021
 import scipy.special as ss
 import pandas as pd
 from plotnine import ggplot, aes, theme, geom_point, labs
+from plotnine import *
 import random
 
 import scipy
@@ -149,9 +150,55 @@ Plot:
 
 (ggplot(GDRresults, aes('Permutations', 'Group_size', fill = 'GDR'))
  + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
- + theme(figure_size=(8, 6))
+ + theme(figure_size=(13, 13))
  + labs(title='GDR simulation')
+ + scale_x_continuous(name="Number of permuted G2-samples from C2 to C1")
+ + scale_y_continuous(name="Group size  (Number of samples in G)")
+ + scale_color_cmap(cmap_name="inferno")
+  + theme(
+     plot_title=element_text(color = "black",
+                             size = 25,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+     axis_title=element_text(color='indigo',
+                             size=15,
+                             family='serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+     
+     axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=30,
+     legend_key_height=15,
+     legend_key_size=30,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+     #legend_title_align='center',
+     
+     )
 )
+
+
+#%% HOW TO - DELETE
+import pandas as pd
+import numpy as np
+from plotnine import *
+from plotnine.data import *
+
+p =  ggplot(aes(x='displ', y='cty'), mpg) + geom_point(aes(color='factor(cyl)'))
+p += theme(legend_text = element_text(angle=180, hjust=1, size=28))
+
+p += theme(axis_text=element_text(color='red',size=15,rotation=45),
+                           axis_title=element_text(color='darkgreen',size=10, weight='semibold'),
+                           axis_ticks=element_line(color='violet',size=20),
+                           panel_grid_major=element_line(color='lightblue',size=1),
+                           panel_grid_minor=element_line(color='orange',size=1),
+                          )
+
+
+p.save(filename = 'test3.png', height=5, width=5, units = 'in', dpi=1000)
 
 #%% Save random values to files
 
@@ -159,7 +206,7 @@ Plot:
 Save values to file
 
 """
-for index, row in GDRresultsRAND.iterrows():
+for index, row in GDRresults.iterrows():
     
     title = 'G' + str(row['Group_size']) + '_P' + str(row['Permutations']) 
     header = title + '_GDR' + str(row['GDR'])
@@ -171,6 +218,9 @@ for index, row in GDRresultsRAND.iterrows():
         f.write('\n')
         for item in row['randomGDR']:
             f.write("%s\n" % item)
+
+
+#%% 
 
 
 
@@ -188,12 +238,88 @@ p-value calculation:
 pval_file = 'C:/Users/norab/Master/thesis_data/simulation/simNull_alldata_24.11.21.csv'
 all_simData = pd.read_csv(pval_file)
 
+
+#%%
+all_simData.rename(columns={'pval':'p-val'}, inplace=True)
+(ggplot(all_simData, aes('permutations', 'group_size', fill = 'p-val'))
+ + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
+ + theme(figure_size=(13, 13))
+ + labs(title='GDR simulation: p - values')
+ + scale_x_continuous(name="Number of permuted G2-samples from C2 to C1")
+ + scale_y_continuous(name="Group size  (Number of samples in G)")
+ + scale_color_cmap(cmap_name="inferno")
+  + theme(
+     plot_title=element_text(color = "black",
+                             size = 25,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+     axis_title=element_text(color='indigo',
+                             size=15,
+                             family='serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+     
+     axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=30,
+     legend_key_height=15,
+     legend_key_size=30,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+     #legend_title_align='center',
+     
+     )
+)
+
+
+
+#---------------------------------------------------
 # plot p-values, uncorrected
 (ggplot(all_simData, aes('permutations', 'group_size', fill = 'pval'))
  + geom_point(alpha=1, size=3.2, stroke = 0.1, color = 'indigo')
  + theme(figure_size=(8, 6))
  + labs(title='GDR simulation p-values')
 )
+
+#%% 
+
+all_simData.rename(columns={'pval_adj_holm':'adj p-val'}, inplace=True)
+
+(ggplot(all_simData, aes('permutations', 'group_size', fill = 'adj p-val'))
+ + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
+ + theme(figure_size=(13, 13))
+ + labs(title='GDR simulation: adjusted p - values')
+ + scale_x_continuous(name="Number of permuted G2-samples from C2 to C1")
+ + scale_y_continuous(name="Group size  (Number of samples in G)")
+ + scale_color_cmap(cmap_name="inferno")
+  + theme(
+     plot_title=element_text(color = "black",
+                             size = 25,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+     axis_title=element_text(color='indigo',
+                             size=15,
+                             family='serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+     
+     axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=30,
+     legend_key_height=15,
+     legend_key_size=30,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+     #legend_title_align='center',
+     
+     )
+)
+
+#---------------------------------------------
 
 # plot p-values, corrected
 (ggplot(all_simData, aes('permutations', 'group_size', fill = 'pval_adj_holm'))

@@ -203,14 +203,30 @@ for key, val in subValues.items():
 
 #%% Data Wrangle functions
 
+
+
 #%% CAN DELETE THIS
 
 # Fjerne feil i sub
 p_val_super = pd.read_csv('C:/Users/norab/Master/thesis_data/result_data/GDRnull/GDRnull_pval_super.csv',header=0, names = ['gene','pval'])
+
+# Denne er helt på jordet
 p_val_sub = pd.read_csv('C:/Users/norab/Master/thesis_data/result_data/GDRnull/GDRnull_pval_sub.csv',header=0, names = ['gene','pval'])
 super_list = list(p_val_super['gene'])
 
-p_val_sub2 = p_val_sub[~p_val_sub['gen'].isin(super_list)]
+p_val_sub2 = p_val_sub[~p_val_sub['gene'].isin(super_list)]
+
+# trikse
+p_val_sub = pd.read_csv('C:/Users/norab/Master/thesis_data/result_data/GDRsignificant/gene_pval_padj_GDRsub.csv',header=0, names = ['gene','pval','pval_adj','GDRsub'])
+p_val_sub_store= p_val_sub[['gene', 'pval']]
+p_val_sub_store.to_csv('C:/Users/norab/Master/thesis_data/result_data/GDRnull/GDRnull_pval_sub.csv',header=['gene', 'pval'], index=False)
+
+
+# trikse
+p_val_super = pd.read_csv('C:/Users/norab/Master/thesis_data/result_data/GDRsignificant/gene_pval_padj_GDRsuper.csv',header=0, names = ['gene','pval','pval_adj','GDRsub'])
+p_val_super_store= p_val_sub[['gene', 'pval']]
+p_val_super_store.to_csv('C:/Users/norab/Master/thesis_data/result_data/GDRnull/GDRnull_pval_super2.csv',header=['gene', 'pval'], index=False)
+
 
 if __name__ == '__main__':
     pass

@@ -26,7 +26,7 @@ Procedure to find number of samples needed for 90% significance level:
 ```{r}
 prob = 0.05
 var_p = prob * (1 - prob)
-num_perm_samples = 70    # 70 = empirical p val = 0.1
+num_perm_samples = 100    # 70 = empirical p val = 0.1
 var_p_n = var_p / num_perm_samples
 sd_p_n = sqrt(var_p_n)
 
@@ -59,15 +59,14 @@ Cumulative distribution function
 ```{r}
 
 # Dummy
-GDRnullFile <- superFiles[3]
-GDRnullFile <- "C:/Users/norab/Master/Data/GDRnull/refined_values/super/GDRnullSuper_ENSG00000178814___OPLA.csv"
-GDRnullFile <- "C:/Users/norab/Master/Data/GDRnull/refined_values/super/GDRnullSuper_ENSG00000134121___NCHL1.csv"
-GDRnullFile <- "C:/Users/norab/Master/Data/GDRnull/refined_values/super/GDRnullSuper_ENSG00000284869___SELB.csv"
-GDRnullFile <- "C:/Users/norab/Master/data/simulation/simNull/simNull_5.csv"
+#GDRnullFile <- superFiles[3]
+#GDRnullFile <- "C:/Users/norab/Master/Data/GDRnull/refined_values/super/GDRnullSuper_ENSG00000178814___OPLA.csv"
+#GDRnullFile <- "C:/Users/norab/Master/Data/GDRnull/refined_values/super/GDRnullSuper_ENSG00000134121___NCHL1.csv"
+#GDRnullFile <- "C:/Users/norab/Master/Data/GDRnull/refined_values/super/GDRnullSuper_ENSG00000284869___SELB.csv"
 
 
-pvalSaveFile <- file_super
-GDRs <- GDRsuper
+#pvalSaveFile <- file_super
+#GDRs <- GDRsuper
 
 calcAndSave_pval <- function(GDRnullFile, GDRs, pvalSaveFile) {
   
@@ -75,12 +74,16 @@ calcAndSave_pval <- function(GDRnullFile, GDRs, pvalSaveFile) {
   GDRnullData <- read.csv(GDRnullFile) # Swap to file
   gene.name <- gsub("^.*_EN", "EN", GDRnullFile)
   gene.name <- gsub(".csv$", "", gene.name)
+  cat(gene.name)
+  cat('\n')
   GDRval <- GDRs$GDR[GDRs$gene == gene.name]
-  
-  P = ecdf(GDRnullData$GDRnull)    # The function giving empirical CDF of GDRnull_values
+
+  P = ecdf(GDRnullData$SDRnull)    # The function giving empirical CDF of GDRnull_values
+  #plot(P)
   p_val = P(GDRval)                # Returns empirical CDF at GDRtrue, ie. calculated GDR for populations
                                    # Save p val for next step - multiple testing correcting
-  plot(P)                         # Plot the shit (dont do for all, make an example or two...
+  #plot(P)                         # Plot the shit (dont do for all, make an example or two...
+  #cat(p_val)
   # Save p val to file
   cat(c(gene.name, p_val), file = pvalSaveFile, sep = ",", append = TRUE)
   cat('\n', file = pvalSaveFile, append=TRUE)
@@ -93,12 +96,13 @@ calcAndSave_pval <- function(GDRnullFile, GDRs, pvalSaveFile) {
 
 # Load calculated GDRs
 GDRsuper <- read.csv("C:/Users/norab/Master/data/GDR/GDRsuper_all.csv", header = TRUE)
-GDRsub <- read.csv("C:/Users/norab/Master/data/GDR/GDRsub_all.csv", header = TRUE)
+GDRsub <- read.csv("C:/Users/norab/Master/data/GDR/CALC_P_GDR_SUB/GDRsub_all.csv", header = TRUE)
 
 # Create file to save p values:
 file_super <- "C:/Users/norab/Master/data/GDRnull/refined_values/GDRnull_pval_super.csv"
 file.create(file_super)
-file_sub <- "C:/Users/norab/Master/data/GDRnull/refined_values/GDRnull_pval_sub.csv"
+#file_sub <- "C:/Users/norab/Master/data/GDRnull/refined_values/GDRnull_pval_sub.csv"
+file_sub <- "C:/Users/norab/Master/data/GDR/CALC_P_GDR_SUB/GDRnull_pval_sub.csv"
 file.create(file_sub)
 
 # Create filelist to process
@@ -108,6 +112,7 @@ subFiles <- list.files(path="C:/Users/norab/Master/data/GDRnull/refined_values/s
 
 super <- sapply(superFiles, calcAndSave_pval, GDRsuper, file_super)
 sub <- sapply(subFiles, calcAndSave_pval, GDRsub, file_sub)
+
 
 ```
 

@@ -4,9 +4,9 @@ Created on Wed Jun  2 15:11:20 2021
 @author: norab
 """
 
-# import sys
-# import os
-# sys.path
+import sys
+import os
+sys.path
 
 
 # Make sure system modules are contained in sys.path

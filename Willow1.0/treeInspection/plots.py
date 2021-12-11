@@ -29,13 +29,24 @@ nz_phydists = load_nz_phydists(file=folder + 'meta_data/nonzero_phydists.csv')  
 uniqseqs = load_uniqseqs(folder + 'meta_data/9381_uniqseqs.txt') #works
 GDRs = load_GDRs(file = folder + 'result_data/GDR/GDR_all.csv') # works
 GDRnull = load_GDRnull()   # works
-
-# Maybe leave out
 GDRsuper = load_GDRs(file = folder + 'result_data/GDR/GDR_all.csv', group_category = 'super')
 GDRsub = load_GDRs(file = folder + 'result_data/GDR/GDR_all.csv', group_category = 'sub')
 
 data_all = nz_phydists.merge(uniqseqs, on = 'gene')
 data_all = data_all.merge(GDRs, on = 'gene')
+data_all.drop_duplicates(inplace=True)
+
+#%%
+# all_data, super
+
+data_all_super = nz_phydists.merge(uniqseqs, on = 'gene')
+data_all_super = data_all_super.merge(GDRsuper, on = 'gene')
+data_all_super.drop_duplicates(inplace=True)
+
+# all_data, sub
+
+data_all_sub = nz_phydists.merge(uniqseqs, on = 'gene')
+data_all_sub = data_all.merge(GDRsub, on = 'gene')
 data_all.drop_duplicates(inplace=True)
 
 
@@ -46,6 +57,7 @@ GDRs.describe()
 GDRsuper.describe()
 GDRsub.describe()
 
+below_095 = GDRsuper[GDRsuper['GDR'] < 0.]
 # Inspect which genes that did not obtain GDR value
 # 1. Get list of all GDR gene labels
 # 2. Get list of all input tree labels
@@ -130,17 +142,90 @@ all_GDRnull = pd.concat(l, axis=0)
 all_GDRnull.describe()
 
 half_GDRnull = all_GDRnull.iloc[0:30000]
+half_GDRnull.columns = ['GDRnull']
 
-(ggplot(half_GDRnull, aes(x='SDRnull', fill = 'SDRnull')) 
-     + geom_density(adjust = 1/2, alpha=0.5) 
-     + scale_fill_manual(values=['green'])
-     + labs(title='30.000 random GDR values'))
 
+(
+ggplot(half_GDRnull, aes(x='GDRnull', y=after_stat('density')))
++ geom_histogram(
+    colour='darkgreen', # change the outline
+    size=2,        # change the thickness of the outline
+    alpha=0.7      # change the transparency
+    )
++ labs(title='30.000 random GDR values (super)')
+)
+
+
+# SUB
+
+l = [pd.read_csv(filename) for filename in glob.glob("C:/Users/norab/Master/thesis_data/result_data/GDRnull/sub/*.csv")]
+all_GDRnull = pd.concat(l, axis=0)
+all_GDRnull.describe()
+
+half_GDRnull = all_GDRnull.iloc[0:30000]
+half_GDRnull.columns = ['GDRnull']
+
+
+(
+ggplot(half_GDRnull, aes(x='GDRnull', y=after_stat('density')))
++ geom_histogram(
+    colour='orange', # change the outline
+    size=2,        # change the thickness of the outline
+    alpha=0.7      # change the transparency
+    )
++ labs(title='30.000 random GDR values (sub)')
+)
 
 #%% Other plots
 
 
-# Unique sequences
+# Unique sequences vs percentage of non-zero phylogenetic distances in tree
+
+(ggplot(data_all, aes('uniqseq', 'totdist', fill = 'GDR'))
+ + geom_point()
+ + theme_classic()
+ + labs(title='non-zero phydist percent vs uniqseq')
+)
+
+# =============================================================================
+# La stå
+# =============================================================================
+# Full
+(ggplot(data_all, aes('uniqseq', 'totdist', fill = 'SDRsub'))
+ + geom_point(alpha = 0.7, stroke= .05, size = 3)
+ + theme_classic()
+ + labs(title='SUB: non-zero sample distances VS nr. unique sequences')
+)
+
+(ggplot(result, aes('uniqseq', 'totdist', fill = 'SDR'))
+ + geom_point(alpha = 0.7, stroke= .05, size = 3)
+ + theme_classic()
+ + labs(title='SUPER: non-zero sample distances VS nr. unique sequences')
+)
+
+# Xlimited
+
+(ggplot(result, aes('uniqseq', 'totdist', fill = 'SDRsub'))
+ + geom_point(alpha = 0.7, stroke= .05, size = 4)
+ + theme_classic()
+ + labs(title='SUB: non-zero sample distances VS nr. unique sequences')
+ + xlim(0,30)
+)
+
+(ggplot(result, aes('uniqseq', 'totdist', fill = 'SDR'))
+ + geom_point(alpha = 0.7, stroke= .05, size = 4)
+ + theme_classic()
+ + labs(title='SUPER: non-zero sample distances VS nr. unique sequences')
+ + xlim(0,30)
+)
+
+
+(ggplot(result, aes('uniqseq', 'totdist', fill = 'SDR'))
+ + geom_point(alpha = 0.7, stroke= .01, size = 5 )
+ + theme_classic()
+ + labs(title='SUPER: totdist vs uniqseq')
+ + xlim(0,30)
+)
 
 
 
