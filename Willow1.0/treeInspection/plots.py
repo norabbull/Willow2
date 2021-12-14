@@ -239,6 +239,7 @@ m2 = aes(x=stage('level', after_scale='x-shift*alt_sign(x)'), group='gene')  # s
      legend_entry_spacing=10,
      legend_box_margin=5,
      legend_title=element_text(weight='bold', size=12),
+     legend_position='right'
 
      )
 )
@@ -272,28 +273,84 @@ ggplot(half_GDRnull, aes(x='GDRnull', y=after_stat('density')))
     alpha=0.7      # change the transparency
     )
 + labs(title='30.000 random GDR values (super)')
++ scale_x_continuous(name="GDR")
++ scale_y_continuous(name="density")
+  + theme(
+     plot_title=element_text(color = "black",
+                             size = 32,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+     axis_title=element_text(color='black',
+                             size=22,
+                             family='sans-serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+     
+     axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=30,
+     legend_key_height=15,
+     legend_key_size=30,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+     #legend_title_align='center',
 )
+  )
 
+
+# MAL
+(ggplot(all_simData, aes('permutations', 'group_size', fill = 'p-val'))
+ + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
+ + theme(figure_size=(7, 7))
+ + labs(title='GDR simulation: p - values')
+ + scale_x_continuous(name="Number of G2-samples moved from C2 to C1")
+ + scale_y_continuous(name="Group size  (number of samples in G)")
+  + theme(
+     plot_title=element_text(color = "black",
+                             size = 32,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+     axis_title=element_text(color='black',
+                             size=22,
+                             family='sans-serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+     
+     axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=30,
+     legend_key_height=15,
+     legend_key_size=30,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+     #legend_title_align='center',
+     
+     )
+)
 
 # SUB
 
-l = [pd.read_csv(filename) for filename in glob.glob("C:/Users/norab/Master/thesis_data/result_data/GDRnull/sub/*.csv")]
-all_GDRnull = pd.concat(l, axis=0)
-all_GDRnull.describe()
+# l = [pd.read_csv(filename) for filename in glob.glob("C:/Users/norab/Master/thesis_data/result_data/GDRnull/sub/*.csv")]
+# all_GDRnull = pd.concat(l, axis=0)
+# all_GDRnull.describe()
 
-half_GDRnull = all_GDRnull.iloc[0:30000]
-half_GDRnull.columns = ['GDRnull']
+# half_GDRnull = all_GDRnull.iloc[0:30000]
+# half_GDRnull.columns = ['GDRnull']
 
 
-(
-ggplot(half_GDRnull, aes(x='GDRnull', y=after_stat('density')))
-+ geom_histogram(
-    colour='orange', # change the outline
-    size=2,        # change the thickness of the outline
-    alpha=0.7      # change the transparency
-    )
-+ labs(title='30.000 random GDR values (sub)')
-)
+# (
+# ggplot(half_GDRnull, aes(x='GDRnull', y=after_stat('density')))
+# + geom_histogram(
+#     colour='orange', # change the outline
+#     size=2,        # change the thickness of the outline
+#     alpha=0.7      # change the transparency
+#     )
+# + labs(title='30.000 random GDR values (sub)')
+# )
 
 #%% Other plots
 
@@ -381,3 +438,39 @@ ggplot(half_GDRnull, aes(x='GDRnull', y=after_stat('density')))
      )
 )
 
+#%%
+nz_phydists = nz_phydists.dropna()
+
+(
+ggplot(nz_phydists, aes(x='totdist', y=after_stat('count/sum(count)*100')))
++ geom_histogram(
+    colour='darkgreen', # change the outline
+    size=2,        # change the thickness of the outline
+    alpha=0.7      # change the transparency
+    )
++ labs(title='Non - zero values in distance matrices')
+ + scale_x_continuous(name="% non-zero distance-values in distance matrices")
+ + scale_y_continuous(name="% of all distance matrices")
+  + theme(
+     plot_title=element_text(color = "black",
+                             size = 32,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+     axis_title=element_text(color='black',
+                             size=22,
+                             family='sans-serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+     
+     axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=30,
+     legend_key_height=15,
+     legend_key_size=30,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+     #legend_title_align='center',
+)
+  )

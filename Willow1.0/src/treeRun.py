@@ -197,6 +197,10 @@ class treeRun:
 
 
     def run_func(self):
+        """
+        Run specified calculation procedure
+
+        """
         if self.func == "calcGDR":
             self.run_calcGDR()
         elif self.func == "calcGDRrandom":
@@ -215,7 +219,7 @@ class treeRun:
 
 import timeit
 
-if __name__ == '__main__':
-    pass
+# if __name__ == '__main__':
+#     pass
 
     

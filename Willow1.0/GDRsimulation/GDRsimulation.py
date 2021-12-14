@@ -150,20 +150,20 @@ Plot:
 
 (ggplot(GDRresults, aes('Permutations', 'Group_size', fill = 'GDR'))
  + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
- + theme(figure_size=(13, 13))
+ + theme(figure_size=(7, 7))
  + labs(title='GDR simulation')
- + scale_x_continuous(name="Number of permuted G2-samples from C2 to C1")
- + scale_y_continuous(name="Group size  (Number of samples in G)")
+ + scale_x_continuous(name="Number of G2-samples moved from C2 to C1")
+ + scale_y_continuous(name="Group size  (number of samples in G)")
  + scale_color_cmap(cmap_name="inferno")
   + theme(
      plot_title=element_text(color = "black",
-                             size = 25,
+                             size = 32,
                              family = 'serif',
                              weight = 'semibold',
                              margin={'b':20}),
-     axis_title=element_text(color='indigo',
-                             size=15,
-                             family='serif',
+     axis_title=element_text(color='black',
+                             size=22,
+                             family='sans-serif',
                              weight='bold',
               
                               margin={'t':15, 'r':15}),
@@ -180,26 +180,37 @@ Plot:
      )
 )
 
-
-#%% HOW TO - DELETE
-import pandas as pd
-import numpy as np
-from plotnine import *
-from plotnine.data import *
-
-p =  ggplot(aes(x='displ', y='cty'), mpg) + geom_point(aes(color='factor(cyl)'))
-p += theme(legend_text = element_text(angle=180, hjust=1, size=28))
-
-p += theme(axis_text=element_text(color='red',size=15,rotation=45),
-                           axis_title=element_text(color='darkgreen',size=10, weight='semibold'),
-                           axis_ticks=element_line(color='violet',size=20),
-                           panel_grid_major=element_line(color='lightblue',size=1),
-                           panel_grid_minor=element_line(color='orange',size=1),
-                          )
+#%% MAL
 
 
-p.save(filename = 'test3.png', height=5, width=5, units = 'in', dpi=1000)
-
+(ggplot(seqdata_HAUS4) 
+ + geom_bar(aes(x='seq', fill='super')) 
+ + labs(title = "HAUS4, SUPER     GDR = 0.971") 
+ #+ scale_x_discrete(name="unique samples")
+ #+ scale_y_discrete(name="count")
+ + xlab("unique samples")
+ + theme(figure_size=(13, 13))
+ + theme(axis_text_x=element_text(rotation=30, hjust=1),
+         plot_title=element_text(color = "black",
+                             size = 35,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+          axis_title=element_text(color='black',
+                             size=25,
+                             family='sans-serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+          axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=25,
+     legend_key_height=15,
+     legend_key_size=25,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+         )
+)
 #%% Save random values to files
 
 """
@@ -241,6 +252,40 @@ all_simData = pd.read_csv(pval_file)
 
 #%%
 all_simData.rename(columns={'pval':'p-val'}, inplace=True)
+
+(ggplot(all_simData, aes('permutations', 'group_size', fill = 'p-val'))
+ + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
+ + theme(figure_size=(7, 7))
+ + labs(title='GDR simulation: p - values')
+ + scale_x_continuous(name="Number of G2-samples moved from C2 to C1")
+ + scale_y_continuous(name="Group size  (number of samples in G)")
+  + theme(
+     plot_title=element_text(color = "black",
+                             size = 32,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+     axis_title=element_text(color='black',
+                             size=22,
+                             family='sans-serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+     
+     axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=30,
+     legend_key_height=15,
+     legend_key_size=30,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+     #legend_title_align='center',
+     
+     )
+)
+
+
+#%% OLD"
 (ggplot(all_simData, aes('permutations', 'group_size', fill = 'p-val'))
  + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
  + theme(figure_size=(13, 13))
@@ -289,20 +334,19 @@ all_simData.rename(columns={'pval_adj_holm':'adj p-val'}, inplace=True)
 
 (ggplot(all_simData, aes('permutations', 'group_size', fill = 'adj p-val'))
  + geom_point(alpha=1, size=3, stroke = 0.1, color = 'indigo')
- + theme(figure_size=(13, 13))
- + labs(title='GDR simulation: adjusted p - values')
- + scale_x_continuous(name="Number of permuted G2-samples from C2 to C1")
- + scale_y_continuous(name="Group size  (Number of samples in G)")
- + scale_color_cmap(cmap_name="inferno")
+ + theme(figure_size=(7, 7))
+ + labs(title='GDR simulation: p - values')
+ + scale_x_continuous(name="Number of G2-samples moved from C2 to C1")
+ + scale_y_continuous(name="Group size  (number of samples in G)")
   + theme(
      plot_title=element_text(color = "black",
-                             size = 25,
+                             size = 32,
                              family = 'serif',
                              weight = 'semibold',
                              margin={'b':20}),
-     axis_title=element_text(color='indigo',
-                             size=15,
-                             family='serif',
+     axis_title=element_text(color='black',
+                             size=22,
+                             family='sans-serif',
                              weight='bold',
               
                               margin={'t':15, 'r':15}),

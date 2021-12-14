@@ -78,7 +78,8 @@ seqdata_KRA22 = find_uniqseq_groups('ENSG00000214518___KRA22')
 seqdata_NDUS5 = find_uniqseq_groups('ENSG00000168653___NDUS5')
 seqdata_HAUS4 = find_uniqseq_groups('ENSG00000092036___HAUS4')
 
-
+k = seqdata_KRA22[(seqdata_KRA22['seq'] == 'ENSG00000214518___KRA22_HUMAN__2') & (seqdata_KRA22['sub'] == 'FIN')]
+l = seqdata_KRA22[(seqdata_KRA22['seq'] == 'ENSG00000214518___KRA22_HUMAN__2')]
 #%% ggplots throw
 
  

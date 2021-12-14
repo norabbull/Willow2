@@ -162,18 +162,25 @@ write.table(SUBdata, file = "C:/Users/norab/Master/data/GDR/GDR1005_significantG
 
 #Plot null dist to check
 ```{r}
-GDRnullFile <- "C:/Users/norab/Master/Data/GDRnull/refined_values/super/GDRnullSuper_ENSG00000134121___NCHL1.csv"
-GDRsuper <- read.csv("C:/Users/norab/Master/data/GDR/GDRsuper_all.csv", header = TRUE)
+GDRnullFile <- "C:/Users/norab/Master/thesis_data/GDRnull/super/SDRnull_ENSG00000134121___NCHL1.csv"
+GDRnullFile <- "C:/Users/norab/Master/thesis_data/result_data/GDRnull/super/SDRnull_ENSG00000000971___CFAH.csv"
+
+GDRsuper <- read.csv("C:/Users/norab/Master/thesis_data/result_data/GDR/GDRsuper_all.csv", header = TRUE)
 
 
 GDRnullData <- read.csv(GDRnullFile) # Swap to file
 gene.name <- gsub("^.*_EN", "EN", GDRnullFile)
 gene.name <- gsub(".csv$", "", gene.name)
 GDRval <- GDRsuper$GDR[GDRsuper$gene == gene.name]
-P = ecdf(GDRnullData$GDRnull)    # The function giving empirical CDF of GDRnull_values
+P = ecdf(GDRnullData$SDRnull)    # The function giving empirical CDF of GDRnull_values
 p_val = P(GDRval)                # Returns empirical CDF at GDRtrue, ie. calculated GDR for populations
                                    # Save p val for next step - multiple testing correcting
-plot(P, main = "GDRnull: NCHL1         GDR = 0.9757", xlab = "GDR", ylab = "cumulative %")  
+plot(P, 
+     main = "GDRnull: NCHL1         GDR = 0.9757", 
+     xlab = "GDR", 
+     ylab = "cumulative %",
+     cex.lab = 1.5,    # X-axis and Y-axis labels size
+     cex. = "sans-serif")  
 
 ```
 
