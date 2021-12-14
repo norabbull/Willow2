@@ -169,26 +169,26 @@ import timeit
 if __name__ == '__main__':
     # Test with simple case
     
-    # Test files
-    phydists_file = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/testOneGene/job_input/geneDists/ENSG00000000938___FGR___CopD.csv'
-    group_info_file = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/testOneGene/job_input/phydist_population_classes.tsv'
-    categories = 'SUPER___SUB'
+    # # Test files
+    # phydists_file = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/testOneGene/job_input/geneDists/ENSG00000000938___FGR___CopD.csv'
+    # group_info_file = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/testOneGene/job_input/phydist_population_classes.tsv'
+    # categories = 'SUPER___SUB'
     
     
-    test_tree = treeMetrics()
-    test_tree.setup(phydists_file, group_info_file, categories)
+    # test_tree = treeMetrics()
+    # test_tree.setup(phydists_file, group_info_file, categories)
     
-    sample_info = test_tree.getSampleInfo()
-    group_info = test_tree.getGroupInfo()
-    categories = test_tree.getCategories()
+    # sample_info = test_tree.getSampleInfo()
+    # group_info = test_tree.getGroupInfo()
+    # categories = test_tree.getCategories()
     
-    # Calc group dists
-    starttime = timeit.default_timer()
-    timeGroupDists = test_tree.calcGroupDists()
-    endtime = timeit.default_timer()
+    # # Calc group dists
+    # starttime = timeit.default_timer()
+    # timeGroupDists = test_tree.calcGroupDists()
+    # endtime = timeit.default_timer()
     
-    test_tree.calcMeanGroupDists()
-    test_tree.calcGDR()    
+    # test_tree.calcMeanGroupDists()
+    # test_tree.calcGDR()    
     
-    GDRss = test_tree.getGDRs()
+    # GDRss = test_tree.getGDRs()
     

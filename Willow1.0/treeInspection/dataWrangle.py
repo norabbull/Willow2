@@ -21,32 +21,6 @@ import pandas as pd
         - GDR null-distribution values
 """
 
-# This is put into Willow
-
-    # def run_calcNZphydists(self):
-    #     """
-    #     Input:    folder with phylgenetic distance files
-    #     Function: calculate total amount of non-zero values for each file in folder
-    #     Return:   pandas dataframe with values for all genes
-        
-    #     """
-        
-    #     # make list of files
-    #     phydist_files = make_filelist(folder)
-    
-    #     # initiate df 
-    #     all_nz_phydists = pd.DataFrame(columns = ['gene', 'nz_phydists'])
-        
-    #     # process files in filelist
-    #     for file in phydist_files: 
-            
-    #         nz_phydists = treeMetrics.calcNonZeroPhydists(phydists)
-    #         geneID = geneName(file)
-    #         all_nz_phydists = all_nz_phydists.append({'gene': geneID, 'nz_phydists':nz_phydists}, ignore_index = True)
-            
-        
-    #     return all_nz_phydists
-    
 #%% Create concatenated file with all GDR values for super- and sub populations
 
 # load calculated GDR values
@@ -200,9 +174,6 @@ for key, val in subValues.items():
 
 # Results: two folders (super and sub) with 1055 files in each, containing 
 # GDRnull values for each gene respectivly. 
-
-#%% Data Wrangle functions
-
 
 
 #%% CAN DELETE THIS

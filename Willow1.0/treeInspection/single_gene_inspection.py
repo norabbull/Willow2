@@ -262,8 +262,6 @@ seqdata_counts_sub.to_csv('C:/Users/norab/Master/data/SDR/seqdata_counts_sub.csv
 
 
 
-
-
 #%% Inspect results from above
 
 # Read
