@@ -1,16 +1,28 @@
 
 
 Listed package versions of all programs and modules used in
-MSc project: "The GDR: A novel approach to detect lareg-scale genomic sequence data"
-by Nora B. Bull
-2021 
+MSc project: "The GDR: A novel approach to detect lareg-scale genomic sequence data", 2021 
 
 
-R:
+R version 4.0.3 -------------
+
+Package:	Version:
+ape 		5.5 
+plyr		4.0.5
+dplyr		1.0.6
 
 
 
 
 
-Python: 
+Python version 3.8.8 -------
+
+Package:	Version:
+Pandas		1.2.4
+Re		2.2.1
+csv		1.0
+yaml		5.4.1
+scipy		1.6.2
+plotnine	0.8.0
+
 
