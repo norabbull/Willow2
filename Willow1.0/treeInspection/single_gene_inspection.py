@@ -3,6 +3,9 @@
 Created on Fri Sep 17 15:41:40 2021
 
 @author: norab
+
+
+
 """
 
  
@@ -60,6 +63,7 @@ def find_uniqseq_groups(gene):
             seq_data.loc[len(seq_data)] = [gene_name, seq, sup, sub]
     
     return seq_data
+
     
 #%% seqdata genes
 
@@ -76,7 +80,14 @@ num_all = seqdata_KRA22[(seqdata_KRA22['seq'] == 'ENSG00000214518___KRA22_HUMAN_
 
 
 
-#%% Plot KRA22 gene sample distribution
+#%% KRA22 
+
+# =============================================================================
+# Plot KRA22 gene sample distribution 
+# =============================================================================
+
+
+# figure 6.11
 
 (ggplot(seqdata_KRA22) 
  + geom_bar(aes(x='seq', fill='super')) 
@@ -106,6 +117,9 @@ num_all = seqdata_KRA22[(seqdata_KRA22['seq'] == 'ENSG00000214518___KRA22_HUMAN_
      legend_title=element_text(weight='bold')
          )
 )
+
+
+# figure 6.12
 
 (ggplot(seqdata_KRA22) 
  + geom_bar(aes(x='seq', fill='sub')) 
@@ -137,8 +151,14 @@ num_all = seqdata_KRA22[(seqdata_KRA22['seq'] == 'ENSG00000214518___KRA22_HUMAN_
 )
 
 
-#%% Plot NDUS5 gene sample distribution
+#%% NDUS5
 
+# =============================================================================
+# Plot NDUS5 gene sample distribution 
+# =============================================================================
+
+
+# figure 6.9
 
 (ggplot(seqdata_NDUS5) 
  + geom_bar(aes(x='seq', fill='super')) 
@@ -170,8 +190,13 @@ num_all = seqdata_KRA22[(seqdata_KRA22['seq'] == 'ENSG00000214518___KRA22_HUMAN_
 )
 
 
-#%% Plot HAUS4 gene sample distribution
+#%% HAUS4 
 
+# =============================================================================
+# Plot HAUS4 gene sample distribution 
+# =============================================================================
+
+# figure 6.10
 
 (ggplot(seqdata_HAUS4) 
  + geom_bar(aes(x='seq', fill='super')) 

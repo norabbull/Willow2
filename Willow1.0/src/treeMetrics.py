@@ -10,6 +10,7 @@ import pandas as pd
 from treeInformation import treeInfo
 
 class treeMetrics(treeInfo):
+    
     """
     inherits treeInfo class. 
     class to perform calculations utilizing informaiton stored with treeInfo. 
