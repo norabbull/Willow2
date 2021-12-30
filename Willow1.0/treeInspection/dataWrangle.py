@@ -12,7 +12,7 @@ import pandas as pd
 
 
 """
-    Script contains formattings and calculations to produce files
+    Formattings to produce files
     that can be read directly by functions in "treeHelpers.py":
         
         - non-zero phydists

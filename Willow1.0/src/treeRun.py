@@ -14,7 +14,7 @@ from treeHelpers import make_filelist
 
 class treeRun:
     """
-        class to organize tree instance calculations for files
+        class to organize tree instance calculations for input files
     """
     
     def __init__(self, config):
@@ -187,7 +187,15 @@ class treeRun:
             except Exception as e: 
                 print("Error to calc NZ phydist for file:" , phydist_file)
                 print(e)
-                
+        
+        
+
+        save_to = self.output_folder + 'NZphydists' + '_' + str(datetime.now().strftime("%d.%m.%Y")) + '.csv'
+           
+        with open(save_to, 'a', newline='') as f:   # write to file    
+            writer = csv.writer(f)
+            writer.writerow(all_nz_phydists)
+        
        
     def run_calcTest(self):
         """
@@ -222,4 +230,4 @@ import timeit
 # if __name__ == '__main__':
 #     pass
 
-    
+

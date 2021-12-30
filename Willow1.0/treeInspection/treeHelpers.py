@@ -3,6 +3,13 @@
 Created on Fri Nov 19 14:58:51 2021
 
 @author: norab
+
+
+CONTAINS: 
+    
+    Help functions to ease data-loading.
+    
+
 """
 
 
@@ -34,8 +41,6 @@ def make_filelist(input_files):
     except Exception as e:
         print("Error with make_filelist:")
         print(e)
-            
-    
 
 def geneName(phydists_file, filetype = "phydist", idtype = 'all'):
     """
@@ -76,7 +81,6 @@ def load_phydists(file):
 def load_simData(file='C:/Users/norab/Master/data/simulation/simNull_pvals.csv'):
     return pd.read_csv(file)
 
-
 def load_uniqseqs(file= 'C:/Users/norab/Master/thesis_data/meta_data/9381_uniqseqs.txt'):
     """
     Input: file_path: str filedire containing number of unique sequences
@@ -92,7 +96,6 @@ def load_uniqseqs(file= 'C:/Users/norab/Master/thesis_data/meta_data/9381_uniqse
     uniqseq.rename(columns = {"index": "gene"}, inplace=True)
     
     return uniqseq
-
 
 def load_nz_phydists(file= 'C:/Users/norab/Master/thesis_data/meta_data/nonzero_phydists.csv'):
     """
@@ -111,8 +114,6 @@ def load_nz_phydists(file= 'C:/Users/norab/Master/thesis_data/meta_data/nonzero_
     
     return totdist
 
-
-    
 def load_GDRs(file = 'C:/Users/norab/Master/thesis_data/result_data/GDR/GDR_all.csv', group_category = 'all'):
     """ 
     Input: file: file with calculated GDR values
@@ -129,8 +130,6 @@ def load_GDRs(file = 'C:/Users/norab/Master/thesis_data/result_data/GDR/GDR_all.
         return GDRs[GDRs['level'] == 'sub']
     else:
         return GDRs 
-    
-    
     
 def load_totdist_pops(file = 'C:/Users/norab/Master/data/other_measures/totdist_pops_all.csv'):
     """
