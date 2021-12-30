@@ -31,7 +31,7 @@ $ python treeMain.py main_config.yml
 
 Job to run is specified in main_config file.
 
-### Input files description #################### 
+### Input files description #############################################################
 
 
 1. main_config.py
@@ -94,16 +94,10 @@ Configuration files to run calculations performed in the master-project is speci
 Formatting and plotting of result data are contained in the "treeInspection" folder, including: 
 
 - treeHelpers.py 		- Help-functions to ease data-loading  
-    
 - dataWrangle.py  		- Format result data for plotting and inspection.
-        
 - plots.py        		- Produce plots of result data
-
-- single_gene_inspection.py	- 
-
-Relative paths used in project are included but must be changed in case of 
-result reproduction. 
+- single_gene_inspection.py	- Produce plots for single gene inspections
 
 
-#############################################
+########################################################################################
 
