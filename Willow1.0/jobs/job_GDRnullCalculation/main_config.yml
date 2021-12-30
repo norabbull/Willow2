@@ -1,0 +1,10 @@
+---
+ func: 'calcGDR'
+ input_group_info: 'C:/Users/norab/Master/WillowProject/Willow1.0/Data/phydist_population_classes.tsv'
+ input_phydist_folder: 'E:/Master/all_phydists/'
+ output_folder: 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/GDRnullCalculation/'
+ output_unprocessed: 'GDRcalculation_unprocessed_files_datetime.csv'
+ group_categories: 'SUPER___SUB'
+ num_random_values: 1000
+ filter_skip: 'None'
+ filter_select: 'C:/Users/norab/Master/thesis_data/result_data/GDRnull/GDRnull_1055genes_selection.csv'

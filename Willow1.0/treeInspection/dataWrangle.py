@@ -56,24 +56,24 @@ GDRall.to_csv('C:/Users/norab/Master/thesis_data/test_result_data/GDR_10genes_al
     
     ----------------------------------------------------------------
     Filtering process: 
-        - Many more than the found ones are likely significant.
-        - WHat I did: 
-                What I wanted: To end up with approximatly 1000 genes to test with
-                    the lowest SDRs for both super and sub populations. 
-                1. Filtered out the genes ith less than 20 samples having a distance
-                to any other sample in the tree. This is 1/3 of the samllest sbu-population group. 
-                2. Selected the 1600 genes with lowest SDR, for both super and sub added. 
-                3. As this list conatined SDR values for both super and sub, some genes were 
-                duplicated in the list. After dropping duplicates, 1055 genes remained, containing the genes with 
-                lowest SDRs in an added list of super and sub populations. 
-                And since I were to run SDRnull distribution for these genes anyways, I could do both super and sub for
-                both genes, regardless of which of the SDR values it was selected for. 
-                If I were to select the gene list of 1000 lowest super SDRs AND 1000 lowest sub SDR, 
-                I would end up with far more genes, being computitionally too expensive with repsect to time I hade
-                to calculate this. 
-                So the genes in the SUPER list that end up non-significant are likely selected to the lit
-                because of a low SUB - pop SDR. 
-        - Interesting: Which ones are not significant?
+    - Many more than the found ones are likely significant.
+    - WHat I did: 
+            What I wanted: To end up with approximatly 1000 genes to test with
+                the lowest SDRs for both super and sub populations. 
+            1. Filtered out the genes ith less than 20 samples having a distance
+            to any other sample in the tree. This is 1/3 of the samllest sbu-population group. 
+            2. Selected the 1600 genes with lowest SDR, for both super and sub added. 
+            3. As this list conatined SDR values for both super and sub, some genes were 
+            duplicated in the list. After dropping duplicates, 1055 genes remained, containing the genes with 
+            lowest SDRs in an added list of super and sub populations. 
+            And since I were to run SDRnull distribution for these genes anyways, I could do both super and sub for
+            both genes, regardless of which of the SDR values it was selected for. 
+            If I were to select the gene list of 1000 lowest super SDRs AND 1000 lowest sub SDR, 
+            I would end up with far more genes, being computitionally too expensive with repsect to time I hade
+            to calculate this. 
+            So the genes in the SUPER list that end up non-significant are likely selected to the lit
+            because of a low SUB - pop SDR. 
+    - Interesting: Which ones are not significant?
 
 """
 
@@ -199,6 +199,24 @@ p_val_super_store= p_val_sub[['gene', 'pval']]
 p_val_super_store.to_csv('C:/Users/norab/Master/thesis_data/result_data/GDRnull/GDRnull_pval_super2.csv',header=['gene', 'pval'], index=False)
 
 
-if __name__ == '__main__':
-    pass
+    #%% Create non-zero distance values file 
+
+"""
+    Non-zero phydist values    
+    Create file containing total amount of non-zero values in each matrix
+
+"""
+
+
+# folder with all phydist files 
+phydist_files = 'C:/Users/norab/Master/thesis_data/test_data/phydists_10samples'
+
+# calculate percentage of non-zero values in phydist matrices that is non-zero
+test = calc_nonZero_phydists(phydist_files)    # function defined above
+
+# save to file 
+saveto = 'C:/Users/norab/Master/thesis_data/meta_data/test_nonzero_phydists.csv'
+test.to_csv(saveto, index = False, header = True)
+
+
 

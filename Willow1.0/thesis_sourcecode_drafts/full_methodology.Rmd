@@ -29,6 +29,7 @@ This section includes:
 - How to run Willow1.0
   1. GDR calculation 
   2. Random GDR value calculation
+  3. Non-zero phylogenetic distances in distance matrix - calculation
 
 - Willow1.0 source code:
   - treeInformation.py
@@ -97,7 +98,12 @@ EUR___GBR___HG00096,0.00236,0.00118,0.00354
 
 ```
 
-All row- and column names refer to a sample/leaf node stemming from the phylogenetic tree and must be formatted as a string that includes group information for all specified group categories. The group names, given by a 3-letter acronym, are separated by three underscores, "___". The order of specified groups in the string determines which group category the gorup is specified for. This information corresponds to how group information is given in the `ìnput_group_info`-file.    
+All row- and column names refer to a sample/leaf node stemming from the phylogenetic 
+tree and must be formatted as a string that includes group information for 
+all specified group categories. The group names, given by a 3-letter acronym, 
+are separated by three underscores, "___". The order of specified groups 
+in the string determines which group category the gorup is specified for. 
+This information corresponds to how group information is given in the `ìnput_group_info`-file.    
 
 
 ## 3. group information file
