@@ -1,30 +1,35 @@
-Specify following parameters in yaml-format: 
 
-DESCRIPTION OF WILLOW1.0 INPUT PARAMETERS TO STORE IN main_config - FILE:
+DESCRIPTION OF WILLOW1.0 INPUT PARAMETERS TO SPECIFY IN main_config:
 
 Format: YAML
 
-(see example below)
 
 PARAMETER DESCRIPTIONS: -----------------------------------------------------------
 
-func: function to run. 
-	Options: 	calcGDR - to calculate GDR values
+func: function to run.  Options:
+		 	calcGDR - to calculate GDR values
 			calcGDRrandom - to calculate random GDR values
 			calcNZphydists - calculate percentage of non-zero values in distance matrix
 			calcTest - run simple test (not operative in Willow1.0)
 
-input_group_info:  path to group info file
-input_phydist_folder: path to distance matrix folder
-output_folder: path to folder to save output files
-output_unprocessed: filename to store names of unprocessed files
-group_categories: specify group categories, must be separated by "___"
-	Example: 'SUPER___SUB'
- 
-num_random_values: number of random values to calculate. Only in use for func = calcGDRrandom. 
-filter_skip: give list of distance matrix files in folder to skip in CSV-format
-filter_select: give list of distance matrix files in folder to run (i.e., skip all others), in CSV-format
+input_group_info:  	path to group specification file.
+			an arbitrarily number of categories/group levels can be specified, but all samples must belong to a group for each category. 
 
+input_phydist_folder: 	path to distance matrix folder. All distance matrix files to process are contained in this folder in CSV format.
+
+output_folder: 		path to folder to save output files. 
+			One CSV-file per group category is created to store calculated values (ie. GDR for super-level).
+
+output_unprocessed: 	filename to store names of unprocessed files
+
+group_categories: 	specify group categories, must be separated by "___", ie. `category1___category2__..."`. 
+	Example: 	'SUPER___SUB'
+ 
+num_random_values: 	number of random values to calculate. Only in use for func = calcGDRrandom. 
+
+filter_skip: 		give list of distance matrix files in folder to skip in CSV-format
+
+filter_select: 		give list of distance matrix files in folder to run (i.e., skip all others), in CSV-format
 
 
 EXAMPLE: -------------------------------------------------------------------
@@ -39,3 +44,8 @@ EXAMPLE: -------------------------------------------------------------------
  num_random_values: 0
  filter_skip: 'None'
  filter_select: 'None'
+
+
+
+
+

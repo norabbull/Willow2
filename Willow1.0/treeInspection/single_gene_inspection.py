@@ -6,7 +6,7 @@ Created on Fri Sep 17 15:41:40 2021
 """
 
 from functools import reduce 
-
+import re
 
 from treeHelpers import *
 import pandas as pd
@@ -24,13 +24,13 @@ import math
 
 #%% load all data table
 
-uniqseqs = load_uniqseqs()
-totdist = load_totdist()
-SDRs = load_SDRs()
-data_all = totdist.merge(SDRs, on = 'gene')
-data_all = data_all.merge(SDVs, on = ['gene', 'level'])
-data_all = data_all.merge(uniqseqs, on = ['gene'])
-data_all.drop_duplicates(inplace=True)
+#uniqseqs = load_uniqseqs()
+#totdist = load_totdist()
+#SDRs = load_SDRs()
+#data_all = totdist.merge(SDRs, on = 'gene')
+#data_all = data_all.merge(SDVs, on = ['gene', 'level'])
+#data_all = data_all.merge(uniqseqs, on = ['gene'])
+#data_all.drop_duplicates(inplace=True)
 
 
 #%% Inspect significant genes
@@ -39,20 +39,23 @@ data_all_sig_SUB = pd.read_csv('C:/Users/norab/Master/thesis_data/result_data/GD
 data_all_sig_SUPER = pd.read_csv('C:/Users/norab/Master/thesis_data/result_data/GDRsignificant/SDR1005_significantGenesSUPER.csv')
 
 
-#%% SDR plot
-
-
-(ggplot(data_all,aes('GDR','uniqseq', fill = 'level')) 
-  + geom_point()
-  + labs(title = 'SDR vs unique sequences')
-  + geom_label(label = "SDR", y = "unique sequences")
-  #+ scale_x_continuous(breaks=us_td_sdr[''])
-)
-
-
 #%% 
 
+
+
 def find_uniqseq_groups(gene):
+    """
+    Input: 
+        gene: gene to inspect
+    
+    Funtion: 
+        load file containing information of sample distributions across 
+        the unique sequences detected for each gene. Organize into 
+        pandas dataframe. 
+    
+    Return: 
+        pandas dataframe of loaded info. 
+    """
     
     file_path = "E:/Master/Data/other/uniqseq_maps/maps/" + gene + "_HUMAN__uniq_samplemap.tsv"
     file = pd.read_csv(file_path, header = None, sep = '\s', index_col = 0, engine='python')
@@ -73,26 +76,20 @@ def find_uniqseq_groups(gene):
     
 #%% seqdata genes
 
-
+# 
 seqdata_KRA22 = find_uniqseq_groups('ENSG00000214518___KRA22')
 seqdata_NDUS5 = find_uniqseq_groups('ENSG00000168653___NDUS5')
 seqdata_HAUS4 = find_uniqseq_groups('ENSG00000092036___HAUS4')
 
-k = seqdata_KRA22[(seqdata_KRA22['seq'] == 'ENSG00000214518___KRA22_HUMAN__2') & (seqdata_KRA22['sub'] == 'FIN')]
-l = seqdata_KRA22[(seqdata_KRA22['seq'] == 'ENSG00000214518___KRA22_HUMAN__2')]
-#%% ggplots throw
-
- 
-ggplot(seqdata_KRA22) + geom_bar(aes(x='seq', fill='super')) + labs(title = "KRA22, SUPER") + theme(axis_text_x=element_text(rotation=90, hjust=1))
-ggplot(seqdata_KRA22) + geom_bar(aes(x='seq', fill='sub')) + labs(title = "KRA22, SUB") + theme(axis_text_x=element_text(rotation=90, hjust=1))
-ggplot(seqdata_NDUS5) + geom_bar(aes(x='seq', fill='super')) # High SDR sub
-ggplot(seqdata_HAUS4) + geom_bar(aes(x='seq', fill='super')) # Many african
-
+# Find number of Finnish samples of the ENSG00000214518___KRA22_HUMAN__2-
+# unique sequence for the KRA22 gene
+num_finnish = seqdata_KRA22[(seqdata_KRA22['seq'] == 'ENSG00000214518___KRA22_HUMAN__2') & (seqdata_KRA22['sub'] == 'FIN')]
+num_all = seqdata_KRA22[(seqdata_KRA22['seq'] == 'ENSG00000214518___KRA22_HUMAN__2')]
 
 
 #%% 
 
-# Get GDR info of genes
+# Get GDRs
 data_all_sig_SUPER[data_all_sig_SUPER['gene'].str.contains('HAUS4')]
 data_all_sig_SUB[data_all_sig_SUB['gene'].str.contains('HAUS4')]
 

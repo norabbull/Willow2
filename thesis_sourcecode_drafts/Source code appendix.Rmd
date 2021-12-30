@@ -1,0 +1,63 @@
+---
+title: 'Appendix: source code'
+author: "Nora Bull"
+date: "26 11 2021"
+output: word_document
+---
+
+```{r}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+
+## Overview: 
+
+1. Calculate distance matrix for all newick-format trees in a folder
+
+2. Simulation source code
+  2.1 treeSimulation.py
+  
+3. Willow1.0 
+  3.1 treeInformation.py
+  3.2 treeMetrics.py
+  3.3 treeRun.py
+  3.4 treeMain.py
+  3.5 treeHelpers.py
+
+4. Data wrangle and plotting
+  4.1 Plot ...
+  ...
+
+# 1. Calculate distance matrixes for all newick-format trees in a folder
+
+
+```{r}
+library(ape)
+
+# Create function to calculate and save matrix
+calcAndSave <- function(treefile) {
+  
+  tree<-read.tree(treefile, savedir)
+  
+  if(is.null(tree)) {
+        return(NULL)
+  } else {
+  pairDist <- cophenetic(tree)
+  name <-  gsub("^.*ninja_trees/", "", treefile)
+  name <- gsub("_HUMAN__full_aln.tre$", "", name)
+  out_filename <- paste0(savedir, name)
+  out_filename <- paste0(out_filename, "___CopD.csv")
+  print("File: ", out_filename)
+  write.csv(pairDist, file=out_filename, row.names=TRUE, col.names=TRUE, sep = ",", quote = F)
+  }
+}
+
+# Make list of newick tree files to process
+files <- list.files(path="C:/Users/norab/Master/WillowShare/data/ninja_trees", full.names=TRUE, recursive=FALSE)
+savedir <- "C:/Users/norab/Master/WillowShare/data/cophenetic_distances/"
+
+# Apply function to all files
+treeDistVals <- sapply(files, savedir, calcAndSave)
+```
+
+
