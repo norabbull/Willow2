@@ -5,42 +5,29 @@ Created on Fri Sep 17 15:41:40 2021
 @author: norab
 """
 
-from functools import reduce 
+ 
 import re
-
-from treeHelpers import *
 import pandas as pd
-import os
-from os.path import isfile, join
+from plotnine import *  
 
-import numpy as np
-
-from plotnine import ggplot, aes, geom_point, geom_line, labs
-from plotnine import *  # TO DO: change
-import numpy as np
-import matplotlib.pyplot as plt
-#from functools import reduce 
-import math
-
-#%% load all data table
-
-#uniqseqs = load_uniqseqs()
-#totdist = load_totdist()
-#SDRs = load_SDRs()
-#data_all = totdist.merge(SDRs, on = 'gene')
-#data_all = data_all.merge(SDVs, on = ['gene', 'level'])
-#data_all = data_all.merge(uniqseqs, on = ['gene'])
-#data_all.drop_duplicates(inplace=True)
-
-
-#%% Inspect significant genes
+#%% Load significant genes
 
 data_all_sig_SUB = pd.read_csv('C:/Users/norab/Master/thesis_data/result_data/GDRsignificant/SDR1005_significantGenesSUB.csv')
 data_all_sig_SUPER = pd.read_csv('C:/Users/norab/Master/thesis_data/result_data/GDRsignificant/SDR1005_significantGenesSUPER.csv')
 
 
-#%% 
+# Get GDRs
 
+data_all_sig_SUPER[data_all_sig_SUPER['gene'].str.contains('KRA22')]
+data_all_sig_SUB[data_all_sig_SUB['gene'].str.contains('KRA22')]
+
+data_all_sig_SUPER[data_all_sig_SUPER['gene'].str.contains('HAUS4')]
+data_all_sig_SUB[data_all_sig_SUB['gene'].str.contains('HAUS4')]
+
+data_all_sig_SUPER[data_all_sig_SUPER['gene'].str.contains('NDUS')]
+data_all_sig_SUB[data_all_sig_SUB['gene'].str.contains('NDUS')]
+
+#%% Data wrange unique sequence information
 
 
 def find_uniqseq_groups(gene):
@@ -76,28 +63,21 @@ def find_uniqseq_groups(gene):
     
 #%% seqdata genes
 
-# 
+# Find sample distribution across unique sequences for the genes
+# KRA22, NDUS5 and HAUS4, using function created above
 seqdata_KRA22 = find_uniqseq_groups('ENSG00000214518___KRA22')
 seqdata_NDUS5 = find_uniqseq_groups('ENSG00000168653___NDUS5')
 seqdata_HAUS4 = find_uniqseq_groups('ENSG00000092036___HAUS4')
 
-# Find number of Finnish samples of the ENSG00000214518___KRA22_HUMAN__2-
+# Inspection of number of Finnish samples of the ENSG00000214518___KRA22_HUMAN__2-
 # unique sequence for the KRA22 gene
 num_finnish = seqdata_KRA22[(seqdata_KRA22['seq'] == 'ENSG00000214518___KRA22_HUMAN__2') & (seqdata_KRA22['sub'] == 'FIN')]
 num_all = seqdata_KRA22[(seqdata_KRA22['seq'] == 'ENSG00000214518___KRA22_HUMAN__2')]
 
 
-#%% 
 
-# Get GDRs
-data_all_sig_SUPER[data_all_sig_SUPER['gene'].str.contains('HAUS4')]
-data_all_sig_SUB[data_all_sig_SUB['gene'].str.contains('HAUS4')]
+#%% Plot KRA22 gene sample distribution
 
-data_all_sig_SUPER[data_all_sig_SUPER['gene'].str.contains('NDUS')]
-data_all_sig_SUB[data_all_sig_SUB['gene'].str.contains('NDUS')]
-
-
-#%% Plot KRA22 gene
 (ggplot(seqdata_KRA22) 
  + geom_bar(aes(x='seq', fill='super')) 
  + labs(title = "KRA22, SUPER     GDR = 0.394") 
@@ -157,7 +137,7 @@ data_all_sig_SUB[data_all_sig_SUB['gene'].str.contains('NDUS')]
 )
 
 
-#%% Plot NDUS5 gene
+#%% Plot NDUS5 gene sample distribution
 
 
 (ggplot(seqdata_NDUS5) 
@@ -190,7 +170,7 @@ data_all_sig_SUB[data_all_sig_SUB['gene'].str.contains('NDUS')]
 )
 
 
-#%% Plot HAUS4 gene
+#%% Plot HAUS4 gene sample distribution
 
 
 (ggplot(seqdata_HAUS4) 
@@ -221,59 +201,4 @@ data_all_sig_SUB[data_all_sig_SUB['gene'].str.contains('NDUS')]
      legend_title=element_text(weight='bold')
          )
 )
-
-
-
-#%% IF TIME: 
-
-"""
-    Count populations samples in uniqseqs with low sample count.
-    Are there any popluations that show high degree of SNVs?
-
-"""
-
-# Load gene list
-significant_genes = pd.read_csv('C:/Users/norab/Master/data/SDR/SDR1005_significantGenesFullname.csv',
-                                header = None, names = ['gene'])
-test = seqdata_OPLA.count(axis = 'columns')
-#
-
-seqdata_counts_sup = pd.DataFrame(columns = ['seq', 'super', 'entries'])
-seqdata_counts_sup = seqdata_counts_sup.append(test)
-seqdata_counts_sub = pd.DataFrame(columns = ['seq', 'sub', 'entries'])
-seqdata_counts_sub = seqdata_counts_sub.append(test)
-
-test = seqdata_OPLA.groupby(["seq", "super"]).size().reset_index(name="entries") 
-
-gene_list = list(significant_genes['gene'])
-seqdata_counts_sub = pd.DataFrame(columns = ['seq', 'sub', 'entries'])
-for gene in gene_list: 
-    seqdata = find_uniqseq_groups(gene)
-    counts = seqdata.groupby(["seq", "sub"]).size().reset_index(name="entries")
-    seqdata_counts_sub = seqdata_counts_sub.append(counts)
-
-
-# Save 
-seqdata_counts_sub.to_csv('C:/Users/norab/Master/data/SDR/seqdata_counts_sub.csv', index = False)
-
-
-
-
-#%% Inspect results from above
-
-# Read
-
-seqdata_count_sup = pd.read_csv('C:/Users/norab/Master/data/SDR/seqdata_counts_sup.csv')
-seqdata_count_sub = pd.read_csv('C:/Users/norab/Master/data/SDR/seqdata_counts_sub.csv')
-
-(ggplot(seqdata_count_sup, mapping = aes(x = "super") 
-        + geom_bar()))
-ggplot(seqdata_count_sup) + geom_point(aes(x='super', y = 'entries')) 
-
-
-(ggplot(data="dataset", 
-       mapping=aes(x="column_in_dataset", fill='another_column_color')) 
- + geom_density(alpha=0.5)
- + labs(title="title"))
-
 
