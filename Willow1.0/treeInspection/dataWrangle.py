@@ -15,6 +15,8 @@ from treeMetrics import treeMetrics
 import pandas as pd
 
 
+
+
 #%% Create concatenated file with all GDR values for super- and sub populations
 
 # load result GDR values
@@ -83,6 +85,11 @@ gene_selection = gene_selection.drop_duplicates()
 
 #%% Concatenate super and sub GDRnull values
 
+"""
+    Create one file containing all GDRnull values for both super- and sub
+    population level
+    
+"""
 
 GDRnullSuper = pd.read_csv('C:/Users/norab/Master/thesis_data/test_result_data/GDR_random_SUPER.csv', names = ['gene', 'GDRnull'])
 GDRnullSub = pd.read_csv('C:/Users/norab/Master/thesis_data/test_result_data/GDR_random_SUB.csv', names=['gene', 'GDRnull'])
@@ -109,7 +116,7 @@ GDRnullAll.to_csv('C:/Users/norab/Master/thesis_data/test_result_data/GDRnull_al
 #%% Create concatenated file of super- and sub GDRnull distribution data
 
 """
-    Separate random GDR values for each gene into separate files (for 
+    Separate GDRnull values for each gene into separate files (for 
     super- and sub population categories respectivly).
     Used for p-val calculation (in R).
 """
@@ -126,7 +133,7 @@ GDRnullSub.index = GDRnullSub['gene']
 
 
 # Check and create list of uniq genes with random values
-unique = list(set(GDRnullSuper.index)) # Correct. there are 1055 genes in the df.
+print(len(set(GDRnullSuper.index))) # Correct. there are 1055 genes in the df.
 
 # Fill gene selection dict with values.
 # Extract genes, save GDR null values as values to each gene key
@@ -153,26 +160,5 @@ for key, val in subValues.items():
 
 # Results: two folders (super and sub) with 1055 files in each, containing 
 # GDRnull values for each gene respectivly. 
-
-
-    #%% Create non-zero distance values file 
-
-"""
-    Non-zero phydist values    
-    Create file containing total amount of non-zero values in each matrix
-
-"""
-
-
-# folder with all phydist files 
-phydist_files = 'C:/Users/norab/Master/thesis_data/test_data/phydists_10samples'
-
-# calculate percentage of non-zero values in phydist matrices that is non-zero
-test = calc_nonZero_phydists(phydist_files)    # function defined above
-
-# save to file 
-saveto = 'C:/Users/norab/Master/thesis_data/meta_data/test_nonzero_phydists.csv'
-test.to_csv(saveto, index = False, header = True)
-
 
 
