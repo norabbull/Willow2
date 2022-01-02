@@ -2,7 +2,7 @@
 
 ################################################
 
-Willow1.0 contain all program code necessary to reproduce results of the
+Willow1.0 contains all program code necessary to reproduce results of the
 master project: The GDR. A novel approach to detect large-scale
 genomic sequence patterns, 2021.
 
@@ -41,8 +41,8 @@ See `main_config_DESCRIPTION` and `main_config_EXAMPLE` (in documentation) for f
 
 
 2. Phylogenetic distance matrix files
-Distance matrices are created from Newick-format phylogenetic distance files in R, see "R_scripts/newick2phydist.R" for details.
-The distance matrices are stored in a folder, where all files in folder are processed in one job-run.
+Distance matrices are created from Newick-format phylogenetic distance files in R, see "R_scripts/newickToDistmat.R" for details.
+All distance matrix files in a folder are processed in one job-run.
 Path to folder is specified in main_config.
 Files are in csv-format.
 
@@ -89,14 +89,31 @@ SUPER           EAS         East Asians
 PROJECT DETAILS
 ########################################################################################
 
-Configuration files to run calculations performed in the master-project is specified in "jobs".
+Configuration files to run calculations performed in the master-project is specified in "Willow1.0/jobs".
 
-Formatting and plotting of result data are contained in the "treeInspection" folder, including: 
+GDR simualtion code is found in "Willow1.0/GDRSimulation":
+
+- GDRsimulation.py 		- Function to calculate simulated GDR values
+				  and visualize GDRs, p-values and adj.p-values.
+- GDRsimulationStats.Rmd	- Function to calculate p-values for simulated GDRs
+				  and test for multiple correction
+
+Formatting and plotting of result data from GDR calculation of simulated values and case-study (human 3'UTRs)
+are mostly found in "Willow1.0/treeInspection" including: 
 
 - treeHelpers.py 		- Help-functions to ease data-loading  
 - dataWrangle.py  		- Format result data for plotting and inspection.
 - plots.py        		- Produce plots of result data
 - single_gene_inspection.py	- Produce plots for single gene inspections
+
+Some plotting and formatting is also performed in R, see "Willow1.0/R_scripts/":
+
+- GDRstatistics.Rmd		- Hypothesis testing of 1055 GDR values
+				  and plotting null distribution of NCHL1 gene
+- newickToDistmat.R		- Convert newick formatted phylogenetic trees to 
+				  phylogenetic distance matrices
+				  
+
 
 
 ########################################################################################
