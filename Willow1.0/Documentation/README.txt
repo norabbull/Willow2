@@ -107,13 +107,15 @@ GDR simualtion code is found in "Willow1.0/GDRSimulation":
 - GDRsimulationStats.Rmd	- Function to calculate p-values for simulated GDRs
 				  and test for multiple correction
 
+
 Formatting and plotting of result data from GDR calculation of simulated values and 
-case-study (human 3'UTRs) are mostly found in "Willow1.0/treeInspection" including: 
+case-study (human 3'UTRs) are mostly found in "Willow1.0/treeInspection": 
 
 - treeHelpers.py 		- Help-functions to ease data-loading  
 - dataWrangle.py  		- Format result data for plotting and inspection.
 - plots.py        		- Produce plots of result data
 - single_gene_inspection.py	- Produce plots for single gene inspections
+
 
 Some plotting and formatting is also performed in R, see "Willow1.0/R_scripts/":
 
