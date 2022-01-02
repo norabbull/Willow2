@@ -9,9 +9,15 @@ output: html_document
 
 ### Willow statistics
 
-This script contains code used to perform hypothesis testing of 1055 
-GDR values, including p-value calculation, adjusting p value for multiple
-testing and plotting the null distribution for the NCHL1 gene. 
+
+This script contains: 
+
+  - Hypothesis testing of 1055 GDR values
+    - p-value calculation
+    - multiple testing correction
+    
+  - Plotting the null distribution for the NCHL1 gene. 
+
 
 # Imports
 ```{r, eval=FALSE}
@@ -47,8 +53,16 @@ print(high_q)
 ## Function to perform p-val caluclation for one file
 ```{r}
 
-pvalSaveFile <- file_super
-GDRs <- GDRsuper
+# Dummies
+#GDRnullFile <- superFiles[3]
+#GDRnullFile <- "C:/Users/norab/Master/Data/GDRnull/refined_values/super/GDRnullSuper_ENSG00000178814___OPLA.csv"
+#GDRnullFile <- "C:/Users/norab/Master/Data/GDRnull/refined_values/super/GDRnullSuper_ENSG00000134121___NCHL1.csv"
+#GDRnullFile <- "C:/Users/norab/Master/Data/GDRnull/refined_values/super/GDRnullSuper_ENSG00000284869___SELB.csv"
+#GDRnullFile <- "C:/Users/norab/Master/data/simulation/simNull/simNull_5.csv"
+#pvalSaveFile <- file_super
+#GDRs <- GDRsuper
+
+
 
 calcAndSave_pval <- function(GDRnullFile, GDRs, pvalSaveFile) {
   
@@ -58,10 +72,11 @@ calcAndSave_pval <- function(GDRnullFile, GDRs, pvalSaveFile) {
   gene.name <- gsub(".csv$", "", gene.name)
   GDRval <- GDRs$GDR[GDRs$gene == gene.name]
   
+  # obtain p val
   P = ecdf(GDRnullData$GDRnull)    # The function giving empirical CDF of GDRnull_values
   p_val = P(GDRval)                # Returns empirical CDF at GDRtrue, ie. calculated GDR for populations
                                    # Save p val for next step - multiple testing correcting
-  plot(P)                         # Plot the shit (dont do for all, make an example or two...
+  # plot(P)                        # Plot the shit if u want
   # Save p val to file
   cat(c(gene.name, p_val), file = pvalSaveFile, sep = ",", append = TRUE)
   cat('\n', file = pvalSaveFile, append=TRUE)
@@ -109,9 +124,19 @@ SUBdata <- inner_join(p_vals_sub, GDRsub, by = "gene")
 
 ```
 
+# Save gene list
+```{r}
+#genes = keep_genes_super$gene
+
+# Save
+lapply(SUPERdata, write, "C:/Users/norab/Master/data/GDR/GDR1005_significantGenesSUPER.csv", append=TRUE)
+lapply(SUBdata, write, "C:/Users/norab/Master/data/GDR/GDR1005_significantGenesSUPER.csv", append=TRUE)
+
+```
 
 
-#Plot null disttribution for 1 selected genes
+
+## Plot null disttribution for NCHL1 gene (figure 6.7)
 
 ```{r}
 GDRnullFile <- "C:/Users/norab/Master/thesis_data/result_data/GDRnull/super/SDRnull_ENSG00000134121___NCHL1.csv"
@@ -128,3 +153,7 @@ p_val = P(GDRval)                # Returns empirical CDF at GDRtrue, ie. calcula
 plot(P, main = "GDRnull: NCHL1         GDR = 0.9757", xlab = "GDR", ylab = "cumulative %")  
 
 ```
+
+
+
+
