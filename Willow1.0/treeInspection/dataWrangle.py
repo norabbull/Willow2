@@ -5,7 +5,11 @@ Created on Sat Nov 27 07:05:03 2021
 @author: norab
 
 DESCRIPTION: 
-    Formatting of result data for easier data inspection and plotting.
+    Formatting result data for easier data inspection and plotting.
+        - GDR values
+        - GDR null values
+        - non-zero phylogenetic distance values
+        
     Data output can be read directly by functions in "treeHelpers.py":
 
 """
@@ -13,8 +17,6 @@ DESCRIPTION:
 from treeHelpers import *
 from treeMetrics import treeMetrics
 import pandas as pd
-
-
 
 
 #%% Create concatenated file with all GDR values for super- and sub populations

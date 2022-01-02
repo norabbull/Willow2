@@ -4,7 +4,13 @@ Created on Fri Sep 17 15:41:40 2021
 
 @author: norab
 
-
+DESCRIPTION:
+    Organize and plot sample distribtuoins across unique sequences
+    for selected genes:
+        
+        - NDUS5 (figure 6.9)
+        - HAUS4 (figure 6.10)
+        - KRA22 (figure 6.11 and 6.12)
 
 """
 
@@ -12,6 +18,7 @@ Created on Fri Sep 17 15:41:40 2021
 import re
 import pandas as pd
 from plotnine import *  
+
 
 #%% Load significant genes
 
@@ -80,75 +87,6 @@ num_all = seqdata_KRA22[(seqdata_KRA22['seq'] == 'ENSG00000214518___KRA22_HUMAN_
 
 
 
-#%% KRA22 
-
-# =============================================================================
-# Plot KRA22 gene sample distribution 
-# =============================================================================
-
-
-# figure 6.11
-
-(ggplot(seqdata_KRA22) 
- + geom_bar(aes(x='seq', fill='super')) 
- + labs(title = "KRA22, SUPER     GDR = 0.394") 
- #+ scale_x_discrete(name="unique samples")
- #+ scale_y_discrete(name="count")
- + xlab("unique 3'UTR variants")
- + theme(figure_size=(13, 13))
- + theme(axis_text_x=element_text(rotation=30, hjust=1),
-         plot_title=element_text(color = "black",
-                             size = 35,
-                             family = 'serif',
-                             weight = 'semibold',
-                             margin={'b':20}),
-          axis_title=element_text(color='black',
-                             size=25,
-                             family='sans-serif',
-                             weight='bold',
-              
-                              margin={'t':15, 'r':15}),
-          axis_text=element_text(size=12, weight='semibold'),
-     legend_key_width=25,
-     legend_key_height=15,
-     legend_key_size=25,
-     legend_entry_spacing=10,
-     legend_box_margin=5,
-     legend_title=element_text(weight='bold')
-         )
-)
-
-
-# figure 6.12
-
-(ggplot(seqdata_KRA22) 
- + geom_bar(aes(x='seq', fill='sub')) 
- + labs(title = "KRA22, SUB     GDR = 0.371") 
- #+ scale_x_discrete(name="unique samples")
- #+ scale_y_discrete(name="count")
- + xlab("unique 3'UTR variants")
- + theme(figure_size=(13, 13))
- + theme(axis_text_x=element_text(rotation=30, hjust=1),
-         plot_title=element_text(color = "black",
-                             size = 35,
-                             family = 'serif',
-                             weight = 'semibold',
-                             margin={'b':20}),
-          axis_title=element_text(color='black',
-                             size=25,
-                             family='sans-serif',
-                             weight='bold',
-              
-                              margin={'t':15, 'r':15}),
-          axis_text=element_text(size=12, weight='semibold'),
-     legend_key_width=25,
-     legend_key_height=15,
-     legend_key_size=25,
-     legend_entry_spacing=10,
-     legend_box_margin=5,
-     legend_title=element_text(weight='bold')
-         )
-)
 
 
 #%% NDUS5
@@ -227,3 +165,72 @@ num_all = seqdata_KRA22[(seqdata_KRA22['seq'] == 'ENSG00000214518___KRA22_HUMAN_
          )
 )
 
+#%% KRA22 
+
+# =============================================================================
+# Plot KRA22 gene sample distribution 
+# =============================================================================
+
+
+# figure 6.11
+
+(ggplot(seqdata_KRA22) 
+ + geom_bar(aes(x='seq', fill='super')) 
+ + labs(title = "KRA22, SUPER     GDR = 0.394") 
+ #+ scale_x_discrete(name="unique samples")
+ #+ scale_y_discrete(name="count")
+ + xlab("unique 3'UTR variants")
+ + theme(figure_size=(13, 13))
+ + theme(axis_text_x=element_text(rotation=30, hjust=1),
+         plot_title=element_text(color = "black",
+                             size = 35,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+          axis_title=element_text(color='black',
+                             size=25,
+                             family='sans-serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+          axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=25,
+     legend_key_height=15,
+     legend_key_size=25,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+         )
+)
+
+
+# figure 6.12
+
+(ggplot(seqdata_KRA22) 
+ + geom_bar(aes(x='seq', fill='sub')) 
+ + labs(title = "KRA22, SUB     GDR = 0.371") 
+ #+ scale_x_discrete(name="unique samples")
+ #+ scale_y_discrete(name="count")
+ + xlab("unique 3'UTR variants")
+ + theme(figure_size=(13, 13))
+ + theme(axis_text_x=element_text(rotation=30, hjust=1),
+         plot_title=element_text(color = "black",
+                             size = 35,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+          axis_title=element_text(color='black',
+                             size=25,
+                             family='sans-serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+          axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=25,
+     legend_key_height=15,
+     legend_key_size=25,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+         )
+)

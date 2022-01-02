@@ -18,6 +18,7 @@ import os
 from os.path import isfile, join
 import re
 
+
 def make_filelist(input_files):
     """
     Input: 

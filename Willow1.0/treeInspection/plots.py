@@ -3,6 +3,14 @@
 Created on Wed Jun  2 06:45:58 2021
 
 @author: norab
+
+DESCRIPTION:
+    Plotting figures:
+        - GDR distributions (figure 6.4)
+        - GDR distributions (figure 6.5 a) 
+        - GDR distributions (figure 6.5 b)
+        - GDR null distribution for 30.000 GDR null values (figure 6.6)
+        - Non - zero values in distance matrices (figure 6.8)
 """
 
 from treeHelpers import *
@@ -53,6 +61,87 @@ GDRsub.describe()
 
 
 #%%
+
+# =============================================================================
+# Plot: GDR distributions (figure 6.4)
+# Density plot 
+# =============================================================================
+
+
+(ggplot(GDRs, aes(x='GDR', fill='level'))
+ + geom_density(adjust = 1/2, alpha=0.5) 
+ + scale_fill_manual(values=['indigo', 'darkorange'])
+ + theme_classic()  # change color
+ + theme(figure_size=(8, 6))
+ + labs(title='GDR distributions')
+ + xlab("GDR")
+ + ylab("Density")
+ + theme(
+     axis_text_x=element_text(rotation=30, hjust=1),
+         plot_title=element_text(color = "black",
+                             size = 35,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+          axis_title=element_text(color='black',
+                             size=25,
+                             family='sans-serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+          axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=30,
+     legend_key_height=20,
+     legend_key_size=40,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold', size=12),
+     legend_position='right'
+
+     )
+)
+
+
+
+# =============================================================================
+# Plot: GDR distributions (figure 6.5 a) 
+# density + lines between sub and super
+# =============================================================================
+
+
+(ggplot(GDRs, aes('level', 'GDR', fill = 'level'))
+ + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.9, show_legend = False)
+ + geom_boxplot(width = shift, alpha=0.4, size = 0.9, show_legend = False)
+ + scale_fill_manual(values=['indigo', 'darkorange'])
+ + theme_classic()  # change color
+ + theme(figure_size=(8, 6))
+ + labs(title='GDR distributions')
+ + xlab("Group level")
+ + ylab("GDR")
+ + theme(
+     axis_text_x=element_text(rotation=30, hjust=1),
+         plot_title=element_text(color = "black",
+                             size = 35,
+                             family = 'serif',
+                             weight = 'semibold',
+                             margin={'b':20}),
+          axis_title=element_text(color='black',
+                             size=25,
+                             family='sans-serif',
+                             weight='bold',
+              
+                              margin={'t':15, 'r':15}),
+          axis_text=element_text(size=12, weight='semibold'),
+     legend_key_width=25,
+     legend_key_height=15,
+     legend_key_size=25,
+     legend_entry_spacing=10,
+     legend_box_margin=5,
+     legend_title=element_text(weight='bold')
+     )
+)
+
+
 
 # =============================================================================
 # Plot: GDR distributions(figure 6.5 b)
@@ -108,91 +197,14 @@ m2 = aes(x=stage('level', after_scale='x-shift*alt_sign(x)'), group='gene')  # s
 
 
 
-# =============================================================================
-# Plot: GDR distributions (figure 6.5 a) 
-# density + lines between sub and super
-# =============================================================================
 
-
-(ggplot(GDRs, aes('level', 'GDR', fill = 'level'))
- + geom_violin(m1, style = 'left-right', alpha = 0.7, size = 0.9, show_legend = False)
- + geom_boxplot(width = shift, alpha=0.4, size = 0.9, show_legend = False)
- + scale_fill_manual(values=['indigo', 'darkorange'])
- + theme_classic()  # change color
- + theme(figure_size=(8, 6))
- + labs(title='GDR distributions')
- + xlab("Group level")
- + ylab("GDR")
- + theme(
-     axis_text_x=element_text(rotation=30, hjust=1),
-         plot_title=element_text(color = "black",
-                             size = 35,
-                             family = 'serif',
-                             weight = 'semibold',
-                             margin={'b':20}),
-          axis_title=element_text(color='black',
-                             size=25,
-                             family='sans-serif',
-                             weight='bold',
-              
-                              margin={'t':15, 'r':15}),
-          axis_text=element_text(size=12, weight='semibold'),
-     legend_key_width=25,
-     legend_key_height=15,
-     legend_key_size=25,
-     legend_entry_spacing=10,
-     legend_box_margin=5,
-     legend_title=element_text(weight='bold')
-     )
-)
-
-
-
-# =============================================================================
-# Plot: GDR distributions (figure 6.4)
-# Density plot 
-# =============================================================================
-
-
-(ggplot(GDRs, aes(x='GDR', fill='level'))
- + geom_density(adjust = 1/2, alpha=0.5) 
- + scale_fill_manual(values=['indigo', 'darkorange'])
- + theme_classic()  # change color
- + theme(figure_size=(8, 6))
- + labs(title='GDR distributions')
- + xlab("GDR")
- + ylab("Density")
- + theme(
-     axis_text_x=element_text(rotation=30, hjust=1),
-         plot_title=element_text(color = "black",
-                             size = 35,
-                             family = 'serif',
-                             weight = 'semibold',
-                             margin={'b':20}),
-          axis_title=element_text(color='black',
-                             size=25,
-                             family='sans-serif',
-                             weight='bold',
-              
-                              margin={'t':15, 'r':15}),
-          axis_text=element_text(size=12, weight='semibold'),
-     legend_key_width=30,
-     legend_key_height=20,
-     legend_key_size=40,
-     legend_entry_spacing=10,
-     legend_box_margin=5,
-     legend_title=element_text(weight='bold', size=12),
-     legend_position='right'
-
-     )
-)
 
 
 
 #%% Null distributions
 
 # =============================================================================
-# # GDR null distribution for 30.000 GDR null values (figure 6.6)
+# GDR null distribution for 30.000 GDR null values (figure 6.6)
 # =============================================================================
 
 l = [pd.read_csv(filename) for filename in glob.glob("C:/Users/norab/Master/thesis_data/result_data/GDRnull/super/*.csv")]
