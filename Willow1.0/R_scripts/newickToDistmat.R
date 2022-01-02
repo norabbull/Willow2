@@ -7,10 +7,9 @@ output: html_document
   
   
   
-  ## Calculate cophenetic distances for all trees in a folder
+# Calculate phylogenetic distances for all trees in a folder
   
 # Imports
-
 library(ape)
 packageVersion("ape")
 
@@ -33,7 +32,6 @@ calcAndSave <- function(file) {
     write.csv(pairDist, file=filename, row.names=TRUE, col.names=TRUE, sep = ",", quote = F)
   }
 }
-
 
 
 # Make list of newick tree files to be processed
