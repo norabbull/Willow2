@@ -1,6 +1,6 @@
 
 
-################################################
+#########################################################################################
 
 Willow1.0 contains all program code necessary to reproduce results of the
 master project: The GDR. A novel approach to detect large-scale
@@ -9,7 +9,7 @@ genomic sequence patterns, 2021.
 Most code is written in Python version 3.8.8, and some additional code
 is written in R version 4.0.3. 
 
-################################################
+########################################################################################
 
 
 ### Overview:
@@ -21,7 +21,7 @@ is written in R version 4.0.3.
   3. Group information file
 
 
-### How to run: ################################
+### How to run: ########################################################################
 
 1. Terminal: 
 $ python treeMain.py main_config.yml
@@ -35,13 +35,16 @@ Job to run is specified in main_config file.
 
 
 1. main_config.py
-The configuration file (main_config.yml) in yaml-format contains all optional input parameters to Willow. 
-It is the only input-argument given to run a Willow job. 
-See `main_config_DESCRIPTION` and `main_config_EXAMPLE` (in documentation) for further details. 
+The configuration file (main_config.yml) in yaml-format contains all optional input 
+parameters to Willow. It is the only input-argument given to run a Willow job. 
+See `main_config_DESCRIPTION` and `main_config_EXAMPLE` (in documentation) for further
+details. 
 
 
 2. Phylogenetic distance matrix files
-Distance matrices are created from Newick-format phylogenetic distance files in R, see "R_scripts/newickToDistmat.R" for details.
+Distance matrices are created from Newick-format phylogenetic distance files in R, 
+see "R_scripts/newickToDistmat.R" for details.
+
 All distance matrix files in a folder are processed in one job-run.
 Path to folder is specified in main_config.
 Files are in csv-format.
@@ -61,16 +64,20 @@ tree and must be formatted as a string that includes group information for
 all specified group categories. The group names, given by a 3-letter acronym, 
 are separated by three underscores, "___". The order of specified groups 
 in the string determines which group category the group belong to. 
-This information corresponds to how group information is given in the group information file.    
+This information corresponds to how group information is given in the group 
+information file.    
 
 
 3. Group information file
-The group information file contains information of all specified groups for all categories. The file is at TSV-format, with tab-separated columns.
-The file contains three columns: `GroupCategory`, `GroupName` and `GroupDescription`, see example below. 
+The group information file contains information of all specified groups for all categories. 
+The file is at TSV-format, with tab-separated columns. 
+The file contains three columns: `GroupCategory`, `GroupName` and `GroupDescription`, 
+see example below. 
 
 EXAMPLE:
 In this example, there are 2 different group categories specified: "SUB" and "SUPER". 
-The group names "FIN", "GBR" and "IBS" are contained in the "SUB" category, whereas "EUR" and "EAS" are contained in the "SUPER" category.
+The group names "FIN", "GBR" and "IBS" are contained in the "SUB" category, whereas 
+"EUR" and "EAS" are contained in the "SUPER" category.
 The `GroupDescription` column contains optional additional group information (optional).
  
 
@@ -89,7 +96,9 @@ SUPER           EAS         East Asians
 PROJECT DETAILS
 ########################################################################################
 
-Configuration files to run calculations performed in the master-project is specified in "Willow1.0/jobs".
+
+Configuration files to run calculations performed in the master-project is specified in 
+"Willow1.0/jobs".
 
 GDR simualtion code is found in "Willow1.0/GDRSimulation":
 
@@ -98,8 +107,8 @@ GDR simualtion code is found in "Willow1.0/GDRSimulation":
 - GDRsimulationStats.Rmd	- Function to calculate p-values for simulated GDRs
 				  and test for multiple correction
 
-Formatting and plotting of result data from GDR calculation of simulated values and case-study (human 3'UTRs)
-are mostly found in "Willow1.0/treeInspection" including: 
+Formatting and plotting of result data from GDR calculation of simulated values and 
+case-study (human 3'UTRs) are mostly found in "Willow1.0/treeInspection" including: 
 
 - treeHelpers.py 		- Help-functions to ease data-loading  
 - dataWrangle.py  		- Format result data for plotting and inspection.
@@ -113,7 +122,6 @@ Some plotting and formatting is also performed in R, see "Willow1.0/R_scripts/":
 - newickToDistmat.R		- Convert newick formatted phylogenetic trees to 
 				  phylogenetic distance matrices
 				  
-
 
 
 ########################################################################################
