@@ -27,8 +27,8 @@ class treeInfo:
         self.sample_info = None
         self.gene_name = None
         self.pop_dists = None
-        self.mean_pop_dists = None     # Used for singleSDR
-        self.mean_type_dists = None    # Used for SDR
+        self.mean_pop_dists = None     # Used for singleGDR
+        self.mean_type_dists = None    # Used for GDR
         self.random_pops = False
         self.uniqseq_map = None
         self.uniqseq_count= None
@@ -38,7 +38,7 @@ class treeInfo:
         self.subtype_info = None
         self.subtype_levels = None
         self.subtype_dists = None
-        self.SDR = None
+        self.GDR = None
         
     def setup(self, dist_mat_file, subtype_info_file):
         self.setDistMat(dist_mat_file)

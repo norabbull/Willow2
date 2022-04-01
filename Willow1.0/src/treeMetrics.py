@@ -106,7 +106,7 @@ class treeMetrics(treeInfo):
             mean_dists = {key: round(dist_summary[key] / count_summary[key], 6)  # Was 8 
                           for key, val in dist_summary.items() if count_summary[key]}
           
-            self.mean_group_dists[cat] = mean_dist
+            self.mean_group_dists[cat] = mean_dists
         
     def calcGDR(self):
         """
