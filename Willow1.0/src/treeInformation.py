@@ -10,7 +10,6 @@ import re
 from random import shuffle
 
 
-#%%
 class treeInfo:
     
     """
@@ -24,12 +23,12 @@ class treeInfo:
         Function: 
             initiate class variables
         """
-        self.name = None
-        self.phydists = None
-        self.categories = None 
-        self.group_info = None
-        self.sample_info = None
-        self.random_groups = False
+        self.name = None                # name of tree, eg. gene
+        self.phydists = None            # phylogenetic distance
+        self.categories = None          # categories for grouping structures
+        self.group_info = None          # groups in each category
+        self.sample_info = None         # info of each sample in tree
+        self.random_groups = False      # if samples are randomly assigned to groups
         
     def setup(self, phydists_file=None, group_info_file=None, categories=None):
         """
@@ -59,7 +58,7 @@ class treeInfo:
         
         if (phydists_file != 'None') and (categories != 'None'):
             self.setSampleInfo()
-        
+
     def setPhydists(self, phydists_file):
         """
         Input:
@@ -87,10 +86,13 @@ class treeInfo:
             'ENSEBL___GENENAME'
             example: 'ENSG00000000938___FGR'
             
+        TO UPDATE
+            
         """
+
         subName = re.sub('^.*ENS', 'ENS', phydists_file)
         self.name = re.sub('___CopD.csv$','', subName)
-    
+            
     def setCategories(self, categories, sep = '___'):
         """
         Input: 
@@ -106,7 +108,6 @@ class treeInfo:
 
         """
         self.categories = categories.split(sep)
-        
     
     def setSampleInfo(self):
         """ 
@@ -155,7 +156,6 @@ class treeInfo:
 
         self.random_groups = True
 
-        
     def setUniqseqMap(self, uniqseq_map_file):
         """
         Input: 
@@ -172,7 +172,6 @@ class treeInfo:
         # Counts
         self.uniqseq_count = len(file[0])   # What is this for
         self.uniqseq_map = sorted(file.count(axis=1), reverse=True)
-
 
     def setGroupInfo(self, group_info_file):
         """
@@ -195,7 +194,6 @@ class treeInfo:
             groups = set(groups['GroupName'])
             self.group_info[cat] = groups
 
-
     def getGroupInfo(self): return self.group_info
     def getSampleInfo(self): return self.sample_info
     def getName(self): return self.name
@@ -204,7 +202,7 @@ class treeInfo:
     def getUniqseqCount(self): return self.uniqseq_count
     def getCategories(self): return self.categories
     
-#%%
+
 if __name__ == '__main__':
   
     # Test with simple case

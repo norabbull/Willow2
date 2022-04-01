@@ -11,7 +11,6 @@ import pandas as pd
 from treeMetrics import treeMetrics
 from treeHelpers import make_filelist
 
-
 class treeRun:
     """
         class to organize tree instance calculations for input files
@@ -31,7 +30,6 @@ class treeRun:
         # Run! 
         self.run_func()
 
-    
     def config_setup(self):
         
         """
@@ -63,7 +61,6 @@ class treeRun:
         self.group_categories = self.config.get('group_categories').strip()
         self.num_random_values = int(self.config.get('num_random_values'))
         self.random = self.num_random_values
-
 
     def run_calcGDR(self):
         """
@@ -154,10 +151,10 @@ class treeRun:
         except Exception as e: 
             print("error with runCalc:\n")
             print(e)
-
     
     def run_calcNZphydists(self):
         """
+        Abb:      calculate non-zero phydists
         Input:    folder with phylgenetic distance files
         Function: calculate total amount of non-zero values for each file in folder
         Return:   pandas dataframe with values for all genes
@@ -195,14 +192,12 @@ class treeRun:
         with open(save_to, 'a', newline='') as f:   # write to file    
             writer = csv.writer(f)
             writer.writerow(all_nz_phydists)
-        
-       
+
     def run_calcTest(self):
         """
         Test function to check functionality of program.
         """
         return 
-
 
     def run_func(self):
         """
@@ -223,7 +218,6 @@ class treeRun:
    
         #logger.info('Session finished successfully: {0}'.format(datetime.now().strftime("%d.%m.%Y_%H.%M")))
 
-#%%
 
 import timeit
 

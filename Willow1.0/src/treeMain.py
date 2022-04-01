@@ -35,12 +35,10 @@ def main(configFilepath=None):
     
     
 if __name__ == '__main__':
-    
-    
+
     #### Bash run
-    main()
-    
-    
+    #main()
+
     #### Run in IDE: 
     # Test job: 
     # configFilepath = 'C:/Users/norab/Master/WillowProject/Willow1.0/jobs/test_GDR_10genes/job_input/main_config.yml'
@@ -58,5 +56,11 @@ if __name__ == '__main__':
     #starttime = timeit.default_timer()
     # main(configFilepath)
     #endtime = timeit.default_timer()
+    
+    # Testrun 25.03.22
+    configFilepath = 'C:/Users/norab/Master/WillowProject/testRuns/testRun25.03/main_config.yml'
+    main(configFilepath)
+
+    # Testrun GDRnull 01.04.2022
 
 

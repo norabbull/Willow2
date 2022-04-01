@@ -73,7 +73,6 @@ class treeMetrics(treeInfo):
             row_start += 1  
                 
         self.group_dists = {'catWithSums': catWithSums, 'catBetSums': catBetSums}
-                                  
 
     def calcMeanGroupDists(self):
         """
@@ -107,8 +106,7 @@ class treeMetrics(treeInfo):
             mean_dists = {key: round(dist_summary[key] / count_summary[key], 6)  # Was 8 
                           for key, val in dist_summary.items() if count_summary[key]}
           
-            self.mean_group_dists[cat] = mean_dists
-         
+            self.mean_group_dists[cat] = mean_dist
         
     def calcGDR(self):
         """
@@ -145,7 +143,6 @@ class treeMetrics(treeInfo):
         
         self.nz_phydists = nonZeroCount / num_entries
         
-        
     def getGroupDists(self): 
         if not self.group_dists: self.calcGroupDists()
         return self.group_dists
@@ -163,11 +160,8 @@ class treeMetrics(treeInfo):
         return self.nz_phydists
 
 
-#%% TEST
-
-import timeit
-
 if __name__ == '__main__':
+    pass
     # Test with simple case
     
     # # Test files
@@ -192,4 +186,3 @@ if __name__ == '__main__':
     # test_tree.calcGDR()    
     
     # GDRss = test_tree.getGDRs()
-    
